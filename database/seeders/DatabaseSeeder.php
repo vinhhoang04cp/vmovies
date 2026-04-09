@@ -13,11 +13,11 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $this->call([
+            UserSeeder::class,    // 1. Users trước
+            GenreSeeder::class,   // 2. Thể loại
+            CountrySeeder::class, // 3. Quốc gia
+            MovieSeeder::class,   // 4. Phim + Episodes + Ratings + Comments (dùng Users/Genres/Countries)
         ]);
     }
 }

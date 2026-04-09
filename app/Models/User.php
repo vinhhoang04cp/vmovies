@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -21,6 +22,9 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'avatar_url',
+        'is_admin',
+        'status',
     ];
 
     /**
@@ -42,7 +46,46 @@ class User extends Authenticatable
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'password'          => 'hashed',
+            'is_admin'          => 'boolean',
         ];
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->is_admin === true;
+    }
+
+    public function isBanned(): bool
+    {
+        return $this->status === 'banned';
+    }
+
+    // Relationships
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    public function ratings(): HasMany
+    {
+        return $this->hasMany(Rating::class);
+    }
+
+    public function bookmarks(): HasMany
+    {
+        return $this->hasMany(Bookmark::class);
+    }
+
+    public function watchHistory(): HasMany
+    {
+        return $this->hasMany(WatchHistory::class);
+    }
+
+    public function bookmarkedMovies()
+    {
+        return $this->belongsToMany(Movie::class, 'bookmarks')
+                    ->withPivot('bookmarked_at')
+                    ->orderByPivot('bookmarked_at', 'desc');
     }
 }
