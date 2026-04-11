@@ -6,7 +6,7 @@ Hệ thống xác thực và phân quyền VMovies API sử dụng **Laravel San
 
 ---
 
-## 📚 Cấu Trúc RBAC
+## Cấu Trúc RBAC
 
 ### Roles (Vai trò)
 
@@ -89,7 +89,7 @@ DASHBOARD:
 
 ---
 
-## 🔑 API Endpoints
+## API Endpoints
 
 ### 1. Login
 **POST** `/api/auth/login`
@@ -438,7 +438,7 @@ $user->role->permissions                        // Collection of permissions
 
 ---
 
-## 🚀 Testing với Postman
+## Testing với Postman
 
 1. Import file `postman_collections/VMovies_Auth_API.json` vào Postman
 2. Đặt biến `base_url` = `http://localhost:8000`
@@ -448,7 +448,7 @@ $user->role->permissions                        // Collection of permissions
 
 ---
 
-## 📌 Lưu Ý Quan Trọng
+## Lưu Ý Quan Trọng
 
 1. **Token Security**: Token được lưu trong database, được hủy khi logout
 2. **Token Expiration**: Hiện tại không có thời gian hết hạn (có thể cấu hình)
@@ -458,7 +458,7 @@ $user->role->permissions                        // Collection of permissions
 
 ---
 
-## 📦 Installation & Setup
+## Installation & Setup
 
 ```bash
 # 1. Cài đặt dependencies
@@ -486,6 +486,4 @@ php artisan serve
 ```
 
 ---
-
-**Last Updated**: 10/04/2026
 

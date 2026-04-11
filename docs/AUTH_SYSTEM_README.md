@@ -1,23 +1,21 @@
-# 🔐 VMovies Authentication & Authorization System
-
-## 📝 Tổng Quan
+## Tổng Quan
 
 Hệ thống xác thực và phân quyền đầy đủ được xây dựng với **Laravel Sanctum** và mô hình **RBAC (Role-Based Access Control)**. Kiến trúc sạch (Clean Architecture) với separation of concerns rõ ràng.
 
 ### Tính Năng
 
-✅ Authentication với Sanctum tokens  
-✅ RBAC với Roles & Permissions  
-✅ 4 roles mặc định: Admin, Editor, Moderator, User  
-✅ 30+ permissions chi tiết  
-✅ Custom Exceptions & Error Handling  
-✅ JSON Response chuẩn  
-✅ Middleware cho authorization  
-✅ Unit & Feature Tests  
+ Authentication với Sanctum tokens  
+ RBAC với Roles & Permissions  
+ 4 roles mặc định: Admin, Editor, Moderator, User  
+ 30+ permissions chi tiết  
+ Custom Exceptions & Error Handling  
+ JSON Response chuẩn  
+ Middleware cho authorization  
+ Unit & Feature Tests  
 
 ---
 
-## 🏗️ Cấu Trúc Dự Án
+## Cấu Trúc Dự Án
 
 ```
 app/
@@ -82,7 +80,7 @@ docs/
 
 ---
 
-## 🚀 Cài Đặt & Setup
+## Cài Đặt & Setup
 
 ### 1. Chuẩn Bị
 
@@ -148,7 +146,7 @@ Server sẽ chạy tại: `http://localhost:8000`
 
 ---
 
-## 🔑 API Endpoints
+## API Endpoints
 
 ### Public Endpoints
 
@@ -167,7 +165,7 @@ POST   /api/auth/logout         # Đăng xuất
 
 ---
 
-## 📖 Hướng Dẫn Sử Dụng
+## Hướng Dẫn Sử Dụng
 
 ### Login
 
@@ -228,7 +226,7 @@ curl -X POST http://localhost:8000/api/auth/logout \
 
 ---
 
-## 🛡️ Authorization & Middleware
+## Authorization & Middleware
 
 ### Middleware Có Sẵn
 
@@ -273,7 +271,7 @@ if ($user->isAdmin()) { ... }
 
 ---
 
-## 👥 Test Users
+## Test Users
 
 Sau khi seed database, bạn có thể sử dụng những tài khoản này:
 
@@ -286,7 +284,7 @@ Sau khi seed database, bạn có thể sử dụng những tài khoản này:
 
 ---
 
-## 🧪 Testing
+## Testing
 
 ### Chạy Unit Tests
 
@@ -314,7 +312,7 @@ php artisan test --coverage
 
 ---
 
-## 🛠️ Roles & Permissions
+## Roles & Permissions
 
 ### Admin Role
 
@@ -342,7 +340,7 @@ Có **tất cả** permissions
 
 ---
 
-## 📚 Database Schema
+## Database Schema
 
 ### Users Table (Thêm mới)
 - `role_id` - Foreign key đến roles table
@@ -368,20 +366,20 @@ Có **tất cả** permissions
 
 ---
 
-## 🔒 Security Features
+## Security Features
 
-✅ Password hashing với bcrypt  
-✅ Token-based authentication  
-✅ RBAC authorization  
-✅ Permission checking  
-✅ Rate limiting (configurable)  
-✅ CORS support  
-✅ Exception handling  
-✅ Validation rules  
+ Password hashing với bcrypt  
+ Token-based authentication  
+ RBAC authorization  
+ Permission checking  
+ Rate limiting (configurable)  
+ CORS support  
+ Exception handling  
+ Validation rules  
 
 ---
 
-## 📝 Error Handling
+## Error Handling
 
 ### Exception Classes
 
@@ -403,7 +401,7 @@ Có **tất cả** permissions
 
 ---
 
-## 🔄 Clean Architecture Pattern
+## Clean Architecture Pattern
 
 ### Layers
 
@@ -425,7 +423,7 @@ Có **tất cả** permissions
 
 ---
 
-## 📞 Support & Documentation
+## Support & Documentation
 
 - Full API Documentation: `docs/API_AUTHENTICATION.md`
 - Postman Collection: `postman_collections/VMovies_Auth_API.json`

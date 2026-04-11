@@ -1,8 +1,6 @@
-# 📊 Phân tích & Thiết kế Database - VMovies
+# Phân tích & Thiết kế Database - VMovies
 
----
-
-## 🎯 Tổng quan
+## Tổng quan
 
 Dựa trên README, hệ thống VMovies cần một database quan hệ (RDBMS) để lưu trữ:
 - Thông tin người dùng (User), vai trò (Role)
@@ -14,9 +12,9 @@ Dựa trên README, hệ thống VMovies cần một database quan hệ (RDBMS) 
 
 ---
 
-## 📋 Danh sách các bảng (Tables)
+## Danh sách các bảng (Tables)
 
-### 1️⃣ **users** - Quản lý người dùng
+### Quản lý người dùng
 ```
 id (PK)
 name
@@ -29,7 +27,7 @@ created_at
 updated_at
 ```
 
-### 2️⃣ **movies** - Quản lý phim
+### Quản lý phim
 ```
 id (PK)
 title (tên phim Việt)
@@ -47,7 +45,7 @@ created_at
 updated_at
 ```
 
-### 3️⃣ **episodes** - Quản lý tập phim
+### Quản lý tập phim
 ```
 id (PK)
 movie_id (FK)
@@ -61,7 +59,7 @@ created_at
 updated_at
 ```
 
-### 4️⃣ **genres** - Thể loại
+### Thể loại
 ```
 id (PK)
 name (tên thể loại)
@@ -72,7 +70,7 @@ created_at
 updated_at
 ```
 
-### 5️⃣ **countries** - Quốc gia
+### Quốc gia
 ```
 id (PK)
 name (tên quốc gia)
@@ -82,7 +80,7 @@ created_at
 updated_at
 ```
 
-### 6️⃣ **directors** - Đạo diễn
+### Đạo diễn
 ```
 id (PK)
 name (tên đạo diễn)
@@ -92,7 +90,7 @@ created_at
 updated_at
 ```
 
-### 7️⃣ **actors** - Diễn viên
+### Diễn viên
 ```
 id (PK)
 name (tên diễn viên)
@@ -102,7 +100,7 @@ created_at
 updated_at
 ```
 
-### 8️⃣ **comments** - Bình luận
+### Bình luận
 ```
 id (PK)
 user_id (FK)
@@ -115,7 +113,7 @@ created_at
 updated_at
 ```
 
-### 9️⃣ **ratings** - Đánh giá phim
+### Đánh giá phim
 ```
 id (PK)
 user_id (FK)
@@ -127,7 +125,7 @@ created_at
 updated_at
 ```
 
-### 🔟 **bookmarks** - Tủ phim yêu thích
+### Tủ phim yêu thích
 ```
 id (PK)
 user_id (FK)
@@ -136,7 +134,7 @@ bookmarked_at (ngày lưu)
 UNIQUE(user_id, movie_id)
 ```
 
-### 1️⃣1️⃣ **watch_history** - Lịch sử xem
+### Lịch sử xem
 ```
 id (PK)
 user_id (FK)
@@ -151,19 +149,19 @@ UNIQUE(user_id, episode_id)
 
 ---
 
-## 🔗 Quan hệ (Relationships)
+## Quan hệ (Relationships)
 
 ### Many-to-Many (M-N)
 
-#### **movie_genre** (Phim - Thể loại)
+#### (Phim - Thể loại)
 ```
 id (PK)
 movie_id (FK → movies)
 genre_id (FK → genres)
 created_at
 UNIQUE(movie_id, genre_id)
-```
-🎯 **Mục đích**: Một phim có nhiều thể loại, một thể loại có nhiều phim.
+``` 
+**Mục đích**: Một phim có nhiều thể loại, một thể loại có nhiều phim.
 
 #### **movie_country** (Phim - Quốc gia)
 ```
@@ -173,9 +171,9 @@ country_id (FK → countries)
 created_at
 UNIQUE(movie_id, country_id)
 ```
-🎯 **Mục đích**: Một phim được sản xuất ở nhiều quốc gia, một quốc gia có nhiều phim.
+**Mục đích**: Một phim được sản xuất ở nhiều quốc gia, một quốc gia có nhiều phim.
 
-#### **movie_director** (Phim - Đạo diễn)
+#### (Phim - Đạo diễn)
 ```
 id (PK)
 movie_id (FK → movies)
@@ -183,9 +181,9 @@ director_id (FK → directors)
 created_at
 UNIQUE(movie_id, director_id)
 ```
-🎯 **Mục đích**: Một phim có nhiều đạo diễn, một đạo diễn làm nhiều phim.
+**Mục đích**: Một phim có nhiều đạo diễn, một đạo diễn làm nhiều phim.
 
-#### **movie_actor** (Phim - Diễn viên)
+#### (Phim - Diễn viên)
 ```
 id (PK)
 movie_id (FK → movies)
@@ -194,11 +192,11 @@ role_name (vai diễn - nullable)
 created_at
 UNIQUE(movie_id, actor_id)
 ```
-🎯 **Mục đích**: Một phim có nhiều diễn viên, một diễn viên đóng nhiều phim.
+**Mục đích**: Một phim có nhiều diễn viên, một diễn viên đóng nhiều phim.
 
 ---
 
-## 📐 Sơ đồ Quan hệ (Entity-Relationship Diagram)
+## Sơ đồ Quan hệ (Entity-Relationship Diagram)
 
 ```
 ┌──────────────┐
@@ -271,7 +269,7 @@ UNIQUE(movie_id, actor_id)
 
 ---
 
-## 🔑 Các chỉ mục (Indexes)
+## Các chỉ mục (Indexes)
 
 Để tối ưu tốc độ truy vấn, cần tạo các chỉ mục:
 
@@ -304,7 +302,7 @@ CREATE INDEX idx_watch_history_user_episode ON watch_history(user_id, episode_id
 
 ---
 
-## 🔐 Ràng buộc toàn vẹn (Constraints)
+## Ràng buộc toàn vẹn (Constraints)
 
 1. **Foreign Keys**: Tất cả khóa ngoài phải tham chiếu đến bản ghi tồn tại.
 2. **Unique Constraints**:
@@ -320,7 +318,7 @@ CREATE INDEX idx_watch_history_user_episode ON watch_history(user_id, episode_id
 
 ---
 
-## 📈 Thống kê dữ liệu
+## Thống kê dữ liệu
 
 | Bảng | Mục đích | Ước tính lượng dữ liệu |
 |------|---------|----------------------|
@@ -336,7 +334,7 @@ CREATE INDEX idx_watch_history_user_episode ON watch_history(user_id, episode_id
 
 ---
 
-## 🚀 Optimization Tips
+## Optimization Tips
 
 1. **Partitioning**: Chia bảng `comments`, `ratings`, `watch_history` theo `created_at` hoặc `user_id` vì dữ liệu quá lớn.
 
@@ -352,7 +350,7 @@ CREATE INDEX idx_watch_history_user_episode ON watch_history(user_id, episode_id
 
 ---
 
-## ✅ Checklist Thiết kế
+## Checklist Thiết kế
 
 - [ ] Tạo migration cho tất cả bảng
 - [ ] Tạo Model & Relationship cho mỗi bảng

@@ -1,10 +1,10 @@
-# 🚀 KẾ HOẠCH XÂY DỰNG BACKEND CMS - RESTful API - VMOVIES
+# KẾ HOẠCH XÂY DỰNG BACKEND CMS - RESTful API - VMOVIES
 
 **Thời gian thực hiện: Tuần 2 (10/4/2026 - 16/4/2026)**
 
 ---
 
-## 🎯 MỤC TIÊU
+## MỤC TIÊU
 
 - Xây dựng hệ thống Backend (API) cho Admin CMS theo chuẩn RESTful.
 - Xác thực & phân quyền (Laravel Sanctum + Middleware).
@@ -14,9 +14,9 @@
 
 ---
 
-## 📋 DANH SÁCH ENDPOINTS RESTful API
+## DANH SÁCH ENDPOINTS RESTful API
 
-### 🔐 Xác thực & Phân quyền
+### Xác thực & Phân quyền
 
 ```
 POST   /api/auth/login
@@ -25,7 +25,7 @@ POST   /api/auth/refresh
 GET    /api/auth/me
 ```
 
-### 📽️ Quản lý phim (Movies)
+###️ Quản lý phim (Movies)
 
 ```
 GET    /api/admin/movies
@@ -45,7 +45,7 @@ POST   /api/admin/movies/{id}/actors/{actorId}
 DELETE /api/admin/movies/{id}/actors/{actorId}
 ```
 
-### 📺 Quản lý tập phim (Episodes)
+### Quản lý tập phim (Episodes)
 
 ```
 GET    /api/admin/movies/{movieId}/episodes
@@ -57,7 +57,7 @@ POST   /api/admin/episodes/bulk-create
 PUT    /api/admin/episodes/reorder
 ```
 
-### 🏷️ Quản lý danh mục
+### Quản lý danh mục
 
 ```
 GET    /api/admin/genres
@@ -73,7 +73,7 @@ PUT    /api/admin/countries/{id}
 DELETE /api/admin/countries/{id}
 ```
 
-### 👥 Quản lý nhân sự phim
+### Quản lý nhân sự phim
 
 ```
 GET    /api/admin/directors
@@ -89,7 +89,7 @@ PUT    /api/admin/actors/{id}
 DELETE /api/admin/actors/{id}
 ```
 
-### 👤 Quản lý người dùng
+### Quản lý người dùng
 
 ```
 GET    /api/admin/users
@@ -100,7 +100,7 @@ PATCH  /api/admin/users/{id}/ban
 PATCH  /api/admin/users/{id}/unban
 ```
 
-### 💬 Quản lý bình luận
+### Quản lý bình luận
 
 ```
 GET    /api/admin/comments
@@ -110,7 +110,7 @@ DELETE /api/admin/comments/{id}
 GET    /api/admin/comments/pending
 ```
 
-### 📊 Thống kê & Dashboard
+### Thống kê & Dashboard
 
 ```
 GET    /api/admin/dashboard
@@ -121,7 +121,7 @@ GET    /api/admin/stats/comments
 
 ---
 
-## 🏗️ CẤU TRÚC THƯ MỤC & FILE CẦN TẠO
+## CẤU TRÚC THƯ MỤC & FILE CẦN TẠO
 
 ```
 app/
@@ -175,7 +175,7 @@ config/
 
 ---
 
-## 🔐 XÁC THỰC & PHÂN QUYỀN
+## XÁC THỰC & PHÂN QUYỀN
 
 - Sử dụng Laravel Sanctum (hoặc JWT).
 - Middleware kiểm tra quyền admin cho các route /api/admin/*.
@@ -183,7 +183,7 @@ config/
 
 ---
 
-## 📝 RESPONSE FORMAT CHUẨN
+## RESPONSE FORMAT CHUẨN
 
 **Thành công:**
 ```json
@@ -205,7 +205,7 @@ config/
 
 ---
 
-## 📅 KẾ HOẠCH CHI TIẾT THEO NGÀY
+## KẾ HOẠCH CHI TIẾT THEO NGÀY
 
 ### Ngày 1-2: Xác thực & phân quyền
 - Cài đặt Sanctum/JWT.
@@ -230,7 +230,7 @@ config/
 
 ---
 
-## 🛠️ VALIDATION RULES (TIÊU BIỂU)
+## VALIDATION RULES (TIÊU BIỂU)
 
 - Movie: title, original_title, summary, release_year, type, status, poster, banner, trailer_url, genres, countries, directors, actors.
 - Episode: episode_number, arc_name, title, video_url, duration.
@@ -238,14 +238,14 @@ config/
 
 ---
 
-## 🧪 TESTING & ERROR HANDLING
+## TESTING & ERROR HANDLING
 
 - Tạo Postman collection cho từng nhóm API.
 - Response error rõ ràng, status code chuẩn (200, 201, 400, 401, 403, 404, 409, 422, 500).
 
 ---
 
-## 📌 LƯU Ý QUAN TRỌNG
+## LƯU Ý QUAN TRỌNG
 
 - Xóa nên dùng soft delete.
 - Tất cả list endpoints phải có pagination.
@@ -256,7 +256,7 @@ config/
 
 ---
 
-## 🎯 KẾT QUẢ KỲ VỌNG
+## KẾT QUẢ KỲ VỌNG
 
 - RESTful API hoàn chỉnh cho Admin CMS.
 - Xác thực & phân quyền hoạt động.

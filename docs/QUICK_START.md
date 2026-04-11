@@ -1,4 +1,4 @@
-# 🚀 Hướng Dẫn Chạy VMovies Authentication System
+# Hướng Dẫn Chạy VMovies Authentication System
 
 ## ⚡ Quick Start (5 phút)
 
@@ -44,9 +44,9 @@ curl -X POST http://localhost:8000/api/auth/login \
 
 ---
 
-## 📋 Chi Tiết Các Bước
+## Chi Tiết Các Bước
 
-### 1️⃣ Environment Setup
+### Environment Setup
 
 **File: .env**
 ```env
@@ -60,17 +60,9 @@ DB_USERNAME=root
 DB_PASSWORD=your_password
 ```
 
-### 2️⃣ Database Configuration
+### Configuration
 
-**Có 2 cách chọn:**
-
-#### Option A: SQLite (Dễ, không cần MySQL)
-```env
-DB_CONNECTION=sqlite
-DB_DATABASE=database/database.sqlite
-```
-
-#### Option B: MySQL (Recommended)
+#### MySQL (Recommended)
 ```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -80,7 +72,7 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
-### 3️⃣ Chạy Migrations
+### Chạy Migrations
 
 ```bash
 # Fresh migration (clear database)
@@ -95,7 +87,7 @@ php artisan migrate
 - `2026_04_10_000002_create_permissions_table.php`
 - Các migrations cũ từ Laravel
 
-### 4️⃣ Seed Dữ Liệu
+### Seed Dữ Liệu
 
 ```bash
 # Seed tất cả (roles, permissions, users)
@@ -118,7 +110,7 @@ php artisan db:seed --class=UserSeeder
 
 ---
 
-## 🧪 Testing
+## Testing
 
 ### 1. Test với Postman
 
@@ -179,7 +171,7 @@ php artisan test --coverage
 
 ---
 
-## 📂 Cấu Trúc File Tạo Ra
+## Cấu Trúc File Tạo Ra
 
 ### Controllers
 - `app/Http/Controllers/Auth/AuthController.php` ✅
@@ -240,7 +232,7 @@ php artisan test --coverage
 
 ---
 
-## ❌ Troubleshooting
+## Troubleshooting
 
 ### 1. "SQLSTATE[HY000]: General error"
 
@@ -305,7 +297,7 @@ kill -9 <PID>
 
 ---
 
-## 🎯 Next Steps
+## Next Steps
 
 Sau khi auth system hoạt động, bạn có thể:
 
@@ -317,7 +309,7 @@ Sau khi auth system hoạt động, bạn có thể:
 
 ---
 
-## 📞 Useful Commands
+## Useful Commands
 
 ```bash
 # Database
@@ -352,7 +344,7 @@ php artisan key:generate
 
 ---
 
-## 📖 Documentation
+## Documentation
 
 - **API Reference**: `docs/API_AUTHENTICATION.md`
 - **Auth System Docs**: `AUTH_SYSTEM_README.md`
@@ -361,20 +353,6 @@ php artisan key:generate
 
 ---
 
-## ✅ Checklist - Sau khi Setup
-
-- [ ] Migrations chạy thành công
-- [ ] Dữ liệu được seed vào database
-- [ ] Login API hoạt động
-- [ ] Token được tạo ra
-- [ ] Get current user hoạt động
-- [ ] Logout hoạt động
-- [ ] Tests pass
-- [ ] Postman collection import thành công
-
----
-
 **Ready to test?** → Login tại `http://localhost:8000/api/auth/login` 🚀
 
-Last Updated: 10/04/2026
 
