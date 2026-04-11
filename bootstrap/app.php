@@ -17,6 +17,11 @@ return Application::configure(basePath: dirname(__DIR__))
             \Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets::class,
         ]);
 
+        // Force JSON responses for all /api/* routes
+        $middleware->api(prepend: [
+            \App\Http\Middleware\ForceJsonResponse::class,
+        ]);
+
         // Register custom middleware aliases
         $middleware->alias([
             'admin' => \App\Http\Middleware\IsAdmin::class,
