@@ -114,6 +114,41 @@ class EpisodeController extends Controller
     }
 
     /**
+     * GET /api/admin/episodes/trashed
+     * Danh sách tập phim đã bị xóa mềm.
+     */
+    public function trashed(Request $request): JsonResponse
+    {
+        try {
+            $episodes = $this->episodeService->listTrashed($request->query());
+            return $this->successResponse(
+                EpisodeResource::collection($episodes)->response()->getData(true),
+                'Danh sách tập phim đã xóa.'
+            );
+        } catch (\Exception $e) {
+            Log::error('Admin list trashed episodes error', ['exception' => $e->getMessage()]);
+            return $this->errorResponse('Lỗi khi lấy danh sách tập phim đã xóa.', 500);
+        }
+    }
+
+    /**
+     * POST /api/admin/episodes/{episode}/restore
+     * Khôi phục tập phim đã xóa mềm.
+     */
+    public function restore(int $id): JsonResponse
+    {
+        try {
+            $episode = $this->episodeService->restore($id);
+            return $this->successResponse(new EpisodeResource($episode), 'Khôi phục tập phim thành công.');
+        } catch (ApiException $e) {
+            return $this->notFoundResponse($e->getMessage());
+        } catch (\Exception $e) {
+            Log::error('Admin restore episode error', ['exception' => $e->getMessage()]);
+            return $this->errorResponse('Lỗi khi khôi phục tập phim.', 500);
+        }
+    }
+
+    /**
      * POST /api/admin/episodes/bulk-create
      * Body: { "movie_id": X, "episodes": [...] }
      */

@@ -113,13 +113,14 @@ class EpisodeService
             $this->checkDuplicateEpisodeNumber($episode->movie_id, $data['episode_number'], $episode->id);
         }
 
-        $episode->update(array_filter([
+        // Dùng merge thay vì array_filter để cho phép set field về null (vd: xóa arc_name)
+        $episode->update([
             'episode_number' => $data['episode_number'] ?? $episode->episode_number,
             'arc_name'       => array_key_exists('arc_name', $data) ? $data['arc_name'] : $episode->arc_name,
             'title'          => array_key_exists('title', $data) ? $data['title'] : $episode->title,
             'video_url'      => $data['video_url'] ?? $episode->video_url,
             'duration'       => array_key_exists('duration', $data) ? $data['duration'] : $episode->duration,
-        ], fn($v) => $v !== null));
+        ]);
 
         return $episode->fresh();
     }
@@ -130,6 +131,41 @@ class EpisodeService
     public function delete(Episode $episode): void
     {
         $episode->delete();
+    }
+
+    /**
+     * Lấy danh sách tập phim đã bị xóa mềm (admin only).
+     */
+    public function listTrashed(array $filters = []): LengthAwarePaginator
+    {
+        $perPage = min((int) ($filters['per_page'] ?? 15), 100);
+
+        $query = Episode::onlyTrashed()->with('movie');
+
+        if (!empty($filters['movie_id'])) {
+            $query->where('movie_id', $filters['movie_id']);
+        }
+
+        return $query->orderBy('deleted_at', 'desc')->paginate($perPage);
+    }
+
+    /**
+     * Khôi phục tập phim đã bị xóa mềm.
+     */
+    public function restore(int $id): Episode
+    {
+        $episode = Episode::onlyTrashed()->with('movie')->find($id);
+
+        if (!$episode) {
+            throw new ApiException('Không tìm thấy tập phim đã xóa.', Response::HTTP_NOT_FOUND, 'NOT_FOUND');
+        }
+
+        $episode->restore();
+
+        /** @var Episode $episode */
+        $episode = $episode->fresh(['movie']);
+
+        return $episode;
     }
 
     /**

@@ -73,11 +73,13 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
 
     // ── Episodes (standalone) ───────────────────────────
     Route::prefix('episodes')->group(function () {
+        Route::get('/trashed',      [AdminEpisodeController::class, 'trashed']);
         Route::post('/bulk-create', [AdminEpisodeController::class, 'bulkCreate']);
         Route::put('/reorder',      [AdminEpisodeController::class, 'reorder']);
         Route::get('/{episode}',    [AdminEpisodeController::class, 'show']);
         Route::put('/{episode}',    [AdminEpisodeController::class, 'update']);
         Route::delete('/{episode}', [AdminEpisodeController::class, 'destroy']);
+        Route::post('/{episode}/restore', [AdminEpisodeController::class, 'restore']);
     });
 });
 
