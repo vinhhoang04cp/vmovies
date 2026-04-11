@@ -196,298 +196,134 @@ UNIQUE(movie_id, actor_id)
 
 ---
 
-## Sơ đồ Quan hệ (Entity-Relationship Diagram) - Chi Tiết
-
-### Toàn cảnh hệ thống
+## Sơ đồ Quan hệ (Entity-Relationship Diagram) - Tổng Thể
 
 ```
-╔═══════════════════════════════════════════════════════════════════════════════╗
-║                          VMOVIES DATABASE DIAGRAM                             ║
-╚═══════════════════════════════════════════════════════════════════════════════╝
-
-                    ┌─────────────────────────────────┐
-                    │           USERS                 │
-                    ├─────────────────────────────────┤
-                    │ PK: id (BIGINT)                 │
-                    │ • name (VARCHAR 255)            │
-                    │ • email (VARCHAR 255) UNIQUE    │
-                    │ • password (VARCHAR 255)        │
-                    │ • avatar_url (TEXT, nullable)   │
-                    │ • status (VARCHAR 20)           │
-                    │ • phone (VARCHAR 20, nullable)  │
-                    │ • date_of_birth (DATE, nullable)│
-                    │ • created_at (TIMESTAMP)        │
-                    │ • updated_at (TIMESTAMP)        │
-                    └────────────────┬──────────────────┘
-                                     │ 1:N
-         ┌───────────────────────────┼───────────────────────────┐
-         │                           │                           │
-         │ 1:N                       │ 1:N                       │ 1:N
-         ▼                           ▼                           ▼
-    ┌─────────────┐          ┌──────────────┐          ┌──────────────┐
-    │  COMMENTS   │          │   RATINGS    │          │  BOOKMARKS   │
-    ├─────────────┤          ├──────────────┤          ├──────────────┤
-    │ PK: id      │          │ PK: id       │          │ PK: id       │
-    │ FK: user_id │          │ FK: user_id  │          │ FK: user_id  │
-    │ FK: movie_id│          │ FK: movie_id │          │ FK: movie_id │
-    │ FK: episode_│          │ • score      │          │ • bookmarked_ │
-    │     id (NK) │          │   (TINYINT   │          │   at (TS)     │
-    │ • content   │          │   1-5)       │          │ UNIQUE KEY:  │
-    │ • is_apprvd │          │ • review_txt │          │ (user_movie) │
-    │ • is_delete │          │ • helpful_ct │          │              │
-    │ • created_at          │ • created_at │          │ • created_at │
-    │ • updated_at          │ • updated_at │          │ • updated_at │
-    └─────────────┘          └──────────────┘          └──────────────┘
-         │                           │
-         └─────────────┬─────────────┘
-                       │ 1:N (movie_id)
-                       │
-                       ▼
-                  ┌──────────────┐
-                  │ WATCH_HISTORY│
-                  ├──────────────┤
-                  │ PK: id       │
-                  │ FK: user_id  │
-                  │ FK: movie_id │
-                  │ FK: episode_ │
-                  │     id       │
-                  │ • current_ts │
-                  │   (SECONDS)  │
-                  │ • watched_at │
-                  │ • created_at │
-                  │ • updated_at │
-                  │ UNIQUE KEY:  │
-                  │ (user_epi)   │
-                  └──────────────┘
-```
-
-### Phần quản lý phim và nội dung
-
-```
-                      ┌───────────────────────────┐
-                      │        MOVIES             │
-                      ├───────────────────────────┤
-                      │ PK: id (BIGINT)           │
-                      │ • title (VARCHAR 255)     │
-                      │ • original_title (TEXT)   │
-                      │ • slug (VARCHAR 255)      │
-                      │ • poster_url (TEXT)       │
-                      │ • banner_url (TEXT)       │
-                      │ • trailer_url (TEXT, NK)  │
-                      │ • summary (LONGTEXT)      │
-                      │ • description (TEXT)      │
-                      │ • release_year (YEAR)     │
-                      │ • status (VARCHAR: ongoing│
-                      │         /completed)       │
-                      │ • type (VARCHAR: movie/   │
-                      │         series)           │
-                      │ • view_count (BIGINT)     │
-                      │ • rating_avg (DECIMAL 3,2)
-                      │ • created_at (TIMESTAMP)  │
-                      │ • updated_at (TIMESTAMP)  │
-                      └────────────┬──────────────┘
-                                   │ 1:N
-                                   ▼
-                         ┌──────────────────┐
-                         │    EPISODES      │
-                         ├──────────────────┤
-                         │ PK: id (BIGINT)  │
-                         │ FK: movie_id     │
-                         │ • episode_num    │
-                         │   (SMALLINT)     │
-                         │ • arc_name (TEXT)│
-                         │ • title (VARCHAR)│
-                         │ • description(TX)│
-                         │ • video_url (TXT)│
-                         │ • duration (INT) │
-                         │ • views (BIGINT) │
-                         │ • release_date   │
-                         │ • created_at     │
-                         │ • updated_at     │
-                         └──────────────────┘
+╔════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                                   VMOVIES - COMPLETE ERD DIAGRAM                                      ║
+╚════════════════════════════════════════════════════════════════════════════════════════════════════════╝
 
 
-        ╔════════════════════════════════════════════════════╗
-        ║    MANY-TO-MANY (N:M) RELATIONSHIPS               ║
-        ╚════════════════════════════════════════════════════╝
+                              ┌──────────────────────────────────────┐
+                              │            USERS TABLE               │
+                              ├──────────────────────────────────────┤
+                              │ PK: id (BIGINT)                      │
+                              │ • name (VARCHAR 255)                 │
+                              │ • email (VARCHAR 255) UNIQUE         │
+                              │ • password (VARCHAR 255)             │
+                              │ • avatar_url (TEXT, nullable)        │
+                              │ • status (VARCHAR 20)                │
+                              │ • phone (VARCHAR 20, nullable)       │
+                              │ • date_of_birth (DATE, nullable)     │
+                              │ • created_at (TIMESTAMP)             │
+                              │ • updated_at (TIMESTAMP)             │
+                              └──────────────────────────────────────┘
+                                         ▲        ▲        ▲        ▲
+                      ┌──────────────────┘        │        │        └───────────────────┬─────────────────┐
+                      │                           │        │                           │                 │
+              1:N     │                    1:N   │        │ 1:N                  1:N   │          1:N    │
+      ┌───────────────┴──────┐      ┌────────────┴──────┐  └──────────┐  ┌─────────────┴─────────┐  ┌───┴────────────┐
+      │                      │      │                   │             │  │                       │  │                │
+      ▼                      ▼      ▼                   ▼             ▼  ▼                       ▼  ▼                ▼
+┌────────────────────┐ ┌──────────────────┐ ┌──────────────────┐ ┌───────────────┐ ┌────────────────┐ ┌──────────────────┐
+│     COMMENTS       │ │     RATINGS      │ │    BOOKMARKS     │ │WATCH_HISTORY  │ │ ROLE_USER(N:M) │ │PERSONAL_ACCESS_  │
+├────────────────────┤ ├──────────────────┤ ├──────────────────┤ ├───────────────┤ ├────────────────┤ │    TOKENS        │
+│ PK: id (BIGINT)    │ │ PK: id (BIGINT)  │ │ PK: id (BIGINT)  │ │ PK: id        │ │ PK: id         │ ├──────────────────┤
+│ FK: user_id        │ │ FK: user_id      │ │ FK: user_id      │ │ FK: user_id   │ │ FK: user_id    │ │ PK: id (BIGINT)  │
+│ FK: movie_id       │ │ FK: movie_id     │ │ FK: movie_id     │ │ FK: movie_id  │ │ FK: role_id    │ │ • tokenable_type │
+│ FK: episode_id (NK)│ │ • score (1-5)    │ │ • bookmarked_at  │ │ FK: episode_id│ │ • created_at   │ │ • tokenable_id   │
+│ • content (TEXT)   │ │ • review_text(TX)│ │ UNIQUE:          │ │ • current_ts  │ │ UNIQUE KEY:    │ │ • name (VARCHAR) │
+│ • is_approved (B)  │ │ • helpful_count  │ │   (user_movie)   │ │ • watched_at  │ │   (user_role)  │ │ • token (VCH)    │
+│ • is_deleted (B)   │ │ • created_at (TS)│ │ • created_at(TS) │ │ • created_at  │ │                │ │   UNIQUE         │
+│ • created_at (TS)  │ │ • updated_at (TS)│ │ • updated_at(TS) │ │ • updated_at  │ │                │ │ • abilities(TEXT)│
+│ • updated_at (TS)  │ │                  │ │                  │ │ UNIQUE KEY:  │ │                │ │ • expires_at(TS) │
+└────────────────────┘ └──────────────────┘ └──────────────────┘ │   (user_epi) │ └────────────────┘ │ • created_at(TS) │
+         │                     │                     │             └───────────────┘                   └──────────────────┘
+         │ FK: movie_id        │ FK: movie_id        │ FK: movie_id
+         │                     │                     │
+         └─────────────────────┴─────────────────────┴─────────────────┐
+                                                                       │
+                    ┌──────────────────────────────────────────────────▼──────────────────────────────────────────┐
+                    │                           MOVIES TABLE                                                       │
+                    ├──────────────────────────────────────────────────────────────────────────────────────────────┤
+                    │ PK: id (BIGINT)              • slug (VARCHAR 255)           • view_count (BIGINT)           │
+                    │ • title (VARCHAR 255)        • summary (LONGTEXT)           • rating_avg (DECIMAL 3,2)      │
+                    │ • original_title (TEXT)      • description (TEXT)           • created_at (TIMESTAMP)         │
+                    │ • poster_url (TEXT)          • release_year (YEAR)          • updated_at (TIMESTAMP)         │
+                    │ • banner_url (TEXT)          • status (VARCHAR: ongoing)                                     │
+                    │ • trailer_url (TEXT, NK)     • type (VARCHAR: movie/series)                                  │
+                    └──────────────────────────────────────────────────────────────────────────────────────────────┘
+                      ▲                                                       ▲
+         ┌────────────┴─────────┬──────────────────┬───────────────────┬─────┴──────────────┬──────────────────┐
+         │                      │                  │                   │                    │                  │
+    N:M  │                 N:M  │              N:M  │               N:M  │                N:M │                 │
+         │                      │                  │                   │                    │                  │
+   ┌─────▼──────────┐      ┌────▼─────────┐   ┌───▼─────────┐   ┌──────▼──────┐      ┌──────▼──────┐    ┌───────▼────────┐
+   │ MOVIE_GENRE    │      │MOVIE_COUNTRY │   │MOVIE_ACTOR  │   │MOVIE_DIRECTOR│   │  EPISODES   │    │  ROLES         │
+   │   (Pivot)      │      │   (Pivot)    │   │  (Pivot)    │   │  (Pivot)     │   │             │    │                │
+   ├────────────────┤      ├──────────────┤   ├─────────────┤   ├──────────────┤   ├─────────────┤    ├────────────────┤
+   │ PK: id         │      │ PK: id       │   │ PK: id      │   │ PK: id       │   │ PK: id      │    │ PK: id (INT)   │
+   │ FK: movie_id   │      │ FK: movie_id │   │ FK: movie_id│   │ FK: movie_id │   │ FK: movie_id│    │ • name (VARCHAR)
+   │ FK: genre_id   │      │ FK: country_ │   │ FK: actor_id│   │ FK: director_│   │ • episode_ │    │   UNIQUE       │
+   │ • created_at   │      │      id      │   │ • role_name │   │      id      │   │   num (INT)│    │ • display_name │
+   │ UNIQUE KEY:    │      │ • created_at │   │ • created_at│   │ • created_at │   │ • arc_name │    │ • created_at   │
+   │(movie_genre)   │      │ UNIQUE KEY:  │   │ UNIQUE KEY: │   │ UNIQUE KEY:  │   │ • title    │    │ • updated_at   │
+   └────┬───────────┘      │(movie_cntry) │   │(movie_actor)│   │(movie_direct)   │ • description    │                │
+        │ FK: genre_id     └────┬────────┘   └──────┬──────┘   └────────┬────────┘   │ • video_url     └────────────────┘
+        │                       │                    │                  │            │ • duration(INT)        │
+        │                       │                    │                  │            │ • views(BIGINT)        │
+        ▼                       ▼                    ▼                  ▼            │ • release_date(DATE)   │
+   ┌────────────┐          ┌──────────────┐    ┌────────────┐    ┌──────────────┐   │ • created_at(TS)       │
+   │   GENRES   │          │  COUNTRIES   │    │   ACTORS   │    │  DIRECTORS   │   │ • updated_at(TS)       │
+   ├────────────┤          ├──────────────┤    ├────────────┤    ├──────────────┤   └─────────────┘
+   │ PK: id(INT)│          │ PK: id (INT) │    │ PK: id(INT)│    │ PK: id (INT) │
+   │ • name(VCH)│          │ • name (VCH) │    │ • name(VCH)│    │ • name (VCH) │
+   │ • slug(VCH)│          │ • code(CHAR2)│    │ • bio(TEXT)│    │ • bio(TEXT)  │
+   │ • desc(TEXT           │ • flag_url(TX)    │ • image_url│    │ • image_url  │
+   │ • icon_url(TX)        │ • created_at(TS)  │   (TEXT)   │    │   (TEXT)     │
+   │ • created_at(TS)      │ • updated_at(TS)  │ • created_ │    │ • created_at │
+   │ • updated_at(TS)      └──────────────┘    │   at(TS)   │    │ • updated_at │
+   └────────────┘                              │ • updated_ │    └──────────────┘
+                                               │   at(TS)   │
+                                               └────────────┘
 
-        MOVIES ◄─────N:M─────► GENRES
-        ┌───────────────────────────────┐
-        │      MOVIE_GENRE (Pivot)      │
-        ├───────────────────────────────┤
-        │ PK: id                        │
-        │ FK: movie_id                  │
-        │ FK: genre_id                  │
-        │ • created_at                  │
-        │ UNIQUE KEY: (movie_genre)     │
-        └───────────────────────────────┘
-                    │              ▲
-                    │              │
-                    └──────────────┘
 
-        MOVIES ◄─────N:M─────► COUNTRIES
-        ┌───────────────────────────────┐
-        │    MOVIE_COUNTRY (Pivot)      │
-        ├───────────────────────────────┤
-        │ PK: id                        │
-        │ FK: movie_id                  │
-        │ FK: country_id                │
-        │ • created_at                  │
-        │ UNIQUE KEY: (movie_country)   │
-        └───────────────────────────────┘
-                    │              ▲
-                    │              │
-                    └──────────────┘
+                                        ┌──────────────────────┐
+                                        │  ROLE_PERMISSION     │
+                                        │    (N:M Pivot)       │
+                                        ├──────────────────────┤
+                                        │ PK: id               │
+                                        │ FK: role_id ◄────────┼─────────────┐
+                                        │ FK: permission_id    │             │
+                                        │ • created_at         │             │
+                                        │ UNIQUE KEY:          │             │
+                                        │ (role_permission)    │             │
+                                        └──────────────────────┘             │
+                                                  ▲                          │
+                                                  │                          │
+                                             N:M  │                          │
+                                                  │                          │
+                                        ┌─────────┴──────────┐        ┌──────▼──────────┐
+                                        │    PERMISSIONS     │        │   ROLES (cont)  │
+                                        ├────────────────────┤        │                 │
+                                        │ PK: id (INT)       │        │ (Already shown  │
+                                        │ • name (VARCHAR)   │        │  above)         │
+                                        │   UNIQUE           │        │                 │
+                                        │ • display_name(VCH)│        │ Connected to    │
+                                        │ • created_at (TS)  │        │ USERS via       │
+                                        │ • updated_at (TS)  │        │ ROLE_USER N:M   │
+                                        └────────────────────┘        │ relationship    │
+                                                                      └─────────────────┘
 
-        MOVIES ◄─────N:M─────► DIRECTORS
-        ┌───────────────────────────────┐
-        │    MOVIE_DIRECTOR (Pivot)     │
-        ├───────────────────────────────┤
-        │ PK: id                        │
-        │ FK: movie_id                  │
-        │ FK: director_id               │
-        │ • created_at                  │
-        │ UNIQUE KEY: (movie_director)  │
-        └───────────────────────────────┘
-                    │              ▲
-                    │              │
-                    └──────────────┘
+═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 
-        MOVIES ◄─────N:M─────► ACTORS
-        ┌───────────────────────────────┐
-        │     MOVIE_ACTOR (Pivot)       │
-        ├───────────────────────────────┤
-        │ PK: id                        │
-        │ FK: movie_id                  │
-        │ FK: actor_id                  │
-        │ • role_name (VARCHAR, NK)     │
-        │ • created_at                  │
-        │ UNIQUE KEY: (movie_actor)     │
-        └───────────────────────────────┘
-                    │              ▲
-                    │              │
-                    └──────────────┘
-```
-
-### Bảng tham chiếu (Reference Tables)
-
-```
-┌────────────────────┐  ┌────────────────────┐  ┌────────────────────┐
-│      GENRES        │  │     COUNTRIES      │  │     DIRECTORS      │
-├────────────────────┤  ├────────────────────┤  ├────────────────────┤
-│ PK: id (INT)       │  │ PK: id (INT)       │  │ PK: id (INT)       │
-│ • name (VARCHAR)   │  │ • name (VARCHAR)   │  │ • name (VARCHAR)   │
-│ • slug (VARCHAR)   │  │ • code (CHAR 2)    │  │ • bio (LONGTEXT)   │
-│ • description(TEXT)│  │ • flag_url (TEXT)  │  │ • image_url (TEXT) │
-│ • icon_url (TEXT)  │  │ • created_at (TS)  │  │ • created_at (TS)  │
-│ • created_at (TS)  │  │ • updated_at (TS)  │  │ • updated_at (TS)  │
-│ • updated_at (TS)  │  └────────────────────┘  └────────────────────┘
-└────────────────────┘
-
-┌────────────────────┐  ┌────────────────────┐  ┌────────────────────┐
-│      ACTORS        │  │       ROLES        │  │    PERMISSIONS     │
-├────────────────────┤  ├────────────────────┤  ├────────────────────┤
-│ PK: id (INT)       │  │ PK: id (INT)       │  │ PK: id (INT)       │
-│ • name (VARCHAR)   │  │ • name (VARCHAR)   │  │ • name (VARCHAR)   │
-│ • bio (LONGTEXT)   │  │   UNIQUE           │  │   UNIQUE           │
-│ • image_url (TEXT) │  │ • display_name(VCH)│  │ • display_name(VCH)│
-│ • created_at (TS)  │  │ • created_at (TS)  │  │ • created_at (TS)  │
-│ • updated_at (TS)  │  │ • updated_at (TS)  │  │ • updated_at (TS)  │
-└────────────────────┘  └────────────────────┘  └────────────────────┘
-```
-
-### Hệ thống phân quyền
-
-```
-                    ┌─────────────────────────┐
-                    │        USERS            │
-                    └────────────┬────────────┘
-                                 │ N:M
-                                 │
-                    ┌────────────▼────────────┐
-                    │     ROLE_USER           │
-                    │  (M-N Pivot Table)      │
-                    ├─────────────────────────┤
-                    │ PK: id                  │
-                    │ FK: user_id             │
-                    │ FK: role_id             │
-                    │ • created_at            │
-                    │ UNIQUE(user_role)       │
-                    └────────────┬────────────┘
-                                 │
-                                 │ N:M
-                                 ▼
-                    ┌─────────────────────────┐
-                    │       ROLES             │
-                    ├─────────────────────────┤
-                    │ PK: id (INT)            │
-                    │ • name (VARCHAR)        │
-                    │   UNIQUE                │
-                    │ • display_name (VARCHAR)│
-                    │ • created_at (TS)       │
-                    │ • updated_at (TS)       │
-                    └────────────┬────────────┘
-                                 │ N:M
-                                 │
-                    ┌────────────▼────────────┐
-                    │   ROLE_PERMISSION       │
-                    │  (M-N Pivot Table)      │
-                    ├─────────────────────────┤
-                    │ PK: id                  │
-                    │ FK: role_id             │
-                    │ FK: permission_id       │
-                    │ • created_at            │
-                    │ UNIQUE(role_permission) │
-                    └────────────┬────────────┘
-                                 │
-                                 │ N:M
-                                 ▼
-                    ┌─────────────────────────┐
-                    │     PERMISSIONS         │
-                    ├─────────────────────────┤
-                    │ PK: id (INT)            │
-                    │ • name (VARCHAR)        │
-                    │   UNIQUE                │
-                    │ • display_name (VARCHAR)│
-                    │ • created_at (TS)       │
-                    │ • updated_at (TS)       │
-                    └─────────────────────────┘
-```
-
-### Bảng hỗ trợ API Authentication
-
-```
-┌──────────────────────────────────┐
-│   PERSONAL_ACCESS_TOKENS         │
-├──────────────────────────────────┤
-│ PK: id (BIGINT)                  │
-│ • tokenable_type (VARCHAR)       │
-│   (e.g., "App\Models\User")      │
-│ • tokenable_id (BIGINT)          │
-│   (FK → users.id)                │
-│ • name (VARCHAR)                 │
-│ • token (VARCHAR) UNIQUE         │
-│ • abilities (TEXT - JSON)        │
-│ • last_used_at (TIMESTAMP, NK)   │
-│ • expires_at (TIMESTAMP, NK)     │
-│ • created_at (TIMESTAMP)         │
-│ • updated_at (TIMESTAMP)         │
-└──────────────────────────────────┘
-```
-
-### Chú giải ký hiệu
-
-| Ký hiệu | Ý nghĩa |
-|---------|---------|
-| **PK** | Primary Key (Khóa chính) |
-| **FK** | Foreign Key (Khóa ngoài) |
-| **N:M** | Quan hệ Nhiều-Nhiều (Many-to-Many) |
-| **1:N** | Quan hệ Một-Nhiều (One-to-Many) |
-| **NK** | Nullable Key (Có thể NULL) |
-| **TS** | TIMESTAMP |
-| **VCH** | VARCHAR |
-| **TX** | TEXT |
-| **UNIQUE KEY** | Ràng buộc duy nhất (không được trùng lặp) |
+                                              LEGEND / CHÚ GIẢI
+───────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  PK = Primary Key (Khóa chính)           │   FK = Foreign Key (Khóa ngoài)        │   N:M = Many-to-Many (Nhiều-Nhiều)
+  1:N = One-to-Many (Một-Nhiều)           │   NK = Nullable (Có thể NULL)          │   TS = TIMESTAMP
+  VCH = VARCHAR                           │   TX = TEXT                           │   B = BOOLEAN / TINYINT(1)
+  INT = INTEGER                           │   BIGINT = Big Integer (8 bytes)      │   UNIQUE KEY = Ràng buộc duy nhất
+═════════════════════════════════════════════════════════════════════════════════════════════════════════════════════
 ```
 
 ---
