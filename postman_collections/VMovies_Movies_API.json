@@ -1,0 +1,656 @@
+{
+  "info": {
+    "name": "VMovies Movie API",
+    "description": "RESTful API for VMovies Movie Management",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@vmovies.com\",\n  \"password\": \"password\"\n}"
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/auth/login",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Me",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/auth/me",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "auth", "me"]
+            }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/auth/logout",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "auth", "logout"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Public Movies",
+      "item": [
+        {
+          "name": "List Movies",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/movies?page=1&per_page=10&sort_by=created_at&sort_dir=desc",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "movies"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "per_page",
+                  "value": "10"
+                },
+                {
+                  "key": "sort_by",
+                  "value": "created_at"
+                },
+                {
+                  "key": "sort_dir",
+                  "value": "desc"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Show Movie",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/movies/1",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "movies", "1"]
+            }
+          }
+        },
+        {
+          "name": "List Episodes",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/movies/1/episodes",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "movies", "1", "episodes"]
+            }
+          }
+        },
+        {
+          "name": "Show Episode",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/movies/1/episodes/1",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "movies", "1", "episodes", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Movies",
+      "item": [
+        {
+          "name": "List Movies",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/admin/movies?page=1&per_page=10",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "admin", "movies"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "per_page",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Trashed Movies",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/admin/movies/trashed",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "admin", "movies", "trashed"]
+            }
+          }
+        },
+        {
+          "name": "Create Movie",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"New Anime Series\",\n  \"original_title\": \"Shin Anime\",\n  \"type\": \"series\",\n  \"status\": \"ongoing\",\n  \"summary\": \"A new anime series\",\n  \"release_year\": 2024,\n  \"genres\": [1],\n  \"countries\": [1]\n}"
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/admin/movies",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "admin", "movies"]
+            }
+          }
+        },
+        {
+          "name": "Show Movie",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/admin/movies/1",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "admin", "movies", "1"]
+            }
+          }
+        },
+        {
+          "name": "Update Movie",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"summary\": \"Updated summary\",\n  \"status\": \"completed\"\n}"
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/admin/movies/1",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "admin", "movies", "1"]
+            }
+          }
+        },
+        {
+          "name": "Delete Movie",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/admin/movies/1",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "admin", "movies", "1"]
+            }
+          }
+        },
+        {
+          "name": "Restore Movie",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/admin/movies/1/restore",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "admin", "movies", "1", "restore"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Episodes",
+      "item": [
+        {
+          "name": "List Episodes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/admin/movies/1/episodes",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "admin", "movies", "1", "episodes"]
+            }
+          }
+        },
+        {
+          "name": "Create Episode",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"episode_number\": 1,\n  \"title\": \"Episode Title\",\n  \"video_url\": \"https://example.com/video.mp4\",\n  \"duration\": 1440\n}"
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/admin/movies/1/episodes",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "admin", "movies", "1", "episodes"]
+            }
+          }
+        },
+        {
+          "name": "Bulk Create Episodes",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"movie_id\": 1,\n  \"episodes\": [\n    {\n      \"episode_number\": 10,\n      \"title\": \"Ep 10\",\n      \"video_url\": \"https://example.com/ep10.mp4\",\n      \"duration\": 1440\n    },\n    {\n      \"episode_number\": 11,\n      \"title\": \"Ep 11\",\n      \"video_url\": \"https://example.com/ep11.mp4\",\n      \"duration\": 1440\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/admin/episodes/bulk-create",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "admin", "episodes", "bulk-create"]
+            }
+          }
+        },
+        {
+          "name": "Show Episode",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/admin/episodes/1",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "admin", "episodes", "1"]
+            }
+          }
+        },
+        {
+          "name": "Update Episode",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Episode Title\"\n}"
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/admin/episodes/1",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "admin", "episodes", "1"]
+            }
+          }
+        },
+        {
+          "name": "Delete Episode",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/admin/episodes/1",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "admin", "episodes", "1"]
+            }
+          }
+        },
+        {
+          "name": "Reorder Episodes",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"movie_id\": 1,\n  \"episodes\": [\n    {\"id\": 1, \"episode_number\": 5},\n    {\"id\": 2, \"episode_number\": 3},\n    {\"id\": 3, \"episode_number\": 1}\n  ]\n}"
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/admin/episodes/reorder",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "admin", "episodes", "reorder"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Pivot Operations",
+      "item": [
+        {
+          "name": "Attach Genre to Movie",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/admin/movies/1/genres/1",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "admin", "movies", "1", "genres", "1"]
+            }
+          }
+        },
+        {
+          "name": "Detach Genre from Movie",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/admin/movies/1/genres/1",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "admin", "movies", "1", "genres", "1"]
+            }
+          }
+        },
+        {
+          "name": "Attach Country to Movie",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/admin/movies/1/countries/1",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "admin", "movies", "1", "countries", "1"]
+            }
+          }
+        },
+        {
+          "name": "Detach Country from Movie",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/admin/movies/1/countries/1",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "admin", "movies", "1", "countries", "1"]
+            }
+          }
+        },
+        {
+          "name": "Attach Director to Movie",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/admin/movies/1/directors/1",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "admin", "movies", "1", "directors", "1"]
+            }
+          }
+        },
+        {
+          "name": "Detach Director from Movie",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/admin/movies/1/directors/1",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "admin", "movies", "1", "directors", "1"]
+            }
+          }
+        },
+        {
+          "name": "Attach Actor to Movie",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role_name\": \"Main Character\"\n}"
+            },
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/admin/movies/1/actors/1",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "admin", "movies", "1", "actors", "1"]
+            }
+          }
+        },
+        {
+          "name": "Detach Actor from Movie",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "http://127.0.0.1:8000/api/admin/movies/1/actors/1",
+              "protocol": "http",
+              "host": ["127", "0", "0", "1"],
+              "port": "8000",
+              "path": ["api", "admin", "movies", "1", "actors", "1"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "token",
+      "value": ""
+    }
+  ]
+}
+
