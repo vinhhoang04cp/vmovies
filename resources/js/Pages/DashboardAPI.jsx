@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/Context/AuthContext';
 import { apiClient } from '@/Services/apiClient';
 
@@ -195,6 +195,50 @@ export default function DashboardAPI() {
                         </div>
                     </div>
                 ) : null}
+
+                {/* Admin Menu */}
+                {user && (
+                    <div className="mt-8 rounded-lg bg-white p-6 shadow">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Admin Management</h3>
+                        <div className="grid gap-3 md:grid-cols-4">
+                            <Link to="/movies" className="p-4 border border-gray-200 rounded hover:bg-blue-50 hover:border-blue-500 transition">
+                                <div className="text-2xl mb-2">🎬</div>
+                                <p className="font-semibold text-gray-900">Quản lý phim</p>
+                                <p className="text-sm text-gray-600">CRUD phim, series</p>
+                            </Link>
+                            <Link to="/genres" className="p-4 border border-gray-200 rounded hover:bg-blue-50 hover:border-blue-500 transition">
+                                <div className="text-2xl mb-2">🏷️</div>
+                                <p className="font-semibold text-gray-900">Thể loại</p>
+                                <p className="text-sm text-gray-600">Quản lý thể loại phim</p>
+                            </Link>
+                            <Link to="/countries" className="p-4 border border-gray-200 rounded hover:bg-blue-50 hover:border-blue-500 transition">
+                                <div className="text-2xl mb-2">🌍</div>
+                                <p className="font-semibold text-gray-900">Quốc gia</p>
+                                <p className="text-sm text-gray-600">Quản lý quốc gia</p>
+                            </Link>
+                            <Link to="/directors" className="p-4 border border-gray-200 rounded hover:bg-blue-50 hover:border-blue-500 transition">
+                                <div className="text-2xl mb-2">🎥</div>
+                                <p className="font-semibold text-gray-900">Đạo diễn</p>
+                                <p className="text-sm text-gray-600">Quản lý đạo diễn</p>
+                            </Link>
+                            <Link to="/actors" className="p-4 border border-gray-200 rounded hover:bg-blue-50 hover:border-blue-500 transition">
+                                <div className="text-2xl mb-2">👤</div>
+                                <p className="font-semibold text-gray-900">Diễn viên</p>
+                                <p className="text-sm text-gray-600">Quản lý diễn viên</p>
+                            </Link>
+                            <Link to="/users" className="p-4 border border-gray-200 rounded hover:bg-blue-50 hover:border-blue-500 transition">
+                                <div className="text-2xl mb-2">👥</div>
+                                <p className="font-semibold text-gray-900">Người dùng</p>
+                                <p className="text-sm text-gray-600">Quản lý tài khoản</p>
+                            </Link>
+                            <Link to="/comments" className="p-4 border border-gray-200 rounded hover:bg-blue-50 hover:border-blue-500 transition">
+                                <div className="text-2xl mb-2">💬</div>
+                                <p className="font-semibold text-gray-900">Bình luận</p>
+                                <p className="text-sm text-gray-600">Duyệt bình luận</p>
+                            </Link>
+                        </div>
+                    </div>
+                )}
 
                 {/* Pending Actions */}
                 {stats?.pending_actions && (

@@ -5,10 +5,24 @@ import { AuthProvider } from '@/Context/AuthContext';
 import { ProtectedRoute, PublicRoute } from '@/Context/ProtectedRoute';
 import { createRoot } from 'react-dom/client';
 
-// Pages
+// Auth Pages
 import LoginAPI from '@/Pages/Auth/LoginAPI';
 import RegisterAPI from '@/Pages/Auth/RegisterAPI';
+
+// Dashboard
 import DashboardAPI from '@/Pages/DashboardAPI';
+
+// Admin Pages
+import MovieManagement from '@/Pages/Admin/MovieManagement';
+import GenreManagement from '@/Pages/Admin/GenreManagement';
+import CountryManagement from '@/Pages/Admin/CountryManagement';
+import DirectorManagement from '@/Pages/Admin/DirectorManagement';
+import ActorManagement from '@/Pages/Admin/ActorManagement';
+import UserManagement from '@/Pages/Admin/UserManagement';
+import CommentManagement from '@/Pages/Admin/CommentManagement';
+
+// Layout
+import AdminLayout from '@/Layouts/AdminLayout';
 
 function App() {
     return (
@@ -33,12 +47,84 @@ function App() {
                         }
                     />
 
-                    {/* Protected routes */}
+                    {/* Protected routes - Dashboard */}
                     <Route
                         path="/dashboard"
                         element={
                             <ProtectedRoute>
                                 <DashboardAPI />
+                            </ProtectedRoute>
+                        }
+                    />
+
+                    {/* Admin routes with sidebar */}
+                    <Route
+                        path="/movies"
+                        element={
+                            <ProtectedRoute>
+                                <AdminLayout>
+                                    <MovieManagement />
+                                </AdminLayout>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/genres"
+                        element={
+                            <ProtectedRoute>
+                                <AdminLayout>
+                                    <GenreManagement />
+                                </AdminLayout>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/countries"
+                        element={
+                            <ProtectedRoute>
+                                <AdminLayout>
+                                    <CountryManagement />
+                                </AdminLayout>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/directors"
+                        element={
+                            <ProtectedRoute>
+                                <AdminLayout>
+                                    <DirectorManagement />
+                                </AdminLayout>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/actors"
+                        element={
+                            <ProtectedRoute>
+                                <AdminLayout>
+                                    <ActorManagement />
+                                </AdminLayout>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/users"
+                        element={
+                            <ProtectedRoute>
+                                <AdminLayout>
+                                    <UserManagement />
+                                </AdminLayout>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/comments"
+                        element={
+                            <ProtectedRoute>
+                                <AdminLayout>
+                                    <CommentManagement />
+                                </AdminLayout>
                             </ProtectedRoute>
                         }
                     />
