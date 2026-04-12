@@ -33,6 +33,39 @@ export const apiClient = {
         }
     },
 
+    async requestMultipart(endpoint, formData, options = {}) {
+        const url = `${API_URL}${endpoint}`;
+        const token = localStorage.getItem('auth_token');
+
+        const headers = {
+            'Accept': 'application/json',
+            ...options.headers,
+        };
+
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        try {
+            const response = await fetch(url, {
+                ...options,
+                method: options.method || 'POST',
+                headers,
+                body: formData,
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || `API Error: ${response.status}`);
+            }
+
+            return { success: true, data };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    },
+
     get(endpoint, options) {
         return this.request(endpoint, { ...options, method: 'GET' });
     },
@@ -63,6 +96,20 @@ export const apiClient = {
 
     delete(endpoint, options) {
         return this.request(endpoint, { ...options, method: 'DELETE' });
+    },
+
+    postMultipart(endpoint, formData, options) {
+        return this.requestMultipart(endpoint, formData, {
+            ...options,
+            method: 'POST',
+        });
+    },
+
+    putMultipart(endpoint, formData, options) {
+        return this.requestMultipart(endpoint, formData, {
+            ...options,
+            method: 'PUT',
+        });
     },
 };
 

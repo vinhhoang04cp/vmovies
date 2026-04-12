@@ -12,6 +12,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 class EpisodeService
 {
+    public function __construct(
+        private FileUploadService $fileUploadService = new FileUploadService()
+    ) {}
     /**
      * Lấy danh sách tập phim của một bộ phim.
      */
@@ -45,15 +48,46 @@ class EpisodeService
     {
         $this->checkDuplicateEpisodeNumber($movie->id, $data['episode_number']);
 
-        return Episode::create([
+        // Handle video file upload if provided
+        $videoUrl = $data['video_url'] ?? null;
+
+        // Debug logging
+        \Log::info('Episode create request', [
+            'has_video_file' => !empty($data['video_file']),
+            'video_file_type' => $data['video_file'] ? get_class($data['video_file']) : null,
+            'video_url' => $videoUrl,
+        ]);
+
+        // Tạo episode tạm thời để có ID cho upload
+        $episode = Episode::create([
             'movie_id'       => $movie->id,
             'episode_number' => $data['episode_number'],
             'arc_name'       => $data['arc_name'] ?? null,
             'title'          => $data['title'] ?? null,
-            'video_url'      => $data['video_url'],
-            'duration'       => $data['duration'] ?? null,
+            'video_url'      => 'processing', // temporary value
+            'duration'       => isset($data['duration']) && $data['duration'] !== null ? (int)$data['duration'] : 0,
             'views'          => 0,
         ]);
+
+        // Upload video file if provided
+        if (!empty($data['video_file'])) {
+            \Log::info('Uploading video file', ['episode_id' => $episode->id]);
+            try {
+                $videoUrl = $this->fileUploadService->uploadVideo($data['video_file'], (string)$episode->id);
+                \Log::info('Video uploaded successfully', ['url' => $videoUrl]);
+                $episode->update(['video_url' => $videoUrl]);
+            } catch (\Exception $e) {
+                \Log::error('Video upload failed', ['error' => $e->getMessage()]);
+                throw $e;
+            }
+        } elseif (!empty($videoUrl) && $videoUrl !== 'pending') {
+            \Log::info('Using provided video URL', ['url' => $videoUrl]);
+            $episode->update(['video_url' => $videoUrl]);
+        } else {
+            \Log::warning('No video URL or file provided');
+        }
+
+        return $episode->fresh();
     }
 
     /**
@@ -95,7 +129,7 @@ class EpisodeService
                     'arc_name'       => $epData['arc_name'] ?? null,
                     'title'          => $epData['title'] ?? null,
                     'video_url'      => $epData['video_url'],
-                    'duration'       => $epData['duration'] ?? null,
+                    'duration'       => isset($epData['duration']) && $epData['duration'] !== null ? (int)$epData['duration'] : 0,
                     'views'          => 0,
                 ]);
             }
@@ -113,14 +147,30 @@ class EpisodeService
             $this->checkDuplicateEpisodeNumber($episode->movie_id, $data['episode_number'], $episode->id);
         }
 
-        // Dùng merge thay vì array_filter để cho phép set field về null (vd: xóa arc_name)
-        $episode->update([
+        // Handle video file upload if provided
+        $newDuration = array_key_exists('duration', $data) ? $data['duration'] : $episode->duration;
+        $updateData = [
             'episode_number' => $data['episode_number'] ?? $episode->episode_number,
             'arc_name'       => array_key_exists('arc_name', $data) ? $data['arc_name'] : $episode->arc_name,
             'title'          => array_key_exists('title', $data) ? $data['title'] : $episode->title,
-            'video_url'      => $data['video_url'] ?? $episode->video_url,
-            'duration'       => array_key_exists('duration', $data) ? $data['duration'] : $episode->duration,
-        ]);
+            'video_url'      => $episode->video_url, // Start with existing, will update if file uploaded
+            'duration'       => ($newDuration !== null) ? (int)$newDuration : $episode->duration ?? 0,
+        ];
+
+        // Upload new video file if provided (PRIORITY over video_url)
+        if (!empty($data['video_file'])) {
+            // Delete old video if exists and is local
+            if ($episode->video_url && strpos($episode->video_url, '/storage/') !== false) {
+                $this->fileUploadService->deleteVideo($episode->video_url);
+            }
+
+            $updateData['video_url'] = $this->fileUploadService->uploadVideo($data['video_file'], (string)$episode->id);
+        } elseif (!empty($data['video_url'])) {
+            // Only use URL if no file is provided
+            $updateData['video_url'] = $data['video_url'];
+        }
+
+        $episode->update($updateData);
 
         return $episode->fresh();
     }
@@ -130,6 +180,11 @@ class EpisodeService
      */
     public function delete(Episode $episode): void
     {
+        // Delete video file if exists and is local
+        if ($episode->video_url && strpos($episode->video_url, '/storage/') !== false) {
+            $this->fileUploadService->deleteVideo($episode->video_url);
+        }
+
         $episode->delete();
     }
 

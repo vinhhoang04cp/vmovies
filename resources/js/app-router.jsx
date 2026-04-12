@@ -20,6 +20,7 @@ import DirectorManagement from '@/Pages/Admin/DirectorManagement';
 import ActorManagement from '@/Pages/Admin/ActorManagement';
 import UserManagement from '@/Pages/Admin/UserManagement';
 import CommentManagement from '@/Pages/Admin/CommentManagement';
+import EpisodeManagement from '@/Pages/Admin/EpisodeManagement';
 
 // Layout
 import AdminLayout from '@/Layouts/AdminLayout';
@@ -64,6 +65,16 @@ function App() {
                             <ProtectedRoute>
                                 <AdminLayout>
                                     <MovieManagement />
+                                </AdminLayout>
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/movies/:movieId/episodes"
+                        element={
+                            <ProtectedRoute>
+                                <AdminLayout>
+                                    <EpisodeManagement />
                                 </AdminLayout>
                             </ProtectedRoute>
                         }

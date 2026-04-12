@@ -20,6 +20,8 @@ export default function AdminSidebar() {
         { path: '/comments', label: 'Bình luận', icon: '💬' },
     ];
 
+    const isActiveEpisode = location.pathname.match(/^\/movies\/\d+\/episodes/);
+
     return (
         <div className="flex h-screen bg-gray-100">
             {/* Sidebar */}
@@ -56,6 +58,16 @@ export default function AdminSidebar() {
                             {isOpen && <span>{item.label}</span>}
                         </Link>
                     ))}
+                    {/* Dynamic: Quản lý tập phim - hiện khi đang ở trang episodes */}
+                    {isActiveEpisode && (
+                        <div
+                            className="flex items-center gap-3 px-4 py-3 rounded bg-green-600 text-white"
+                            title={isOpen ? '' : 'Quản lý tập phim'}
+                        >
+                            <span className="text-xl">📺</span>
+                            {isOpen && <span>Quản lý tập phim</span>}
+                        </div>
+                    )}
                 </nav>
 
                 {/* User Info & Logout */}

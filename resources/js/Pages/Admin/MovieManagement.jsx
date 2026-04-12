@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { movieApi } from '@/Services/movieApi';
 import { genreApi } from '@/Services/genreApi';
 import { countryApi } from '@/Services/countryApi';
@@ -30,6 +31,8 @@ export default function MovieManagement() {
             deleteItem,
             setError,
         } = useResourceManagement(movieApi);
+
+    const navigate = useNavigate();
 
     const [showModal, setShowModal] = useState(false);
     const [editingId, setEditingId] = useState(null);
@@ -309,6 +312,12 @@ export default function MovieManagement() {
                                 sortDir={sortDir}
                                 rowAction={(row) => (
                                     <div className="flex gap-2 justify-center">
+                                        <button
+                                            onClick={() => navigate(`/movies/${row.id}/episodes`)}
+                                            className="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition"
+                                        >
+                                            Tập phim
+                                        </button>
                                         <button
                                             onClick={() => handleEdit(row)}
                                             className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition"

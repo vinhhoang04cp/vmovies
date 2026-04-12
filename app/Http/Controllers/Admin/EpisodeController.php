@@ -53,13 +53,25 @@ class EpisodeController extends Controller
     {
         try {
             $movie   = $this->movieService->findOrFail($movieId);
-            $episode = $this->episodeService->create($movie, $request->validated());
+            $data = $request->validated();
+
+            // Pass uploaded file if exists
+            if ($request->hasFile('video_file')) {
+                $data['video_file'] = $request->file('video_file');
+            }
+
+            $episode = $this->episodeService->create($movie, $data);
             return $this->createdResponse(new EpisodeResource($episode), 'Tạo tập phim thành công.');
         } catch (ApiException $e) {
             return $e->render($request);
-        } catch (\Exception $e) {
-            Log::error('Admin store episode error', ['exception' => $e->getMessage()]);
-            return $this->errorResponse('Lỗi khi tạo tập phim.', 500);
+        } catch (\Throwable $e) {
+            Log::error('Admin store episode error', [
+                'exception' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+            $message = config('app.debug') ? $e->getMessage() : 'Lỗi khi tạo tập phim.';
+            return $this->errorResponse($message, 500);
         }
     }
 
@@ -86,13 +98,25 @@ class EpisodeController extends Controller
     {
         try {
             $episode = $this->episodeService->findOrFail($id);
-            $episode = $this->episodeService->update($episode, $request->validated());
+            $data = $request->validated();
+
+            // Pass uploaded file if exists
+            if ($request->hasFile('video_file')) {
+                $data['video_file'] = $request->file('video_file');
+            }
+
+            $episode = $this->episodeService->update($episode, $data);
             return $this->successResponse(new EpisodeResource($episode), 'Cập nhật tập phim thành công.');
         } catch (ApiException $e) {
             return $e->render($request);
-        } catch (\Exception $e) {
-            Log::error('Admin update episode error', ['exception' => $e->getMessage()]);
-            return $this->errorResponse('Lỗi khi cập nhật tập phim.', 500);
+        } catch (\Throwable $e) {
+            Log::error('Admin update episode error', [
+                'exception' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+            ]);
+            $message = config('app.debug') ? $e->getMessage() : 'Lỗi khi cập nhật tập phim.';
+            return $this->errorResponse($message, 500);
         }
     }
 
