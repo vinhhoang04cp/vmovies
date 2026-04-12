@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\DirectorController as AdminDirectorController;
 use App\Http\Controllers\Admin\ActorController as AdminActorController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Admin\CommentController as AdminCommentController;
+use App\Http\Controllers\Admin\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 // ═══════════════════════════════════════════════════════
@@ -139,6 +140,14 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
         Route::get('/{comment}',              [AdminCommentController::class, 'show']);
         Route::patch('/{comment}/approve',    [AdminCommentController::class, 'approve']);
         Route::delete('/{comment}',           [AdminCommentController::class, 'destroy']);
+    });
+
+    // ── Dashboard & Stats ─────────────────────────────────
+    Route::get('dashboard',        [DashboardController::class, 'index']);
+    Route::prefix('stats')->group(function () {
+        Route::get('movies',   [DashboardController::class, 'movieStats']);
+        Route::get('users',    [DashboardController::class, 'userStats']);
+        Route::get('comments', [DashboardController::class, 'commentStats']);
     });
 });
 
