@@ -11,6 +11,7 @@ class Director extends Model
 {
     use HasFactory, SoftDeletes;
 
+    // cac truong co the duoc gan gia tri khi tao moi hoac cap nhat
     protected $fillable = ['name', 'bio', 'image_url'];
 
     public function movies(): BelongsToMany

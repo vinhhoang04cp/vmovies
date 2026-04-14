@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Genre extends Model
 {
     use HasFactory, SoftDeletes;
+    // cac truong co the duoc gan gia tri khi tao moi hoac cap nhat
 
     protected $fillable = ['name', 'slug', 'description', 'icon_url'];
 

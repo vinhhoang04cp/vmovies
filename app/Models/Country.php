@@ -9,8 +9,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Country extends Model
 {
+    
     use HasFactory, SoftDeletes;
-
+    
+    // cac truong co the duoc gan gia tri khi tao moi hoac cap nhat
     protected $fillable = ['name', 'code', 'flag_url'];
 
     public function movies(): BelongsToMany
