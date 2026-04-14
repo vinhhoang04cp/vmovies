@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 class DirectorService
 {
     /**
-     * Danh sách đạo diễn với pagination + filter.
+     * ham list se tra ve danh sach cac dao dien, co the loc theo ten va sap xep theo ten, ngay tao hoac so
      */
     public function list(array $filters = []): LengthAwarePaginator
     {
@@ -32,7 +32,7 @@ class DirectorService
     }
 
     /**
-     * Danh sách đạo diễn đã xóa mềm.
+     *  danh sach cac dao dien da bi xoa mem, co the loc theo ten va sap xep theo ten, ngay xoa hoac so luong phim tham gia
      */
     public function listTrashed(array $filters = []): LengthAwarePaginator
     {

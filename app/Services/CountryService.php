@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 class CountryService
 {
     /**
-     * Danh sách quốc gia với pagination + filter.
+     * ham list se tra ve danh sach cac quoc gia, co the loc theo ten va ma quoc gia, sap xep theo ten, ma quoc gia, ngay tao hoac so luong phim tham gia
      */
     public function list(array $filters = []): LengthAwarePaginator
     {
@@ -36,7 +36,7 @@ class CountryService
     }
 
     /**
-     * Danh sách quốc gia đã xóa mềm (admin only).
+        * danh sach cac quoc gia da bi xoa mem, co the loc theo ten va ma quoc gia, sap xep theo ten, ma quoc gia, ngay xoa hoac so luong phim tham gia
      */
     public function listTrashed(array $filters = []): LengthAwarePaginator
     {
@@ -49,7 +49,7 @@ class CountryService
     }
 
     /**
-     * Lấy chi tiết một quốc gia.
+     * ham findOrFail se tra ve chi tiet quoc gia theo id, neu khong tim thay se nem ApiException, co the bao gom cac quoc gia da bi xoa mem neu tham so $withTrashed la true
      */
     public function findOrFail(int $id, bool $withTrashed = false): Country
     {
@@ -69,7 +69,7 @@ class CountryService
     }
 
     /**
-     * Tạo quốc gia mới.
+        * ham create se tao moi mot quoc gia, tra ve doi tuong Country vua duoc tao
      */
     public function create(array $data): Country
     {
@@ -83,7 +83,7 @@ class CountryService
     }
 
     /**
-     * Cập nhật quốc gia.
+     * ham update se cap nhat thong tin cua mot quoc gia, tra ve doi tuong Country sau khi da duoc cap nhat. Neu mot truong khong duoc truyen vao trong $data thi se giu nguyen gia tri cu
      */
     public function update(Country $country, array $data): Country
     {
@@ -101,7 +101,7 @@ class CountryService
     }
 
     /**
-     * Xóa mềm quốc gia.
+        * ham delete se xoa mem mot quoc gia, neu thanh cong se tra ve null, neu khong tim thay quoc gia se nem ApiException
      */
     public function delete(Country $country): void
     {
@@ -109,7 +109,7 @@ class CountryService
     }
 
     /**
-     * Khôi phục quốc gia đã xóa mềm.
+        * ham restore se phuc hoi mot quoc gia da bi xoa mem, neu thanh cong se tra ve doi tuong Country sau khi da duoc phuc hoi, neu khong tim thay quoc gia da bi xoa mem se nem ApiException
      */
     public function restore(int $id): Country
     {
@@ -131,8 +131,10 @@ class CountryService
 
     private function checkDuplicateCode(string $code, ?int $excludeId = null): void
     {
+        // Kiểm tra xem đã có quốc gia nào khác sử dụng mã code này chưa (bỏ qua chính nó khi cập nhật)
         $query = Country::where('code', strtoupper($code));
 
+        // Nếu đang cập nhật, bỏ qua bản ghi hiện tại
         if ($excludeId) {
             $query->where('id', '!=', $excludeId);
         }

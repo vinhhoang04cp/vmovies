@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 class GenreService
 {
     /**
-     * Danh sách thể loại với pagination + filter.
+        * ham list se tra ve danh sach cac the loai, co the loc theo ten va sap xep theo ten, ngay tao hoac so luong phim tham gia
      */
     public function list(array $filters = []): LengthAwarePaginator
     {

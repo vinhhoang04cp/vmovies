@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 class ActorService
 {
     /**
-     * Danh sách diễn viên với pagination + filter.
+     * ham list se tra ve danh sach cac dien vien, co the loc theo ten va sap xep theo ten, ngay tao hoac so luong phim tham gia
      */
     public function list(array $filters = []): LengthAwarePaginator
     {
@@ -32,7 +32,7 @@ class ActorService
     }
 
     /**
-     * Danh sách diễn viên đã xóa mềm.
+     * danh sach cac dien vien da bi xoa mem, co the loc theo ten va sap xep theo ten, ngay xoa hoac so luong phim tham gia
      */
     public function listTrashed(array $filters = []): LengthAwarePaginator
     {
@@ -45,7 +45,7 @@ class ActorService
     }
 
     /**
-     * Lấy chi tiết diễn viên.
+     * ham findOrFail se tra ve chi tiet dien vien theo id, neu khong tim thay se nem ApiException, co the bao gom cac dien vien da bi xoa mem neu tham so $withTrashed la true
      */
     public function findOrFail(int $id, bool $withTrashed = false): Actor
     {
@@ -65,7 +65,7 @@ class ActorService
     }
 
     /**
-     * Tạo diễn viên mới.
+     * ham create se tao moi mot dien vien, tra ve doi tuong Actor vua duoc tao
      */
     public function create(array $data): Actor
     {
@@ -77,7 +77,7 @@ class ActorService
     }
 
     /**
-     * Cập nhật diễn viên.
+     * ham update se cap nhat thong tin cua mot dien vien, tra ve doi tuong Actor sau khi da duoc cap nhat. Neu mot truong khong duoc truyen vao trong $data thi se giu nguyen gia tri cu
      */
     public function update(Actor $actor, array $data): Actor
     {
@@ -91,7 +91,7 @@ class ActorService
     }
 
     /**
-     * Xóa mềm diễn viên.
+     * ham delete se xoa mem mot dien vien, neu thanh cong se tra ve null, neu khong tim thay dien vien se nem ApiException
      */
     public function delete(Actor $actor): void
     {
@@ -99,7 +99,7 @@ class ActorService
     }
 
     /**
-     * Khôi phục diễn viên đã xóa mềm.
+     * ham restore se phuc hoi mot dien vien da bi xoa mem, neu thanh cong se tra ve doi tuong Actor sau khi da duoc phuc hoi, neu khong tim thay dien vien da bi xoa mem se nem ApiException
      */
     public function restore(int $id): Actor
     {
