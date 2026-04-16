@@ -22,6 +22,12 @@ import UserManagement from '@/Pages/Admin/UserManagement';
 import CommentManagement from '@/Pages/Admin/CommentManagement';
 import EpisodeManagement from '@/Pages/Admin/EpisodeManagement';
 
+// Viewer Pages
+import HomePage from '@/Pages/Viewer/HomePage';
+import MovieDetailPage from '@/Pages/Viewer/MovieDetailPage';
+import WatchPage from '@/Pages/Viewer/WatchPage';
+import SearchPage from '@/Pages/Viewer/SearchPage';
+
 // Layout
 import AdminLayout from '@/Layouts/AdminLayout';
 
@@ -30,7 +36,13 @@ function App() {
         <Router>
             <AuthProvider>
                 <Routes>
-                    {/* Public routes */}
+                    {/* ═══ Public Viewer Routes ═══ */}
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/movie/:id" element={<MovieDetailPage />} />
+                    <Route path="/watch/:movieId/:episodeId" element={<WatchPage />} />
+                    <Route path="/search" element={<SearchPage />} />
+
+                    {/* ═══ Auth Routes ═══ */}
                     <Route
                         path="/login"
                         element={
@@ -48,7 +60,7 @@ function App() {
                         }
                     />
 
-                    {/* Protected routes - Dashboard */}
+                    {/* ═══ Protected routes - Dashboard ═══ */}
                     <Route
                         path="/dashboard"
                         element={
@@ -58,7 +70,7 @@ function App() {
                         }
                     />
 
-                    {/* Admin routes with sidebar */}
+                    {/* ═══ Admin routes with sidebar ═══ */}
                     <Route
                         path="/movies"
                         element={
@@ -139,9 +151,6 @@ function App() {
                             </ProtectedRoute>
                         }
                     />
-
-                    {/* Redirect to login by default */}
-                    <Route path="/" element={<Navigate to="/login" />} />
                 </Routes>
             </AuthProvider>
         </Router>
@@ -151,4 +160,3 @@ function App() {
 // Mount React app to #app
 const root = createRoot(document.getElementById('app'));
 root.render(<App />);
-

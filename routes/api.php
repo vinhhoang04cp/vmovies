@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\MovieController;
+use App\Http\Controllers\GenreController;
+use App\Http\Controllers\CountryController;
 use App\Http\Controllers\Admin\MovieController as AdminMovieController;
 use App\Http\Controllers\Admin\EpisodeController as AdminEpisodeController;
 use App\Http\Controllers\Admin\GenreController as AdminGenreController;
@@ -38,6 +40,9 @@ Route::prefix('movies')->group(function () {
     Route::get('/{movie}/episodes',           [MovieController::class, 'episodes']);
     Route::get('/{movie}/episodes/{episode}', [MovieController::class, 'showEpisode']);
 });
+
+Route::get('/genres',    [GenreController::class, 'index']);
+Route::get('/countries', [CountryController::class, 'index']);
 
 // ═══════════════════════════════════════════════════════
 //  ADMIN ROUTES (requires auth + admin role)
@@ -150,4 +155,3 @@ Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function ()
         Route::get('comments', [DashboardController::class, 'commentStats']);
     });
 });
-
