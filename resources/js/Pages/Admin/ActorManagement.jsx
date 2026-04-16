@@ -128,14 +128,14 @@ export default function ActorManagement() {
     ];
 
     return (
-        <div className="p-8 bg-gray-100 min-h-screen">
+        <div className="p-8 bg-gray-50 min-h-screen">
             <div className="max-w-7xl mx-auto">
                 <div className="flex items-center justify-between mb-6">
-                    <h1 className="text-3xl font-bold text-gray-800">Quản lý diễn viên</h1>
+                    <h1 className="text-4xl font-extrabold text-black uppercase tracking-tight border-b-4 border-black inline-block pb-2">Quản lý diễn viên</h1>
                     <button
                         onClick={handleCreate}
                         disabled={loading}
-                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 transition"
+                        className="px-4 py-2 bg-black text-white rounded-none border border-black hover:bg-gray-800 hover:text-white uppercase font-bold disabled:opacity-50 transition"
                     >
                         + Thêm diễn viên
                     </button>
@@ -153,17 +153,17 @@ export default function ActorManagement() {
                     <Toast message={error} type="error" onClose={() => setError(null)} />
                 )}
 
-                <div className="mb-6 bg-white p-4 rounded-lg shadow">
+                <div className="mb-6 bg-white p-4 border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] rounded-none">
                     <input
                         type="text"
                         placeholder="Tìm kiếm diễn viên..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-2 border border-gray-400 rounded-none focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
                     />
                 </div>
 
-                <div className="bg-white rounded-lg shadow">
+                <div className="bg-white border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] rounded-none">
                     {loading ? (
                         <div className="p-8 flex justify-center">
                             <LoadingSpinner />
@@ -183,13 +183,13 @@ export default function ActorManagement() {
                                     <div className="flex gap-2 justify-center">
                                         <button
                                             onClick={() => handleEdit(row)}
-                                            className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                                            className="px-3 py-1 text-sm bg-black text-white rounded-none border border-black hover:bg-gray-800 hover:text-white uppercase font-bold transition"
                                         >
                                             Sửa
                                         </button>
                                         <button
                                             onClick={() => handleDelete(row.id)}
-                                            className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition"
+                                            className="px-3 py-1 text-sm bg-red-600 text-white rounded-none hover:bg-red-800 uppercase font-bold transition"
                                         >
                                             Xóa
                                         </button>
@@ -230,7 +230,7 @@ export default function ActorManagement() {
                             onChange={(e) =>
                                 setFormData({ ...formData, name: e.target.value })
                             }
-                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 border border-gray-400 rounded-none focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
                             placeholder="Nhập tên diễn viên"
                         />
                     </div>
@@ -245,7 +245,7 @@ export default function ActorManagement() {
                             onChange={(e) =>
                                 setFormData({ ...formData, nationality: e.target.value })
                             }
-                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 border border-gray-400 rounded-none focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
                             placeholder="VD: Việt Nam, Hàn Quốc..."
                         />
                     </div>
@@ -260,7 +260,7 @@ export default function ActorManagement() {
                             onChange={(e) =>
                                 setFormData({ ...formData, birth_date: e.target.value })
                             }
-                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 border border-gray-400 rounded-none focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
                         />
                     </div>
 
@@ -274,7 +274,7 @@ export default function ActorManagement() {
                             onChange={(e) =>
                                 setFormData({ ...formData, image_url: e.target.value })
                             }
-                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 border border-gray-400 rounded-none focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
                             placeholder="https://..."
                         />
                     </div>
@@ -288,7 +288,7 @@ export default function ActorManagement() {
                             onChange={(e) =>
                                 setFormData({ ...formData, bio: e.target.value })
                             }
-                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-3 py-2 border border-gray-400 rounded-none focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
                             placeholder="Mô tả về diễn viên..."
                             rows={3}
                         />

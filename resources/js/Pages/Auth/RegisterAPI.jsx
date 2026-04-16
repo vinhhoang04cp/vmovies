@@ -76,17 +76,17 @@ export default function RegisterAPI() {
     };
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100 px-4 py-12">
-            <div className="w-full max-w-md rounded-lg bg-white shadow-lg">
-                <div className="border-b border-gray-200 bg-gradient-to-r from-green-500 to-emerald-600 px-8 py-8">
-                    <h1 className="text-3xl font-bold text-white">VMovies</h1>
-                    <p className="mt-2 text-green-100">Create Account</p>
+        <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4 py-12">
+            <div className="w-full max-w-md bg-white border border-black">
+                <div className="border-b border-black bg-black px-8 py-8">
+                    <h1 className="text-3xl font-extrabold tracking-tight text-white">VMovies</h1>
+                    <p className="mt-2 text-gray-400 text-sm tracking-wide uppercase">Create Account</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-5 p-8">
                     {/* Server error message */}
                     {(error || formErrors.submit) && (
-                        <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700 border border-red-200">
+                        <div className="bg-red-50 p-4 text-sm text-red-700 border border-red-200">
                             {error || formErrors.submit}
                         </div>
                     )}
@@ -100,7 +100,7 @@ export default function RegisterAPI() {
                             name="name"
                             value={formData.name}
                             onChange={handleChange}
-                            className="mt-1 block w-full"
+                            className="mt-2 block w-full"
                             placeholder="John Doe"
                             disabled={loading}
                             autoComplete="name"
@@ -110,14 +110,14 @@ export default function RegisterAPI() {
 
                     {/* Email field */}
                     <div>
-                        <InputLabel htmlFor="email" value="Email Address" />
+                        <InputLabel htmlFor="email" value="Email" />
                         <TextInput
                             id="email"
                             type="email"
                             name="email"
                             value={formData.email}
                             onChange={handleChange}
-                            className="mt-1 block w-full"
+                            className="mt-2 block w-full"
                             placeholder="john@example.com"
                             disabled={loading}
                             autoComplete="email"
@@ -134,7 +134,7 @@ export default function RegisterAPI() {
                             name="password"
                             value={formData.password}
                             onChange={handleChange}
-                            className="mt-1 block w-full"
+                            className="mt-2 block w-full"
                             placeholder="••••••••"
                             disabled={loading}
                             autoComplete="new-password"
@@ -151,7 +151,7 @@ export default function RegisterAPI() {
                             name="password_confirmation"
                             value={formData.password_confirmation}
                             onChange={handleChange}
-                            className="mt-1 block w-full"
+                            className="mt-2 block w-full"
                             placeholder="••••••••"
                             disabled={loading}
                             autoComplete="new-password"
@@ -160,7 +160,7 @@ export default function RegisterAPI() {
                     </div>
 
                     {/* Submit button */}
-                    <div>
+                    <div className="pt-2">
                         <PrimaryButton
                             className="w-full justify-center"
                             disabled={loading}
@@ -170,11 +170,11 @@ export default function RegisterAPI() {
                     </div>
 
                     {/* Login link */}
-                    <div className="text-center text-sm text-gray-600">
+                    <div className="text-center text-sm text-gray-500 pt-4 border-t border-gray-100">
                         Already have an account?{' '}
                         <Link
                             to="/login"
-                            className="font-medium text-emerald-600 hover:text-emerald-500"
+                            className="font-bold text-black hover:underline"
                         >
                             Log in
                         </Link>

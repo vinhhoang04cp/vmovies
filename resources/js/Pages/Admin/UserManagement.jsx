@@ -100,10 +100,10 @@ export default function UserManagement() {
     ];
 
     return (
-        <div className="p-8 bg-gray-100 min-h-screen">
+        <div className="p-8 bg-gray-50 min-h-screen">
             <div className="max-w-7xl mx-auto">
                 <div className="flex items-center justify-between mb-6">
-                    <h1 className="text-3xl font-bold text-gray-800">Quản lý người dùng</h1>
+                    <h1 className="text-4xl font-extrabold text-black uppercase tracking-tight border-b-4 border-black inline-block pb-2">Quản lý người dùng</h1>
                 </div>
 
                 {toast && (
@@ -118,17 +118,17 @@ export default function UserManagement() {
                     <Toast message={error} type="error" onClose={() => setError(null)} />
                 )}
 
-                <div className="mb-6 bg-white p-4 rounded-lg shadow">
+                <div className="mb-6 bg-white p-4 border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] rounded-none">
                     <input
                         type="text"
                         placeholder="Tìm kiếm người dùng..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-2 border border-gray-400 rounded-none focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
                     />
                 </div>
 
-                <div className="bg-white rounded-lg shadow">
+                <div className="bg-white border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] rounded-none">
                     {loading ? (
                         <div className="p-8 flex justify-center">
                             <LoadingSpinner />
@@ -156,7 +156,7 @@ export default function UserManagement() {
                                         ) : (
                                             <button
                                                 onClick={() => handleBan(row.id)}
-                                                className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition"
+                                                className="px-3 py-1 text-sm bg-red-600 text-white rounded-none hover:bg-red-800 uppercase font-bold transition"
                                             >
                                                 Cấm
                                             </button>

@@ -259,14 +259,14 @@ export default function MovieManagement() {
     ];
 
     return (
-        <div className="p-8 bg-gray-100 min-h-screen">
+        <div className="p-8 bg-gray-50 min-h-screen">
             <div className="max-w-7xl mx-auto">
                 <div className="flex items-center justify-between mb-6">
-                    <h1 className="text-3xl font-bold text-gray-800">Quản lý phim</h1>
+                    <h1 className="text-4xl font-extrabold text-black uppercase tracking-tight border-b-4 border-black inline-block pb-2">Quản lý phim</h1>
                     <button
                         onClick={handleCreate}
                         disabled={loading}
-                        className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 transition"
+                        className="px-4 py-2 bg-black text-white rounded-none border border-black hover:bg-gray-800 hover:text-white uppercase font-bold disabled:opacity-50 transition"
                     >
                         + Thêm phim
                     </button>
@@ -284,17 +284,17 @@ export default function MovieManagement() {
                     <Toast message={error} type="error" onClose={() => setError(null)} />
                 )}
 
-                <div className="mb-6 bg-white p-4 rounded-lg shadow">
+                <div className="mb-6 bg-white p-4 border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] rounded-none">
                     <input
                         type="text"
                         placeholder="Tìm kiếm phim..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-2 border border-gray-400 rounded-none focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
                     />
                 </div>
 
-                <div className="bg-white rounded-lg shadow">
+                <div className="bg-white border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] rounded-none">
                     {loading ? (
                         <div className="p-8 flex justify-center">
                             <LoadingSpinner />
@@ -320,13 +320,13 @@ export default function MovieManagement() {
                                         </button>
                                         <button
                                             onClick={() => handleEdit(row)}
-                                            className="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+                                            className="px-3 py-1 text-sm bg-black text-white rounded-none border border-black hover:bg-gray-800 hover:text-white uppercase font-bold transition"
                                         >
                                             Sửa
                                         </button>
                                         <button
                                             onClick={() => handleDelete(row.id)}
-                                            className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700 transition"
+                                            className="px-3 py-1 text-sm bg-red-600 text-white rounded-none hover:bg-red-800 uppercase font-bold transition"
                                         >
                                             Xóa
                                         </button>
@@ -374,7 +374,7 @@ export default function MovieManagement() {
                                     onChange={(e) =>
                                         setFormData({ ...formData, title: e.target.value })
                                     }
-                                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-2 border border-gray-400 rounded-none focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
                                     placeholder="Nhập tên phim"
                                 />
                             </div>
@@ -389,7 +389,7 @@ export default function MovieManagement() {
                                     onChange={(e) =>
                                         setFormData({ ...formData, original_title: e.target.value })
                                     }
-                                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-2 border border-gray-400 rounded-none focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
                                     placeholder="Original title"
                                 />
                             </div>
@@ -404,7 +404,7 @@ export default function MovieManagement() {
                                         onChange={(e) =>
                                             setFormData({ ...formData, type: e.target.value })
                                         }
-                                        className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full px-3 py-2 border border-gray-400 rounded-none focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
                                     >
                                         <option value="movie">Phim lẻ</option>
                                         <option value="series">Series</option>
@@ -421,7 +421,7 @@ export default function MovieManagement() {
                                         onChange={(e) =>
                                             setFormData({ ...formData, status: e.target.value })
                                         }
-                                        className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                        className="w-full px-3 py-2 border border-gray-400 rounded-none focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
                                     >
                                         <option value="draft">Nháp</option>
                                         <option value="published">Đã phát hành</option>
@@ -443,7 +443,7 @@ export default function MovieManagement() {
                                             release_year: parseInt(e.target.value),
                                         })
                                     }
-                                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-2 border border-gray-400 rounded-none focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
                                     min={1900}
                                     max={new Date().getFullYear() + 1}
                                 />
@@ -458,7 +458,7 @@ export default function MovieManagement() {
                                     onChange={(e) =>
                                         setFormData({ ...formData, summary: e.target.value })
                                     }
-                                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-2 border border-gray-400 rounded-none focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
                                     placeholder="Mô tả nội dung phim..."
                                     rows={3}
                                 />
@@ -468,7 +468,7 @@ export default function MovieManagement() {
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Thể loại
                                 </label>
-                                <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-300 rounded p-2">
+                                <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-400 rounded-none p-2">
                                     {genres.map((genre) => (
                                         <label key={genre.id} className="flex items-center gap-2">
                                             <input
@@ -501,7 +501,7 @@ export default function MovieManagement() {
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Quốc gia
                                 </label>
-                                <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-300 rounded p-2">
+                                <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-400 rounded-none p-2">
                                     {countries.map((country) => (
                                         <label key={country.id} className="flex items-center gap-2">
                                             <input
@@ -537,7 +537,7 @@ export default function MovieManagement() {
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Đạo diễn
                                 </label>
-                                <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-300 rounded p-2">
+                                <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-400 rounded-none p-2">
                                     {directors.map((director) => (
                                         <label key={director.id} className="flex items-center gap-2">
                                             <input
@@ -573,7 +573,7 @@ export default function MovieManagement() {
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
                                     Diễn viên
                                 </label>
-                                <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-300 rounded p-2">
+                                <div className="space-y-2 max-h-40 overflow-y-auto border border-gray-400 rounded-none p-2">
                                     {actors.map((actor) => (
                                         <label key={actor.id} className="flex items-center gap-2">
                                             <input
@@ -615,7 +615,7 @@ export default function MovieManagement() {
                                     onChange={(e) =>
                                         setFormData({ ...formData, poster: e.target.value })
                                     }
-                                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-2 border border-gray-400 rounded-none focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
                                     placeholder="https://..."
                                 />
                             </div>
@@ -630,7 +630,7 @@ export default function MovieManagement() {
                                     onChange={(e) =>
                                         setFormData({ ...formData, banner: e.target.value })
                                     }
-                                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-2 border border-gray-400 rounded-none focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
                                     placeholder="https://..."
                                 />
                             </div>
@@ -645,7 +645,7 @@ export default function MovieManagement() {
                                     onChange={(e) =>
                                         setFormData({ ...formData, trailer_url: e.target.value })
                                     }
-                                    className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="w-full px-3 py-2 border border-gray-400 rounded-none focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
                                     placeholder="https://youtube.com/..."
                                 />
                             </div>

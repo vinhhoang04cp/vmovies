@@ -13,15 +13,15 @@ export default function Table({
     loading = false,
 }) {
     return (
-        <div className="overflow-x-auto border border-gray-200 rounded-lg">
+        <div className="overflow-x-auto border-t-0 border-x-0 border-b-0 border-black rounded-none">
             <table className="min-w-full bg-white">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-white border-b-4 border-black">
                     <tr>
                         {columns.map((col) => (
                             <th
                                 key={col.key}
-                                className={`px-4 py-3 text-left font-semibold text-gray-700 ${
-                                    col.sortable ? 'cursor-pointer hover:bg-gray-100' : ''
+                                className={`px-4 py-4 text-left font-extrabold text-black uppercase tracking-wider border-b border-black text-sm ${
+                                    col.sortable ? 'cursor-pointer hover:bg-gray-200' : ''
                                 }`}
                                 onClick={() =>
                                     col.sortable &&
@@ -34,14 +34,14 @@ export default function Table({
                                 <div className="flex items-center gap-2">
                                     {col.label}
                                     {col.sortable && sortBy === col.key && (
-                                        <span className="text-blue-600">
+                                        <span className="text-black font-black">
                                             {sortDir === 'asc' ? '↑' : '↓'}
                                         </span>
                                     )}
                                 </div>
                             </th>
                         ))}
-                        {rowAction && <th className="px-4 py-3 text-center font-semibold text-gray-700">Hành động</th>}
+                        {rowAction && <th className="px-4 py-4 text-center font-extrabold text-black uppercase tracking-wider border-b border-black text-sm">Hành động</th>}
                     </tr>
                 </thead>
                 <tbody>
@@ -61,10 +61,10 @@ export default function Table({
                         data.map((row, idx) => (
                             <tr
                                 key={row.id || idx}
-                                className={`border-b border-gray-200 ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-blue-50 transition`}
+                                className={`border-b border-black ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-200 transition-colors uppercase text-sm tracking-wide font-semibold text-black`}
                             >
                                 {columns.map((col) => (
-                                    <td key={col.key} className="px-4 py-3 text-gray-700">
+                                    <td key={col.key} className="px-4 py-4 border-r border-gray-200 last:border-r-0">
                                         {col.render
                                             ? col.render(row[col.key], row)
                                             : row[col.key]}
