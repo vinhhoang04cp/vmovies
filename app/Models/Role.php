@@ -10,6 +10,7 @@ class Role extends Model
 {
     use HasFactory;
 
+    // cac truong co the duoc gan gia tri khi tao moi Role
     protected $fillable = [
         'name',
         'display_name',
