@@ -10,6 +10,7 @@ class Rating extends Model
 {
     use HasFactory;
 
+    // cac truong co the duoc gan gia tri khi tao moi Rating
     protected $fillable = [
         'user_id',
         'movie_id',
@@ -18,6 +19,7 @@ class Rating extends Model
         'helpful_count',
     ];
 
+    // cast diem danh gia va so luot danh gia huu ich thanh kieu integer
     protected $casts = [
         'score'         => 'integer',
         'helpful_count' => 'integer',
