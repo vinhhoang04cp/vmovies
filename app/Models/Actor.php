@@ -1,6 +1,7 @@
 <?php
 
-namespace App\Models;
+// linh 
+namespace App\Models; 
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

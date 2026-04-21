@@ -1,5 +1,6 @@
 <?php
 
+// duong 
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;

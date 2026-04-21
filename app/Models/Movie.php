@@ -20,7 +20,7 @@ class Movie extends Model
     {
         static::creating(function (Movie $movie) {
             if (empty($movie->slug)) {
-                $movie->slug = Str::slug($movie->title) . '-' . time();
+                $movie->slug = Str::slug($movie->title).'-'.time();
             }
         });
     }
@@ -41,8 +41,8 @@ class Movie extends Model
     ];
 
     protected $casts = [
-        'release_year'   => 'integer',
-        'view_count'     => 'integer',
+        'release_year' => 'integer',
+        'view_count' => 'integer',
         'average_rating' => 'float',
     ];
 
@@ -105,7 +105,6 @@ class Movie extends Model
     public function actors(): BelongsToMany
     {
         return $this->belongsToMany(Actor::class, 'movie_actor')
-                    ->withPivot('role_name');
+            ->withPivot('role_name');
     }
 }
-
