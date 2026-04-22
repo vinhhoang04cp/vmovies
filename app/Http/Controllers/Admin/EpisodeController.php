@@ -22,7 +22,7 @@ class EpisodeController extends Controller
 
     public function __construct(
         private EpisodeService $episodeService,
-        private MovieService   $movieService,
+        private MovieService $movieService,
     ) {}
 
     /**
@@ -31,7 +31,7 @@ class EpisodeController extends Controller
     public function index(Request $request, int $movieId): JsonResponse
     {
         try {
-            $movie   = $this->movieService->findOrFail($movieId);
+            $movie = $this->movieService->findOrFail($movieId);
             $episodes = $this->episodeService->listByMovie($movie, $request->query());
 
             return $this->successResponse(
@@ -42,6 +42,7 @@ class EpisodeController extends Controller
             return $this->notFoundResponse($e->getMessage());
         } catch (\Exception $e) {
             Log::error('Admin list episodes error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi lấy danh sách tập phim.', 500);
         }
     }
@@ -52,7 +53,7 @@ class EpisodeController extends Controller
     public function store(StoreEpisodeRequest $request, int $movieId): JsonResponse
     {
         try {
-            $movie   = $this->movieService->findOrFail($movieId);
+            $movie = $this->movieService->findOrFail($movieId);
             $data = $request->validated();
 
             // Pass uploaded file if exists
@@ -61,6 +62,7 @@ class EpisodeController extends Controller
             }
 
             $episode = $this->episodeService->create($movie, $data);
+
             return $this->createdResponse(new EpisodeResource($episode), 'Tạo tập phim thành công.');
         } catch (ApiException $e) {
             return $e->render($request);
@@ -71,6 +73,7 @@ class EpisodeController extends Controller
                 'line' => $e->getLine(),
             ]);
             $message = config('app.debug') ? $e->getMessage() : 'Lỗi khi tạo tập phim.';
+
             return $this->errorResponse($message, 500);
         }
     }
@@ -82,11 +85,13 @@ class EpisodeController extends Controller
     {
         try {
             $episode = $this->episodeService->findOrFail($id);
+
             return $this->successResponse(new EpisodeResource($episode), 'Chi tiết tập phim.');
         } catch (ApiException $e) {
             return $this->notFoundResponse($e->getMessage());
         } catch (\Exception $e) {
             Log::error('Admin show episode error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi lấy tập phim.', 500);
         }
     }
@@ -106,6 +111,7 @@ class EpisodeController extends Controller
             }
 
             $episode = $this->episodeService->update($episode, $data);
+
             return $this->successResponse(new EpisodeResource($episode), 'Cập nhật tập phim thành công.');
         } catch (ApiException $e) {
             return $e->render($request);
@@ -116,6 +122,7 @@ class EpisodeController extends Controller
                 'line' => $e->getLine(),
             ]);
             $message = config('app.debug') ? $e->getMessage() : 'Lỗi khi cập nhật tập phim.';
+
             return $this->errorResponse($message, 500);
         }
     }
@@ -128,11 +135,13 @@ class EpisodeController extends Controller
         try {
             $episode = $this->episodeService->findOrFail($id);
             $this->episodeService->delete($episode);
+
             return $this->successResponse(null, 'Xóa tập phim thành công.');
         } catch (ApiException $e) {
             return $this->notFoundResponse($e->getMessage());
         } catch (\Exception $e) {
             Log::error('Admin delete episode error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi xóa tập phim.', 500);
         }
     }
@@ -145,12 +154,14 @@ class EpisodeController extends Controller
     {
         try {
             $episodes = $this->episodeService->listTrashed($request->query());
+
             return $this->successResponse(
                 EpisodeResource::collection($episodes)->response()->getData(true),
                 'Danh sách tập phim đã xóa.'
             );
         } catch (\Exception $e) {
             Log::error('Admin list trashed episodes error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi lấy danh sách tập phim đã xóa.', 500);
         }
     }
@@ -163,11 +174,13 @@ class EpisodeController extends Controller
     {
         try {
             $episode = $this->episodeService->restore($id);
+
             return $this->successResponse(new EpisodeResource($episode), 'Khôi phục tập phim thành công.');
         } catch (ApiException $e) {
             return $this->notFoundResponse($e->getMessage());
         } catch (\Exception $e) {
             Log::error('Admin restore episode error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi khôi phục tập phim.', 500);
         }
     }
@@ -180,7 +193,7 @@ class EpisodeController extends Controller
     {
         try {
             $movieId = $request->input('movie_id');
-            $movie   = $this->movieService->findOrFail($movieId);
+            $movie = $this->movieService->findOrFail($movieId);
             $episodes = $this->episodeService->bulkCreate($movie, $request->validated()['episodes']);
 
             return $this->createdResponse(
@@ -191,6 +204,7 @@ class EpisodeController extends Controller
             return $e->render($request);
         } catch (\Exception $e) {
             Log::error('Admin bulk create episodes error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi tạo nhiều tập phim.', 500);
         }
     }
@@ -202,22 +216,23 @@ class EpisodeController extends Controller
     public function reorder(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'movie_id'                   => ['required', 'integer', 'exists:movies,id'],
-            'episodes'                   => ['required', 'array', 'min:1'],
-            'episodes.*.id'              => ['required', 'integer', 'exists:episodes,id'],
-            'episodes.*.episode_number'  => ['required', 'integer', 'min:1'],
+            'movie_id' => ['required', 'integer', 'exists:movies,id'],
+            'episodes' => ['required', 'array', 'min:1'],
+            'episodes.*.id' => ['required', 'integer', 'exists:episodes,id'],
+            'episodes.*.episode_number' => ['required', 'integer', 'min:1'],
         ]);
 
         try {
             $movie = Movie::findOrFail($validated['movie_id']);
             $this->episodeService->reorder($movie, $validated['episodes']);
+
             return $this->successResponse(null, 'Sắp xếp lại tập phim thành công.');
         } catch (ApiException $e) {
             return $e->render($request);
         } catch (\Exception $e) {
             Log::error('Admin reorder episodes error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi sắp xếp tập phim.', 500);
         }
     }
 }
-

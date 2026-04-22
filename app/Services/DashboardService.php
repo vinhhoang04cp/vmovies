@@ -12,7 +12,6 @@ use App\Models\Genre;
 use App\Models\Movie;
 use App\Models\Rating;
 use App\Models\User;
-use App\Models\WatchHistory;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -24,34 +23,34 @@ class DashboardService
 
     public function overview(): array
     {
-        $now      = Carbon::now();
-        $weekAgo  = $now->copy()->subWeek();
+        $now = Carbon::now();
+        $weekAgo = $now->copy()->subWeek();
         $monthAgo = $now->copy()->subMonth();
 
         return [
-            'totals'           => $this->totals(),
-            'new_this_week'    => $this->newThisWeek($weekAgo),
-            'new_this_month'   => $this->newThisMonth($monthAgo),
-            'pending_actions'  => $this->pendingActions(),
-            'top_movies'       => $this->topMoviesByViews(5),
-            'recent_movies'    => $this->recentMovies(5),
-            'recent_comments'  => $this->recentComments(5),
-            'recent_users'     => $this->recentUsers(5),
+            'totals' => $this->totals(),
+            'new_this_week' => $this->newThisWeek($weekAgo),
+            'new_this_month' => $this->newThisMonth($monthAgo),
+            'pending_actions' => $this->pendingActions(),
+            'top_movies' => $this->topMoviesByViews(5),
+            'recent_movies' => $this->recentMovies(5),
+            'recent_comments' => $this->recentComments(5),
+            'recent_users' => $this->recentUsers(5),
         ];
     }
 
     private function totals(): array
     {
         return [
-            'movies'    => Movie::count(),
-            'episodes'  => Episode::count(),
-            'users'     => User::count(),
-            'comments'  => Comment::where('is_deleted', false)->count(),
-            'genres'    => Genre::count(),
+            'movies' => Movie::count(),
+            'episodes' => Episode::count(),
+            'users' => User::count(),
+            'comments' => Comment::where('is_deleted', false)->count(),
+            'genres' => Genre::count(),
             'countries' => Country::count(),
             'directors' => Director::count(),
-            'actors'    => Actor::count(),
-            'ratings'   => Rating::count(),
+            'actors' => Actor::count(),
+            'ratings' => Rating::count(),
             'bookmarks' => Bookmark::count(),
         ];
     }
@@ -59,8 +58,8 @@ class DashboardService
     private function newThisWeek(Carbon $weekAgo): array
     {
         return [
-            'movies'   => Movie::where('created_at', '>=', $weekAgo)->count(),
-            'users'    => User::where('created_at', '>=', $weekAgo)->count(),
+            'movies' => Movie::where('created_at', '>=', $weekAgo)->count(),
+            'users' => User::where('created_at', '>=', $weekAgo)->count(),
             'comments' => Comment::where('created_at', '>=', $weekAgo)->where('is_deleted', false)->count(),
         ];
     }
@@ -68,8 +67,8 @@ class DashboardService
     private function newThisMonth(Carbon $monthAgo): array
     {
         return [
-            'movies'   => Movie::where('created_at', '>=', $monthAgo)->count(),
-            'users'    => User::where('created_at', '>=', $monthAgo)->count(),
+            'movies' => Movie::where('created_at', '>=', $monthAgo)->count(),
+            'users' => User::where('created_at', '>=', $monthAgo)->count(),
             'comments' => Comment::where('created_at', '>=', $monthAgo)->where('is_deleted', false)->count(),
         ];
     }
@@ -78,8 +77,8 @@ class DashboardService
     {
         return [
             'pending_comments' => Comment::where('is_approved', false)->where('is_deleted', false)->count(),
-            'banned_users'     => User::where('status', 'banned')->count(),
-            'trashed_movies'   => Movie::onlyTrashed()->count(),
+            'banned_users' => User::where('status', 'banned')->count(),
+            'trashed_movies' => Movie::onlyTrashed()->count(),
             'trashed_episodes' => Episode::onlyTrashed()->count(),
         ];
     }
@@ -109,13 +108,13 @@ class DashboardService
             ->latest()
             ->limit($limit)
             ->get()
-            ->map(fn($c) => [
-                'id'          => $c->id,
-                'content'     => mb_substr($c->content, 0, 80) . (mb_strlen($c->content) > 80 ? '...' : ''),
+            ->map(fn ($c) => [
+                'id' => $c->id,
+                'content' => mb_substr($c->content, 0, 80).(mb_strlen($c->content) > 80 ? '...' : ''),
                 'is_approved' => $c->is_approved,
-                'user'        => $c->user ? ['id' => $c->user->id, 'name' => $c->user->name] : null,
-                'movie'       => $c->movie ? ['id' => $c->movie->id, 'title' => $c->movie->title] : null,
-                'created_at'  => $c->created_at,
+                'user' => $c->user ? ['id' => $c->user->id, 'name' => $c->user->name] : null,
+                'movie' => $c->movie ? ['id' => $c->movie->id, 'title' => $c->movie->title] : null,
+                'created_at' => $c->created_at,
             ])
             ->toArray();
     }
@@ -127,12 +126,12 @@ class DashboardService
             ->latest()
             ->limit($limit)
             ->get()
-            ->map(fn($u) => [
-                'id'         => $u->id,
-                'name'       => $u->name,
-                'email'      => $u->email,
-                'status'     => $u->status,
-                'role'       => $u->role?->name,
+            ->map(fn ($u) => [
+                'id' => $u->id,
+                'name' => $u->name,
+                'email' => $u->email,
+                'status' => $u->status,
+                'role' => $u->role?->name,
                 'created_at' => $u->created_at,
             ])
             ->toArray();
@@ -145,30 +144,30 @@ class DashboardService
     public function movieStats(): array
     {
         return [
-            'overview'          => $this->movieOverview(),
-            'by_type'           => $this->moviesByType(),
-            'by_status'         => $this->moviesByStatus(),
-            'by_genre'          => $this->moviesByGenre(),
-            'by_country'        => $this->moviesByCountry(),
-            'by_release_year'   => $this->moviesByYear(),
-            'top_viewed'        => $this->topMoviesByViews(10),
-            'top_rated'         => $this->topMoviesByRating(10),
-            'most_commented'    => $this->mostCommentedMovies(10),
-            'most_bookmarked'   => $this->mostBookmarkedMovies(10),
+            'overview' => $this->movieOverview(),
+            'by_type' => $this->moviesByType(),
+            'by_status' => $this->moviesByStatus(),
+            'by_genre' => $this->moviesByGenre(),
+            'by_country' => $this->moviesByCountry(),
+            'by_release_year' => $this->moviesByYear(),
+            'top_viewed' => $this->topMoviesByViews(10),
+            'top_rated' => $this->topMoviesByRating(10),
+            'most_commented' => $this->mostCommentedMovies(10),
+            'most_bookmarked' => $this->mostBookmarkedMovies(10),
         ];
     }
 
     private function movieOverview(): array
     {
         return [
-            'total'          => Movie::count(),
-            'active'         => Movie::whereNull('deleted_at')->count(),
-            'trashed'        => Movie::onlyTrashed()->count(),
+            'total' => Movie::count(),
+            'active' => Movie::whereNull('deleted_at')->count(),
+            'trashed' => Movie::onlyTrashed()->count(),
             'total_episodes' => Episode::count(),
-            'total_views'    => (int) Movie::sum('view_count'),
-            'avg_rating'     => round((float) Movie::avg('average_rating'), 2),
-            'total_ratings'  => Rating::count(),
-            'total_bookmarks'=> Bookmark::count(),
+            'total_views' => (int) Movie::sum('view_count'),
+            'avg_rating' => round((float) Movie::avg('average_rating'), 2),
+            'total_ratings' => Rating::count(),
+            'total_bookmarks' => Bookmark::count(),
         ];
     }
 
@@ -227,7 +226,7 @@ class DashboardService
 
     private function mostCommentedMovies(int $limit): array
     {
-        return Movie::withCount(['comments' => fn($q) => $q->where('is_deleted', false)])
+        return Movie::withCount(['comments' => fn ($q) => $q->where('is_deleted', false)])
             ->orderByDesc('comments_count')
             ->limit($limit)
             ->get(['id', 'title', 'slug', 'poster_url', 'type', 'comments_count'])
@@ -250,27 +249,27 @@ class DashboardService
     public function userStats(): array
     {
         return [
-            'overview'          => $this->userOverview(),
-            'by_status'         => $this->usersByStatus(),
-            'by_role'           => $this->usersByRole(),
-            'growth_by_month'   => $this->userGrowthByMonth(),
-            'top_commenters'    => $this->topCommenters(10),
-            'top_bookmarkers'   => $this->topBookmarkers(10),
-            'top_raters'        => $this->topRaters(10),
+            'overview' => $this->userOverview(),
+            'by_status' => $this->usersByStatus(),
+            'by_role' => $this->usersByRole(),
+            'growth_by_month' => $this->userGrowthByMonth(),
+            'top_commenters' => $this->topCommenters(10),
+            'top_bookmarkers' => $this->topBookmarkers(10),
+            'top_raters' => $this->topRaters(10),
         ];
     }
 
     private function userOverview(): array
     {
-        $now      = Carbon::now();
-        $weekAgo  = $now->copy()->subWeek();
+        $now = Carbon::now();
+        $weekAgo = $now->copy()->subWeek();
         $monthAgo = $now->copy()->subMonth();
 
         return [
-            'total'          => User::count(),
-            'active'         => User::where('status', 'active')->count(),
-            'banned'         => User::where('status', 'banned')->count(),
-            'new_this_week'  => User::where('created_at', '>=', $weekAgo)->count(),
+            'total' => User::count(),
+            'active' => User::where('status', 'active')->count(),
+            'banned' => User::where('status', 'banned')->count(),
+            'new_this_week' => User::where('created_at', '>=', $weekAgo)->count(),
             'new_this_month' => User::where('created_at', '>=', $monthAgo)->count(),
         ];
     }
@@ -295,25 +294,25 @@ class DashboardService
     private function userGrowthByMonth(): array
     {
         return User::select(
-                DB::raw('YEAR(created_at) as year'),
-                DB::raw('MONTH(created_at) as month'),
-                DB::raw('count(*) as total')
-            )
+            DB::raw('YEAR(created_at) as year'),
+            DB::raw('MONTH(created_at) as month'),
+            DB::raw('count(*) as total')
+        )
             ->where('created_at', '>=', Carbon::now()->subMonths(12))
             ->groupBy('year', 'month')
             ->orderBy('year')
             ->orderBy('month')
             ->get()
-            ->map(fn($row) => [
-                'period' => sprintf('%d-%02d', $row->year, $row->month),
-                'total'  => $row->total,
-            ])
+            ->map(fn ($row) => [
+            'period' => sprintf('%d-%02d', $row->year, $row->month),
+            'total' => $row->total,
+        ])
             ->toArray();
     }
 
     private function topCommenters(int $limit): array
     {
-        return User::withCount(['comments' => fn($q) => $q->where('is_deleted', false)])
+        return User::withCount(['comments' => fn ($q) => $q->where('is_deleted', false)])
             ->orderByDesc('comments_count')
             ->having('comments_count', '>', 0)
             ->limit($limit)
@@ -348,34 +347,34 @@ class DashboardService
     public function commentStats(): array
     {
         return [
-            'overview'         => $this->commentOverview(),
-            'by_status'        => $this->commentsByStatus(),
-            'growth_by_month'  => $this->commentGrowthByMonth(),
-            'top_movies'       => $this->mostCommentedMovies(10),
-            'top_commenters'   => $this->topCommenters(10),
-            'recent_pending'   => $this->recentPendingComments(10),
+            'overview' => $this->commentOverview(),
+            'by_status' => $this->commentsByStatus(),
+            'growth_by_month' => $this->commentGrowthByMonth(),
+            'top_movies' => $this->mostCommentedMovies(10),
+            'top_commenters' => $this->topCommenters(10),
+            'recent_pending' => $this->recentPendingComments(10),
         ];
     }
 
     private function commentOverview(): array
     {
-        $now      = Carbon::now();
-        $weekAgo  = $now->copy()->subWeek();
+        $now = Carbon::now();
+        $weekAgo = $now->copy()->subWeek();
         $monthAgo = $now->copy()->subMonth();
 
-        $total    = Comment::count();
+        $total = Comment::count();
         $approved = Comment::where('is_approved', true)->where('is_deleted', false)->count();
-        $pending  = Comment::where('is_approved', false)->where('is_deleted', false)->count();
-        $deleted  = Comment::where('is_deleted', true)->count();
+        $pending = Comment::where('is_approved', false)->where('is_deleted', false)->count();
+        $deleted = Comment::where('is_deleted', true)->count();
 
         return [
-            'total'              => $total,
-            'approved'           => $approved,
-            'pending'            => $pending,
-            'deleted'            => $deleted,
-            'approval_rate'      => $total > 0 ? round(($approved / $total) * 100, 1) : 0,
-            'new_this_week'      => Comment::where('created_at', '>=', $weekAgo)->where('is_deleted', false)->count(),
-            'new_this_month'     => Comment::where('created_at', '>=', $monthAgo)->where('is_deleted', false)->count(),
+            'total' => $total,
+            'approved' => $approved,
+            'pending' => $pending,
+            'deleted' => $deleted,
+            'approval_rate' => $total > 0 ? round(($approved / $total) * 100, 1) : 0,
+            'new_this_week' => Comment::where('created_at', '>=', $weekAgo)->where('is_deleted', false)->count(),
+            'new_this_month' => Comment::where('created_at', '>=', $monthAgo)->where('is_deleted', false)->count(),
         ];
     }
 
@@ -383,30 +382,30 @@ class DashboardService
     {
         return [
             'approved' => Comment::where('is_approved', true)->where('is_deleted', false)->count(),
-            'pending'  => Comment::where('is_approved', false)->where('is_deleted', false)->count(),
-            'deleted'  => Comment::where('is_deleted', true)->count(),
+            'pending' => Comment::where('is_approved', false)->where('is_deleted', false)->count(),
+            'deleted' => Comment::where('is_deleted', true)->count(),
         ];
     }
 
     private function commentGrowthByMonth(): array
     {
         return Comment::select(
-                DB::raw('YEAR(created_at) as year'),
-                DB::raw('MONTH(created_at) as month'),
-                DB::raw('count(*) as total'),
-                DB::raw('SUM(CASE WHEN is_approved = 1 THEN 1 ELSE 0 END) as approved')
-            )
+            DB::raw('YEAR(created_at) as year'),
+            DB::raw('MONTH(created_at) as month'),
+            DB::raw('count(*) as total'),
+            DB::raw('SUM(CASE WHEN is_approved = 1 THEN 1 ELSE 0 END) as approved')
+        )
             ->where('created_at', '>=', Carbon::now()->subMonths(12))
             ->where('is_deleted', false)
             ->groupBy('year', 'month')
             ->orderBy('year')
             ->orderBy('month')
             ->get()
-            ->map(fn($row) => [
-                'period'   => sprintf('%d-%02d', $row->year, $row->month),
-                'total'    => $row->total,
-                'approved' => $row->approved,
-            ])
+            ->map(fn ($row) => [
+            'period' => sprintf('%d-%02d', $row->year, $row->month),
+            'total' => $row->total,
+            'approved' => $row->approved,
+        ])
             ->toArray();
     }
 
@@ -418,14 +417,13 @@ class DashboardService
             ->latest()
             ->limit($limit)
             ->get()
-            ->map(fn($c) => [
-                'id'         => $c->id,
-                'content'    => mb_substr($c->content, 0, 100) . (mb_strlen($c->content) > 100 ? '...' : ''),
-                'user'       => $c->user ? ['id' => $c->user->id, 'name' => $c->user->name] : null,
-                'movie'      => $c->movie ? ['id' => $c->movie->id, 'title' => $c->movie->title] : null,
+            ->map(fn ($c) => [
+                'id' => $c->id,
+                'content' => mb_substr($c->content, 0, 100).(mb_strlen($c->content) > 100 ? '...' : ''),
+                'user' => $c->user ? ['id' => $c->user->id, 'name' => $c->user->name] : null,
+                'movie' => $c->movie ? ['id' => $c->movie->id, 'title' => $c->movie->title] : null,
                 'created_at' => $c->created_at,
             ])
             ->toArray();
     }
 }
-

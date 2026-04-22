@@ -34,7 +34,7 @@ class Rating extends Model
      * Ép kiểu dữ liệu
      */
     protected $casts = [
-        'score'         => 'integer',
+        'score' => 'integer',
         'helpful_count' => 'integer',
     ];
 
@@ -54,4 +54,3 @@ class Rating extends Model
         return $this->belongsTo(Movie::class);
     }
 }
-

@@ -1,79 +1,84 @@
 import { apiClient } from './apiClient';
 
+/**
+ * movieApi - Chứa các phương thức quản lý phim dành cho trang Admin.
+ */
 export const movieApi = {
-    // Danh sách phim
+    // Lấy danh sách phim (có hỗ trợ lọc và phân trang qua params)
     list(params = {}) {
         const query = new URLSearchParams(params).toString();
         return apiClient.get('/admin/movies' + (query ? `?${query}` : ''));
     },
 
-    // Danh sách phim đã xóa
+    // Lấy danh sách các phim đã bị xóa mềm (thùng rác)
     trashed(params = {}) {
         const query = new URLSearchParams(params).toString();
         return apiClient.get('/admin/movies/trashed' + (query ? `?${query}` : ''));
     },
 
-    // Chi tiết phim
+    // Lấy chi tiết thông tin của một bộ phim cụ thể qua ID
     get(id) {
         return apiClient.get(`/admin/movies/${id}`);
     },
 
-    // Tạo phim mới
+    // Tạo một bộ phim mới
     create(data) {
         return apiClient.post('/admin/movies', data);
     },
 
-    // Cập nhật phim
+    // Cập nhật thông tin phim đã có
     update(id, data) {
         return apiClient.put(`/admin/movies/${id}`, data);
     },
 
-    // Xóa mềm phim
+    // Xóa mềm một bộ phim (đưa vào thùng rác)
     destroy(id) {
         return apiClient.delete(`/admin/movies/${id}`);
     },
 
-    // Khôi phục phim
+    // Khôi phục bộ phim đã bị xóa mềm
     restore(id) {
         return apiClient.post(`/admin/movies/${id}/restore`, {});
     },
 
-    // Gắn thể loại vào phim
+    // Các hàm quản lý mối quan hệ (nhiều - nhiều) của phim:
+    
+    // Gắn một thể loại (Genre) vào phim
     attachGenre(movieId, genreId) {
         return apiClient.post(`/admin/movies/${movieId}/genres/${genreId}`, {});
     },
 
-    // Bỏ thể loại khỏi phim
+    // Gỡ một thể loại ra khỏi phim
     detachGenre(movieId, genreId) {
         return apiClient.delete(`/admin/movies/${movieId}/genres/${genreId}`);
     },
 
-    // Gắn quốc gia vào phim
+    // Gắn một quốc gia (Country) vào phim
     attachCountry(movieId, countryId) {
         return apiClient.post(`/admin/movies/${movieId}/countries/${countryId}`, {});
     },
 
-    // Bỏ quốc gia khỏi phim
+    // Gỡ một quốc gia ra khỏi phim
     detachCountry(movieId, countryId) {
         return apiClient.delete(`/admin/movies/${movieId}/countries/${countryId}`);
     },
 
-    // Gắn đạo diễn vào phim
+    // Gắn một đạo diễn (Director) vào phim
     attachDirector(movieId, directorId) {
         return apiClient.post(`/admin/movies/${movieId}/directors/${directorId}`, {});
     },
 
-    // Bỏ đạo diễn khỏi phim
+    // Gỡ một đạo diễn ra khỏi phim
     detachDirector(movieId, directorId) {
         return apiClient.delete(`/admin/movies/${movieId}/directors/${directorId}`);
     },
 
-    // Gắn diễn viên vào phim
+    // Gắn một diễn viên (Actor) vào phim
     attachActor(movieId, actorId) {
         return apiClient.post(`/admin/movies/${movieId}/actors/${actorId}`, {});
     },
 
-    // Bỏ diễn viên khỏi phim
+    // Gỡ một diễn viên ra khỏi phim
     detachActor(movieId, actorId) {
         return apiClient.delete(`/admin/movies/${movieId}/actors/${actorId}`);
     },

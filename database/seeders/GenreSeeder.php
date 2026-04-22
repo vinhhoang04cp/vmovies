@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use App\Models\Genre;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 class GenreSeeder extends Seeder
 {
@@ -25,17 +24,16 @@ class GenreSeeder extends Seeder
             ['name' => 'Âm nhạc',      'slug' => 'am-nhac'],
             ['name' => 'Gia đình',     'slug' => 'gia-dinh'],
             ['name' => 'Trinh thám',   'slug' => 'trinh-tham'],
-            ['name' => 'Siêu anh hùng','slug' => 'sieu-anh-hung'],
+            ['name' => 'Siêu anh hùng', 'slug' => 'sieu-anh-hung'],
         ];
 
         foreach ($genres as $genre) {
             Genre::firstOrCreate(['slug' => $genre['slug']], [
-                'name'        => $genre['name'],
-                'slug'        => $genre['slug'],
+                'name' => $genre['name'],
+                'slug' => $genre['slug'],
                 'description' => null,
-                'icon_url'    => null,
+                'icon_url' => null,
             ]);
         }
     }
 }
-

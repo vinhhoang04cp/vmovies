@@ -11,17 +11,17 @@ use Symfony\Component\HttpFoundation\Response;
 class GenreService
 {
     /**
-        * ham list se tra ve danh sach cac the loai, co the loc theo ten va sap xep theo ten, ngay tao hoac so luong phim tham gia
+     * ham list se tra ve danh sach cac the loai, co the loc theo ten va sap xep theo ten, ngay tao hoac so luong phim tham gia
      */
     public function list(array $filters = []): LengthAwarePaginator
     {
         $query = Genre::withCount('movies');
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $query->where('name', 'like', "%{$filters['search']}%");
         }
 
-        $sortBy  = in_array($filters['sort_by'] ?? '', ['name', 'created_at', 'movies_count'])
+        $sortBy = in_array($filters['sort_by'] ?? '', ['name', 'created_at', 'movies_count'])
             ? $filters['sort_by']
             : 'name';
         $sortDir = ($filters['sort_dir'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
@@ -59,7 +59,7 @@ class GenreService
 
         $genre = $query->find($id);
 
-        if (!$genre) {
+        if (! $genre) {
             throw new ApiException('Không tìm thấy thể loại.', Response::HTTP_NOT_FOUND, 'NOT_FOUND');
         }
 
@@ -71,15 +71,15 @@ class GenreService
      */
     public function create(array $data): Genre
     {
-        $slug = $data['slug'] ?? Str::slug($data['name']) . '-' . time();
+        $slug = $data['slug'] ?? Str::slug($data['name']).'-'.time();
 
         $this->checkDuplicateSlug($slug);
 
         return Genre::create([
-            'name'        => $data['name'],
-            'slug'        => $slug,
+            'name' => $data['name'],
+            'slug' => $slug,
             'description' => $data['description'] ?? null,
-            'icon_url'    => $data['icon_url'] ?? null,
+            'icon_url' => $data['icon_url'] ?? null,
         ]);
     }
 
@@ -88,15 +88,15 @@ class GenreService
      */
     public function update(Genre $genre, array $data): Genre
     {
-        if (!empty($data['slug']) && $data['slug'] !== $genre->slug) {
+        if (! empty($data['slug']) && $data['slug'] !== $genre->slug) {
             $this->checkDuplicateSlug($data['slug'], $genre->id);
         }
 
         $genre->update([
-            'name'        => $data['name'] ?? $genre->name,
-            'slug'        => $data['slug'] ?? $genre->slug,
+            'name' => $data['name'] ?? $genre->name,
+            'slug' => $data['slug'] ?? $genre->slug,
             'description' => array_key_exists('description', $data) ? $data['description'] : $genre->description,
-            'icon_url'    => array_key_exists('icon_url', $data) ? $data['icon_url'] : $genre->icon_url,
+            'icon_url' => array_key_exists('icon_url', $data) ? $data['icon_url'] : $genre->icon_url,
         ]);
 
         return $genre->fresh();
@@ -117,7 +117,7 @@ class GenreService
     {
         $genre = Genre::onlyTrashed()->find($id);
 
-        if (!$genre) {
+        if (! $genre) {
             throw new ApiException('Không tìm thấy thể loại đã xóa.', Response::HTTP_NOT_FOUND, 'NOT_FOUND');
         }
 
@@ -148,4 +148,3 @@ class GenreService
         }
     }
 }
-

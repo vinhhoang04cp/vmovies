@@ -112,4 +112,3 @@ class ApiAuthenticationTest extends TestCase
             ->assertJsonStructure(['data' => ['token']]);
     }
 }
-

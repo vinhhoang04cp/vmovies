@@ -1,6 +1,7 @@
 <?php
 
 // duong
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -39,7 +40,7 @@ class Comment extends Model
      */
     protected $casts = [
         'is_approved' => 'boolean',
-        'is_deleted'  => 'boolean',
+        'is_deleted' => 'boolean',
     ];
 
     /**
@@ -69,4 +70,3 @@ class Comment extends Model
         return $this->belongsTo(Episode::class);
     }
 }
-

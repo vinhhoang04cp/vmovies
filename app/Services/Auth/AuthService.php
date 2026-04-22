@@ -131,6 +131,7 @@ class AuthService
     public function logout(User $user): bool
     {
         $user->tokens()->delete();
+
         return true;
     }
 
@@ -150,4 +151,3 @@ class AuthService
         ];
     }
 }
-

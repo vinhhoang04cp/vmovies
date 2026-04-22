@@ -1,34 +1,37 @@
 import { apiClient } from './apiClient';
 
+/**
+ * directorApi - Quản lý danh mục đạo diễn (Director).
+ */
 export const directorApi = {
-    // Danh sách đạo diễn
+    // Lấy danh sách đạo diễn
     list(params = {}) {
         const query = new URLSearchParams(params).toString();
         return apiClient.get('/admin/directors' + (query ? `?${query}` : ''));
     },
 
-    // Danh sách đạo diễn đã xóa
+    // Lấy danh sách đạo diễn đã xóa
     trashed(params = {}) {
         const query = new URLSearchParams(params).toString();
         return apiClient.get('/admin/directors/trashed' + (query ? `?${query}` : ''));
     },
 
-    // Chi tiết đạo diễn
+    // Lấy thông tin một đạo diễn
     get(id) {
         return apiClient.get(`/admin/directors/${id}`);
     },
 
-    // Tạo đạo diễn mới
+    // Thêm mới đạo diễn
     create(data) {
         return apiClient.post('/admin/directors', data);
     },
 
-    // Cập nhật đạo diễn
+    // Chỉnh sửa thông tin đạo diễn
     update(id, data) {
         return apiClient.put(`/admin/directors/${id}`, data);
     },
 
-    // Xóa mềm đạo diễn
+    // Xóa đạo diễn
     destroy(id) {
         return apiClient.delete(`/admin/directors/${id}`);
     },

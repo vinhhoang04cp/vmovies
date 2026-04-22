@@ -1,5 +1,7 @@
 <?php
+
 // linh
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -30,7 +32,6 @@ class Actor extends Model
     public function movies(): BelongsToMany
     {
         return $this->belongsToMany(Movie::class, 'movie_actor')
-                    ->withPivot('role_name');
+            ->withPivot('role_name');
     }
 }
-

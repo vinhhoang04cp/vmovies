@@ -1,6 +1,7 @@
 <?php
 
 // linh
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,7 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Country extends Model
 {
     use HasFactory, SoftDeletes;
-    
+
     /**
      * Các trường có thể gán giá trị
      * - name: Tên quốc gia (VD: Việt Nam, Mỹ)
@@ -33,4 +34,3 @@ class Country extends Model
         return $this->belongsToMany(Movie::class, 'movie_country');
     }
 }
-

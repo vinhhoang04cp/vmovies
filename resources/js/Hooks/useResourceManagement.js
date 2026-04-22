@@ -1,19 +1,24 @@
 import { useState, useCallback } from 'react';
 
 /**
- * useResourceManagement - Custom hook để quản lý CRUD resource
+ * useResourceManagement - Custom hook dùng chung cho các trang quản lý (Admin).
+ * Giúp xử lý các tác vụ lặp đi lặp lại như: Lấy danh sách, Phân trang, Tìm kiếm, Sắp xếp, Xóa, Khôi phục.
+ * 
+ * @param {Object} apiService - Một instance của service API (ví dụ: movieApi, actorApi).
  */
 export function useResourceManagement(apiService) {
-    const [items, setItems] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [meta, setMeta] = useState({});
-    const [page, setPage] = useState(1);
-    const [search, setSearch] = useState('');
-    const [sortBy, setSortBy] = useState('name');
-    const [sortDir, setSortDir] = useState('asc');
+    const [items, setItems] = useState([]); // Danh sách dữ liệu (phim, diễn viên, ...)
+    const [loading, setLoading] = useState(false); // Trạng thái đang tải API
+    const [error, setError] = useState(null); // Lỗi khi gọi API
+    const [meta, setMeta] = useState({}); // Thông tin phân trang từ Laravel (total, per_page, last_page...)
+    const [page, setPage] = useState(1); // Trang hiện tại
+    const [search, setSearch] = useState(''); // Từ khóa tìm kiếm
+    const [sortBy, setSortBy] = useState('name'); // Trường cần sắp xếp
+    const [sortDir, setSortDir] = useState('asc'); // Hướng sắp xếp (asc/desc)
 
-    // Fetch danh sách items
+    /**
+     * Hàm gọi API để lấy danh sách items dựa trên các tham số tìm kiếm/sắp xếp/phân trang.
+     */
     const fetchItems = useCallback(async (pageNum = 1) => {
         setLoading(true);
         setError(null);
@@ -27,10 +32,11 @@ export function useResourceManagement(apiService) {
             });
 
             if (response.success) {
-                // apiClient wraps: { success, data: { success, data: { data: [], meta: {} } } }
+                // Phân tích dữ liệu trả về từ apiClient (thường bọc trong data.data)
                 const apiData = response.data?.data || response.data;
                 const items = Array.isArray(apiData?.data) ? apiData.data : (Array.isArray(apiData) ? apiData : []);
                 const meta = apiData?.meta || {};
+                
                 setItems(items);
                 setMeta(meta);
                 setPage(pageNum);
@@ -44,18 +50,21 @@ export function useResourceManagement(apiService) {
         }
     }, [apiService, search, sortBy, sortDir]);
 
-    // Xóa item
+    /**
+     * Hàm xử lý xóa một item theo ID.
+     */
     const deleteItem = useCallback(async (id) => {
-        if (!window.confirm('Bạn có chắc chắn muốn xóa?')) return false;
+        if (!window.confirm('Bạn có chắc chắn muốn xóa mục này?')) return false;
 
         setLoading(true);
         try {
             const response = await apiService.destroy(id);
             if (response.success) {
+                // Sau khi xóa thành công, tải lại danh sách ở trang hiện tại để cập nhật UI
                 await fetchItems(page);
                 return true;
             } else {
-                setError(response.error || 'Lỗi khi xóa');
+                setError(response.error || 'Lỗi khi thực hiện lệnh xóa');
                 return false;
             }
         } catch (err) {
@@ -66,7 +75,9 @@ export function useResourceManagement(apiService) {
         }
     }, [apiService, page, fetchItems]);
 
-    // Khôi phục item
+    /**
+     * Hàm xử lý khôi phục một item đã xóa (dành cho các model dùng SoftDelete).
+     */
     const restoreItem = useCallback(async (id) => {
         setLoading(true);
         try {
@@ -75,7 +86,7 @@ export function useResourceManagement(apiService) {
                 await fetchItems(page);
                 return true;
             } else {
-                setError(response.error || 'Lỗi khi khôi phục');
+                setError(response.error || 'Lỗi khi thực hiện lệnh khôi phục');
                 return false;
             }
         } catch (err) {

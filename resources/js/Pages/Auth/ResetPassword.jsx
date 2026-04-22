@@ -5,7 +5,13 @@ import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, useForm } from '@inertiajs/react';
 
+/**
+ * ResetPassword - Trang đặt lại mật khẩu mới.
+ * 
+ * Người dùng sử dụng trang này sau khi nhấp vào liên kết từ email khôi phục mật khẩu.
+ */
 export default function ResetPassword({ token, email }) {
+    // Khởi tạo form với token và email được cung cấp từ URL, cùng các trường mật khẩu mới.
     const { data, setData, post, processing, errors, reset } = useForm({
         token: token,
         email: email,
@@ -13,21 +19,26 @@ export default function ResetPassword({ token, email }) {
         password_confirmation: '',
     });
 
+    /**
+     * submit - Gửi yêu cầu cập nhật mật khẩu mới.
+     */
     const submit = (e) => {
         e.preventDefault();
 
         post(route('password.store'), {
+            // Sau khi hoàn tất, xóa trắng mật khẩu.
             onFinish: () => reset('password', 'password_confirmation'),
         });
     };
 
     return (
         <GuestLayout>
-            <Head title="Reset Password" />
+            <Head title="Đặt lại mật khẩu" />
 
             <form onSubmit={submit}>
+                {/* Trường Email (thường đã được điền sẵn) */}
                 <div>
-                    <InputLabel htmlFor="email" value="Email" />
+                    <InputLabel htmlFor="email" value="Địa chỉ Email" />
 
                     <TextInput
                         id="email"
@@ -42,8 +53,9 @@ export default function ResetPassword({ token, email }) {
                     <InputError message={errors.email} className="mt-2" />
                 </div>
 
+                {/* Trường Mật khẩu mới */}
                 <div className="mt-4">
-                    <InputLabel htmlFor="password" value="Password" />
+                    <InputLabel htmlFor="password" value="Mật khẩu mới" />
 
                     <TextInput
                         id="password"
@@ -59,10 +71,11 @@ export default function ResetPassword({ token, email }) {
                     <InputError message={errors.password} className="mt-2" />
                 </div>
 
+                {/* Xác nhận mật khẩu mới */}
                 <div className="mt-4">
                     <InputLabel
                         htmlFor="password_confirmation"
-                        value="Confirm Password"
+                        value="Xác nhận mật khẩu"
                     />
 
                     <TextInput
@@ -85,7 +98,7 @@ export default function ResetPassword({ token, email }) {
 
                 <div className="mt-4 flex items-center justify-end">
                     <PrimaryButton className="ms-4" disabled={processing}>
-                        Reset Password
+                        Cập nhật mật khẩu
                     </PrimaryButton>
                 </div>
             </form>

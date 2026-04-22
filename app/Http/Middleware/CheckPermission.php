@@ -33,4 +33,3 @@ class CheckPermission
         return $next($request);
     }
 }
-

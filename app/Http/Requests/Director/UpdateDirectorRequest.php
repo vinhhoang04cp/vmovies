@@ -14,8 +14,8 @@ class UpdateDirectorRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'      => ['sometimes', 'required', 'string', 'max:150'],
-            'bio'       => ['nullable', 'string', 'max:2000'],
+            'name' => ['sometimes', 'required', 'string', 'max:150'],
+            'bio' => ['nullable', 'string', 'max:2000'],
             'image_url' => ['nullable', 'string', 'max:2048'],
         ];
     }
@@ -27,4 +27,3 @@ class UpdateDirectorRequest extends FormRequest
         ];
     }
 }
-

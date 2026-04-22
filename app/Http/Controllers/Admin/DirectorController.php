@@ -27,12 +27,14 @@ class DirectorController extends Controller
     {
         try {
             $directors = $this->directorService->list($request->query());
+
             return $this->successResponse(
                 DirectorResource::collection($directors)->response()->getData(true),
                 'Danh sách đạo diễn.'
             );
         } catch (\Exception $e) {
             Log::error('Admin list directors error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi lấy danh sách đạo diễn.', 500);
         }
     }
@@ -45,12 +47,14 @@ class DirectorController extends Controller
     {
         try {
             $directors = $this->directorService->listTrashed($request->query());
+
             return $this->successResponse(
                 DirectorResource::collection($directors)->response()->getData(true),
                 'Danh sách đạo diễn đã xóa.'
             );
         } catch (\Exception $e) {
             Log::error('Admin list trashed directors error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi lấy danh sách đạo diễn đã xóa.', 500);
         }
     }
@@ -63,9 +67,11 @@ class DirectorController extends Controller
     {
         try {
             $director = $this->directorService->create($request->validated());
+
             return $this->createdResponse(new DirectorResource($director), 'Tạo đạo diễn thành công.');
         } catch (\Exception $e) {
             Log::error('Admin store director error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi tạo đạo diễn.', 500);
         }
     }
@@ -78,11 +84,13 @@ class DirectorController extends Controller
     {
         try {
             $director = $this->directorService->findOrFail($id, withTrashed: true);
+
             return $this->successResponse(new DirectorResource($director), 'Chi tiết đạo diễn.');
         } catch (ApiException $e) {
             return $this->notFoundResponse($e->getMessage());
         } catch (\Exception $e) {
             Log::error('Admin show director error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi lấy đạo diễn.', 500);
         }
     }
@@ -96,11 +104,13 @@ class DirectorController extends Controller
         try {
             $director = $this->directorService->findOrFail($id);
             $director = $this->directorService->update($director, $request->validated());
+
             return $this->successResponse(new DirectorResource($director), 'Cập nhật đạo diễn thành công.');
         } catch (ApiException $e) {
             return $e->render($request);
         } catch (\Exception $e) {
             Log::error('Admin update director error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi cập nhật đạo diễn.', 500);
         }
     }
@@ -114,11 +124,13 @@ class DirectorController extends Controller
         try {
             $director = $this->directorService->findOrFail($id);
             $this->directorService->delete($director);
+
             return $this->successResponse(null, 'Xóa đạo diễn thành công.');
         } catch (ApiException $e) {
             return $this->notFoundResponse($e->getMessage());
         } catch (\Exception $e) {
             Log::error('Admin delete director error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi xóa đạo diễn.', 500);
         }
     }
@@ -131,13 +143,14 @@ class DirectorController extends Controller
     {
         try {
             $director = $this->directorService->restore($id);
+
             return $this->successResponse(new DirectorResource($director), 'Khôi phục đạo diễn thành công.');
         } catch (ApiException $e) {
             return $this->notFoundResponse($e->getMessage());
         } catch (\Exception $e) {
             Log::error('Admin restore director error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi khôi phục đạo diễn.', 500);
         }
     }
 }
-

@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Response;
 class ApiException extends Exception
 {
     protected int $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
+
     protected string $errorCode = 'INTERNAL_SERVER_ERROR';
 
     public function __construct(
@@ -43,4 +44,3 @@ class ApiException extends Exception
         ], $this->statusCode);
     }
 }
-

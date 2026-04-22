@@ -3,26 +3,24 @@
 namespace App\Services;
 
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Log;
 
 class FileUploadService
 {
     /**
      * Upload video file to storage and return public URL
      *
-     * @param UploadedFile $file
-     * @param string $episode_id
      * @return string Public URL of the uploaded video
      */
     public function uploadVideo(UploadedFile $file, string $episode_id): string
     {
         try {
             // Check if file is valid
-            if (!$file->isValid()) {
+            if (! $file->isValid()) {
                 throw new \RuntimeException(
-                    'File upload không hợp lệ. Mã lỗi: ' . $file->getError()
+                    'File upload không hợp lệ. Mã lỗi: '.$file->getError()
                 );
             }
 
@@ -33,7 +31,7 @@ class FileUploadService
             ]);
 
             // Generate unique filename: episodes/{episode_id}/{uuid}.{ext}
-            $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+            $filename = Str::uuid().'.'.$file->getClientOriginalExtension();
             $path = "episodes/{$episode_id}";
 
             Log::info('Uploading to path', ['path' => $path, 'filename' => $filename]);
@@ -50,7 +48,7 @@ class FileUploadService
             Log::info('File stored successfully', ['storagePath' => $storagePath]);
 
             // Return public URL
-            $publicUrl = asset('storage/' . $storagePath);
+            $publicUrl = asset('storage/'.$storagePath);
             Log::info('Video upload complete', ['url' => $publicUrl]);
 
             return $publicUrl;
@@ -66,8 +64,7 @@ class FileUploadService
     /**
      * Delete video file from storage
      *
-     * @param string $videoUrl Full URL of the video
-     * @return bool
+     * @param  string  $videoUrl  Full URL of the video
      */
     public function deleteVideo(string $videoUrl): bool
     {
@@ -90,9 +87,6 @@ class FileUploadService
 
     /**
      * Delete all videos in an episode directory
-     *
-     * @param string $episode_id
-     * @return bool
      */
     public function deleteEpisodeVideos(string $episode_id): bool
     {
@@ -105,4 +99,3 @@ class FileUploadService
         return false;
     }
 }
-

@@ -28,12 +28,14 @@ class GenreController extends Controller
     {
         try {
             $genres = $this->genreService->list($request->query());
+
             return $this->successResponse(
                 GenreResource::collection($genres)->response()->getData(true),
                 'Danh sách thể loại.'
             );
         } catch (\Exception $e) {
             Log::error('Admin list genres error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi lấy danh sách thể loại.', 500);
         }
     }
@@ -46,12 +48,14 @@ class GenreController extends Controller
     {
         try {
             $genres = $this->genreService->listTrashed($request->query());
+
             return $this->successResponse(
                 GenreResource::collection($genres)->response()->getData(true),
                 'Danh sách thể loại đã xóa.'
             );
         } catch (\Exception $e) {
             Log::error('Admin list trashed genres error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi lấy danh sách thể loại đã xóa.', 500);
         }
     }
@@ -64,11 +68,13 @@ class GenreController extends Controller
     {
         try {
             $genre = $this->genreService->create($request->validated());
+
             return $this->createdResponse(new GenreResource($genre), 'Tạo thể loại thành công.');
         } catch (ApiException $e) {
             return $e->render($request);
         } catch (\Exception $e) {
             Log::error('Admin store genre error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi tạo thể loại.', 500);
         }
     }
@@ -81,11 +87,13 @@ class GenreController extends Controller
     {
         try {
             $genre = $this->genreService->findOrFail($id, withTrashed: true);
+
             return $this->successResponse(new GenreResource($genre), 'Chi tiết thể loại.');
         } catch (ApiException $e) {
             return $this->notFoundResponse($e->getMessage());
         } catch (\Exception $e) {
             Log::error('Admin show genre error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi lấy thể loại.', 500);
         }
     }
@@ -99,11 +107,13 @@ class GenreController extends Controller
         try {
             $genre = $this->genreService->findOrFail($id);
             $genre = $this->genreService->update($genre, $request->validated());
+
             return $this->successResponse(new GenreResource($genre), 'Cập nhật thể loại thành công.');
         } catch (ApiException $e) {
             return $e->render($request);
         } catch (\Exception $e) {
             Log::error('Admin update genre error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi cập nhật thể loại.', 500);
         }
     }
@@ -117,11 +127,13 @@ class GenreController extends Controller
         try {
             $genre = $this->genreService->findOrFail($id);
             $this->genreService->delete($genre);
+
             return $this->successResponse(null, 'Xóa thể loại thành công.');
         } catch (ApiException $e) {
             return $this->notFoundResponse($e->getMessage());
         } catch (\Exception $e) {
             Log::error('Admin delete genre error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi xóa thể loại.', 500);
         }
     }
@@ -134,13 +146,14 @@ class GenreController extends Controller
     {
         try {
             $genre = $this->genreService->restore($id);
+
             return $this->successResponse(new GenreResource($genre), 'Khôi phục thể loại thành công.');
         } catch (ApiException $e) {
             return $this->notFoundResponse($e->getMessage());
         } catch (\Exception $e) {
             Log::error('Admin restore genre error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi khôi phục thể loại.', 500);
         }
     }
 }
-

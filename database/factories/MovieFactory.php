@@ -12,17 +12,17 @@ class MovieFactory extends Factory
         $title = fake()->sentence(3, false);
 
         return [
-            'title'          => rtrim($title, '.'),
+            'title' => rtrim($title, '.'),
             'original_title' => fake()->optional()->sentence(3, false),
-            'slug'           => Str::slug($title) . '-' . fake()->unique()->numberBetween(1, 99999),
-            'poster_url'     => 'https://placehold.co/300x450/1a1a2e/ffffff?text=Poster',
-            'banner_url'     => 'https://placehold.co/1280x720/1a1a2e/ffffff?text=Banner',
-            'trailer_url'    => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-            'summary'        => fake()->paragraphs(2, true),
-            'release_year'   => fake()->numberBetween(2000, 2026),
-            'status'         => fake()->randomElement(['ongoing', 'completed']),
-            'type'           => fake()->randomElement(['movie', 'series']),
-            'view_count'     => fake()->numberBetween(0, 1000000),
+            'slug' => Str::slug($title).'-'.fake()->unique()->numberBetween(1, 99999),
+            'poster_url' => 'https://placehold.co/300x450/1a1a2e/ffffff?text=Poster',
+            'banner_url' => 'https://placehold.co/1280x720/1a1a2e/ffffff?text=Banner',
+            'trailer_url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+            'summary' => fake()->paragraphs(2, true),
+            'release_year' => fake()->numberBetween(2000, 2026),
+            'status' => fake()->randomElement(['ongoing', 'completed']),
+            'type' => fake()->randomElement(['movie', 'series']),
+            'view_count' => fake()->numberBetween(0, 1000000),
             'average_rating' => 0,
         ];
     }
@@ -47,4 +47,3 @@ class MovieFactory extends Factory
         return $this->state(fn (array $attributes) => ['status' => 'ongoing']);
     }
 }
-

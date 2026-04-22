@@ -14,8 +14,8 @@ class StoreCountryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'     => ['required', 'string', 'max:100'],
-            'code'     => ['required', 'string', 'max:5', 'regex:/^[A-Za-z]+$/'],
+            'name' => ['required', 'string', 'max:100'],
+            'code' => ['required', 'string', 'max:5', 'regex:/^[A-Za-z]+$/'],
             'flag_url' => ['nullable', 'string', 'max:2048'],
         ];
     }
@@ -25,9 +25,8 @@ class StoreCountryRequest extends FormRequest
         return [
             'name.required' => 'Tên quốc gia là bắt buộc.',
             'code.required' => 'Mã quốc gia là bắt buộc.',
-            'code.max'      => 'Mã quốc gia không vượt quá 5 ký tự.',
-            'code.regex'    => 'Mã quốc gia chỉ được chứa chữ cái.',
+            'code.max' => 'Mã quốc gia không vượt quá 5 ký tự.',
+            'code.regex' => 'Mã quốc gia chỉ được chứa chữ cái.',
         ];
     }
 }
-

@@ -60,4 +60,3 @@ return [
         'allow_credentials' => true,
     ],
 ];
-

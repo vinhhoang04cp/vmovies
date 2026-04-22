@@ -19,35 +19,35 @@ class MovieService
         $query = Movie::withCount('episodes')
             ->with(['genres', 'countries']);
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('original_title', 'like', "%{$search}%");
+                    ->orWhere('original_title', 'like', "%{$search}%");
             });
         }
 
-        if (!empty($filters['type'])) {
+        if (! empty($filters['type'])) {
             $query->where('type', $filters['type']);
         }
 
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
 
-        if (!empty($filters['genre_id'])) {
-            $query->whereHas('genres', fn($q) => $q->where('genres.id', $filters['genre_id']));
+        if (! empty($filters['genre_id'])) {
+            $query->whereHas('genres', fn ($q) => $q->where('genres.id', $filters['genre_id']));
         }
 
-        if (!empty($filters['country_id'])) {
-            $query->whereHas('countries', fn($q) => $q->where('countries.id', $filters['country_id']));
+        if (! empty($filters['country_id'])) {
+            $query->whereHas('countries', fn ($q) => $q->where('countries.id', $filters['country_id']));
         }
 
-        if (!empty($filters['year'])) {
+        if (! empty($filters['year'])) {
             $query->where('release_year', $filters['year']);
         }
 
-        $sortBy  = $filters['sort_by'] ?? 'created_at';
+        $sortBy = $filters['sort_by'] ?? 'created_at';
         $sortDir = $filters['sort_dir'] ?? 'desc';
         $allowedSorts = ['created_at', 'title', 'release_year', 'view_count', 'average_rating'];
 
@@ -86,7 +86,7 @@ class MovieService
 
         $movie = $query->find($id);
 
-        if (!$movie) {
+        if (! $movie) {
             throw new ApiException('Không tìm thấy phim.', Response::HTTP_NOT_FOUND, 'NOT_FOUND');
         }
 
@@ -100,21 +100,21 @@ class MovieService
     {
         return DB::transaction(function () use ($data) {
             if (empty($data['slug'])) {
-                $data['slug'] = Str::slug($data['title']) . '-' . time();
+                $data['slug'] = Str::slug($data['title']).'-'.time();
             }
 
             $movie = Movie::create([
-                'title'          => $data['title'],
+                'title' => $data['title'],
                 'original_title' => $data['original_title'] ?? null,
-                'slug'           => $data['slug'],
-                'poster_url'     => $data['poster_url'] ?? null,
-                'banner_url'     => $data['banner_url'] ?? null,
-                'trailer_url'    => $data['trailer_url'] ?? null,
-                'summary'        => $data['summary'] ?? null,
-                'release_year'   => $data['release_year'] ?? null,
-                'status'         => $data['status'] ?? 'ongoing',
-                'type'           => $data['type'],
-                'view_count'     => 0,
+                'slug' => $data['slug'],
+                'poster_url' => $data['poster_url'] ?? null,
+                'banner_url' => $data['banner_url'] ?? null,
+                'trailer_url' => $data['trailer_url'] ?? null,
+                'summary' => $data['summary'] ?? null,
+                'release_year' => $data['release_year'] ?? null,
+                'status' => $data['status'] ?? 'ongoing',
+                'type' => $data['type'],
+                'view_count' => 0,
                 'average_rating' => 0,
             ]);
 
@@ -131,17 +131,17 @@ class MovieService
     {
         return DB::transaction(function () use ($movie, $data) {
             $movie->update(array_filter([
-                'title'          => $data['title'] ?? $movie->title,
+                'title' => $data['title'] ?? $movie->title,
                 'original_title' => array_key_exists('original_title', $data) ? $data['original_title'] : $movie->original_title,
-                'slug'           => $data['slug'] ?? $movie->slug,
-                'poster_url'     => array_key_exists('poster_url', $data) ? $data['poster_url'] : $movie->poster_url,
-                'banner_url'     => array_key_exists('banner_url', $data) ? $data['banner_url'] : $movie->banner_url,
-                'trailer_url'    => array_key_exists('trailer_url', $data) ? $data['trailer_url'] : $movie->trailer_url,
-                'summary'        => array_key_exists('summary', $data) ? $data['summary'] : $movie->summary,
-                'release_year'   => $data['release_year'] ?? $movie->release_year,
-                'status'         => $data['status'] ?? $movie->status,
-                'type'           => $data['type'] ?? $movie->type,
-            ], fn($v) => $v !== null));
+                'slug' => $data['slug'] ?? $movie->slug,
+                'poster_url' => array_key_exists('poster_url', $data) ? $data['poster_url'] : $movie->poster_url,
+                'banner_url' => array_key_exists('banner_url', $data) ? $data['banner_url'] : $movie->banner_url,
+                'trailer_url' => array_key_exists('trailer_url', $data) ? $data['trailer_url'] : $movie->trailer_url,
+                'summary' => array_key_exists('summary', $data) ? $data['summary'] : $movie->summary,
+                'release_year' => $data['release_year'] ?? $movie->release_year,
+                'status' => $data['status'] ?? $movie->status,
+                'type' => $data['type'] ?? $movie->type,
+            ], fn ($v) => $v !== null));
 
             $this->syncRelationships($movie, $data);
 
@@ -164,7 +164,7 @@ class MovieService
     {
         $movie = Movie::onlyTrashed()->find($id);
 
-        if (!$movie) {
+        if (! $movie) {
             throw new ApiException('Không tìm thấy phim đã xóa.', Response::HTTP_NOT_FOUND, 'NOT_FOUND');
         }
 
@@ -247,11 +247,10 @@ class MovieService
         }
 
         if (array_key_exists('actors', $data)) {
-            $actorsSync = collect($data['actors'] ?? [])->mapWithKeys(fn($actor) => [
+            $actorsSync = collect($data['actors'] ?? [])->mapWithKeys(fn ($actor) => [
                 $actor['id'] => ['role_name' => $actor['role_name'] ?? null],
             ])->toArray();
             $movie->actors()->sync($actorsSync);
         }
     }
 }
-

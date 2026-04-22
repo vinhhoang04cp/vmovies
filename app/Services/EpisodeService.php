@@ -13,8 +13,9 @@ use Symfony\Component\HttpFoundation\Response;
 class EpisodeService
 {
     public function __construct(
-        private FileUploadService $fileUploadService = new FileUploadService()
+        private FileUploadService $fileUploadService = new FileUploadService
     ) {}
+
     /**
      * Lấy danh sách tập phim của một bộ phim.
      */
@@ -34,7 +35,7 @@ class EpisodeService
     {
         $episode = Episode::with('movie')->find($id);
 
-        if (!$episode) {
+        if (! $episode) {
             throw new ApiException('Không tìm thấy tập phim.', Response::HTTP_NOT_FOUND, 'NOT_FOUND');
         }
 
@@ -53,34 +54,34 @@ class EpisodeService
 
         // Debug logging
         \Log::info('Episode create request', [
-            'has_video_file' => !empty($data['video_file']),
+            'has_video_file' => ! empty($data['video_file']),
             'video_file_type' => $data['video_file'] ? get_class($data['video_file']) : null,
             'video_url' => $videoUrl,
         ]);
 
         // Tạo episode tạm thời để có ID cho upload
         $episode = Episode::create([
-            'movie_id'       => $movie->id,
+            'movie_id' => $movie->id,
             'episode_number' => $data['episode_number'],
-            'arc_name'       => $data['arc_name'] ?? null,
-            'title'          => $data['title'] ?? null,
-            'video_url'      => 'processing', // temporary value
-            'duration'       => isset($data['duration']) && $data['duration'] !== null ? (int)$data['duration'] : 0,
-            'views'          => 0,
+            'arc_name' => $data['arc_name'] ?? null,
+            'title' => $data['title'] ?? null,
+            'video_url' => 'processing', // temporary value
+            'duration' => isset($data['duration']) && $data['duration'] !== null ? (int) $data['duration'] : 0,
+            'views' => 0,
         ]);
 
         // Upload video file if provided
-        if (!empty($data['video_file'])) {
+        if (! empty($data['video_file'])) {
             \Log::info('Uploading video file', ['episode_id' => $episode->id]);
             try {
-                $videoUrl = $this->fileUploadService->uploadVideo($data['video_file'], (string)$episode->id);
+                $videoUrl = $this->fileUploadService->uploadVideo($data['video_file'], (string) $episode->id);
                 \Log::info('Video uploaded successfully', ['url' => $videoUrl]);
                 $episode->update(['video_url' => $videoUrl]);
             } catch (\Exception $e) {
                 \Log::error('Video upload failed', ['error' => $e->getMessage()]);
                 throw $e;
             }
-        } elseif (!empty($videoUrl) && $videoUrl !== 'pending') {
+        } elseif (! empty($videoUrl) && $videoUrl !== 'pending') {
             \Log::info('Using provided video URL', ['url' => $videoUrl]);
             $episode->update(['video_url' => $videoUrl]);
         } else {
@@ -93,7 +94,7 @@ class EpisodeService
     /**
      * Tạo nhiều tập phim cùng lúc (bulk create).
      */
-    public function bulkCreate(Movie $movie, array $episodes): \Illuminate\Database\Eloquent\Collection
+    public function bulkCreate(Movie $movie, array $episodes): Collection
     {
         return DB::transaction(function () use ($movie, $episodes) {
             $numbers = array_column($episodes, 'episode_number');
@@ -113,9 +114,9 @@ class EpisodeService
                 ->pluck('episode_number')
                 ->toArray();
 
-            if (!empty($existing)) {
+            if (! empty($existing)) {
                 throw new ApiException(
-                    'Các tập ' . implode(', ', $existing) . ' đã tồn tại.',
+                    'Các tập '.implode(', ', $existing).' đã tồn tại.',
                     Response::HTTP_CONFLICT,
                     'EPISODE_EXISTS'
                 );
@@ -124,17 +125,17 @@ class EpisodeService
             $created = [];
             foreach ($episodes as $epData) {
                 $created[] = Episode::create([
-                    'movie_id'       => $movie->id,
+                    'movie_id' => $movie->id,
                     'episode_number' => $epData['episode_number'],
-                    'arc_name'       => $epData['arc_name'] ?? null,
-                    'title'          => $epData['title'] ?? null,
-                    'video_url'      => $epData['video_url'],
-                    'duration'       => isset($epData['duration']) && $epData['duration'] !== null ? (int)$epData['duration'] : 0,
-                    'views'          => 0,
+                    'arc_name' => $epData['arc_name'] ?? null,
+                    'title' => $epData['title'] ?? null,
+                    'video_url' => $epData['video_url'],
+                    'duration' => isset($epData['duration']) && $epData['duration'] !== null ? (int) $epData['duration'] : 0,
+                    'views' => 0,
                 ]);
             }
 
-            return Episode::whereIn('id', array_map(fn($e) => $e->id, $created))->get();
+            return Episode::whereIn('id', array_map(fn ($e) => $e->id, $created))->get();
         });
     }
 
@@ -151,21 +152,21 @@ class EpisodeService
         $newDuration = array_key_exists('duration', $data) ? $data['duration'] : $episode->duration;
         $updateData = [
             'episode_number' => $data['episode_number'] ?? $episode->episode_number,
-            'arc_name'       => array_key_exists('arc_name', $data) ? $data['arc_name'] : $episode->arc_name,
-            'title'          => array_key_exists('title', $data) ? $data['title'] : $episode->title,
-            'video_url'      => $episode->video_url, // Start with existing, will update if file uploaded
-            'duration'       => ($newDuration !== null) ? (int)$newDuration : $episode->duration ?? 0,
+            'arc_name' => array_key_exists('arc_name', $data) ? $data['arc_name'] : $episode->arc_name,
+            'title' => array_key_exists('title', $data) ? $data['title'] : $episode->title,
+            'video_url' => $episode->video_url, // Start with existing, will update if file uploaded
+            'duration' => ($newDuration !== null) ? (int) $newDuration : $episode->duration ?? 0,
         ];
 
         // Upload new video file if provided (PRIORITY over video_url)
-        if (!empty($data['video_file'])) {
+        if (! empty($data['video_file'])) {
             // Delete old video if exists and is local
             if ($episode->video_url && strpos($episode->video_url, '/storage/') !== false) {
                 $this->fileUploadService->deleteVideo($episode->video_url);
             }
 
-            $updateData['video_url'] = $this->fileUploadService->uploadVideo($data['video_file'], (string)$episode->id);
-        } elseif (!empty($data['video_url'])) {
+            $updateData['video_url'] = $this->fileUploadService->uploadVideo($data['video_file'], (string) $episode->id);
+        } elseif (! empty($data['video_url'])) {
             // Only use URL if no file is provided
             $updateData['video_url'] = $data['video_url'];
         }
@@ -197,7 +198,7 @@ class EpisodeService
 
         $query = Episode::onlyTrashed()->with('movie');
 
-        if (!empty($filters['movie_id'])) {
+        if (! empty($filters['movie_id'])) {
             $query->where('movie_id', $filters['movie_id']);
         }
 
@@ -211,7 +212,7 @@ class EpisodeService
     {
         $episode = Episode::onlyTrashed()->with('movie')->find($id);
 
-        if (!$episode) {
+        if (! $episode) {
             throw new ApiException('Không tìm thấy tập phim đã xóa.', Response::HTTP_NOT_FOUND, 'NOT_FOUND');
         }
 
@@ -258,4 +259,3 @@ class EpisodeService
         }
     }
 }
-

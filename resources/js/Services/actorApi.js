@@ -1,19 +1,22 @@
 import { apiClient } from './apiClient';
 
+/**
+ * actorApi - Chứa các phương thức quản lý diễn viên (Actor) dành cho Admin.
+ */
 export const actorApi = {
-    // Danh sách diễn viên
+    // Lấy danh sách diễn viên (có lọc/phân trang)
     list(params = {}) {
         const query = new URLSearchParams(params).toString();
         return apiClient.get('/admin/actors' + (query ? `?${query}` : ''));
     },
 
-    // Danh sách diễn viên đã xóa
+    // Lấy danh sách diễn viên đã bị xóa (thùng rác)
     trashed(params = {}) {
         const query = new URLSearchParams(params).toString();
         return apiClient.get('/admin/actors/trashed' + (query ? `?${query}` : ''));
     },
 
-    // Chi tiết diễn viên
+    // Lấy thông tin chi tiết một diễn viên
     get(id) {
         return apiClient.get(`/admin/actors/${id}`);
     },
@@ -23,7 +26,7 @@ export const actorApi = {
         return apiClient.post('/admin/actors', data);
     },
 
-    // Cập nhật diễn viên
+    // Cập nhật thông tin diễn viên
     update(id, data) {
         return apiClient.put(`/admin/actors/${id}`, data);
     },
@@ -33,7 +36,7 @@ export const actorApi = {
         return apiClient.delete(`/admin/actors/${id}`);
     },
 
-    // Khôi phục diễn viên
+    // Khôi phục diễn viên từ thùng rác
     restore(id) {
         return apiClient.post(`/admin/actors/${id}/restore`, {});
     },

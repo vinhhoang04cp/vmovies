@@ -16,14 +16,14 @@ class CountryService
     {
         $query = Country::withCount('movies');
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $query->where(function ($q) use ($filters) {
                 $q->where('name', 'like', "%{$filters['search']}%")
-                  ->orWhere('code', 'like', "%{$filters['search']}%");
+                    ->orWhere('code', 'like', "%{$filters['search']}%");
             });
         }
 
-        $sortBy  = in_array($filters['sort_by'] ?? '', ['name', 'code', 'created_at', 'movies_count'])
+        $sortBy = in_array($filters['sort_by'] ?? '', ['name', 'code', 'created_at', 'movies_count'])
             ? $filters['sort_by']
             : 'name';
         $sortDir = ($filters['sort_dir'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
@@ -36,7 +36,7 @@ class CountryService
     }
 
     /**
-        * danh sach cac quoc gia da bi xoa mem, co the loc theo ten va ma quoc gia, sap xep theo ten, ma quoc gia, ngay xoa hoac so luong phim tham gia
+     * danh sach cac quoc gia da bi xoa mem, co the loc theo ten va ma quoc gia, sap xep theo ten, ma quoc gia, ngay xoa hoac so luong phim tham gia
      */
     public function listTrashed(array $filters = []): LengthAwarePaginator
     {
@@ -61,7 +61,7 @@ class CountryService
 
         $country = $query->find($id);
 
-        if (!$country) {
+        if (! $country) {
             throw new ApiException('Không tìm thấy quốc gia.', Response::HTTP_NOT_FOUND, 'NOT_FOUND');
         }
 
@@ -69,15 +69,15 @@ class CountryService
     }
 
     /**
-        * ham create se tao moi mot quoc gia, tra ve doi tuong Country vua duoc tao
+     * ham create se tao moi mot quoc gia, tra ve doi tuong Country vua duoc tao
      */
     public function create(array $data): Country
     {
         $this->checkDuplicateCode($data['code']);
 
         return Country::create([
-            'name'     => $data['name'],
-            'code'     => strtoupper($data['code']),
+            'name' => $data['name'],
+            'code' => strtoupper($data['code']),
             'flag_url' => $data['flag_url'] ?? null,
         ]);
     }
@@ -87,13 +87,13 @@ class CountryService
      */
     public function update(Country $country, array $data): Country
     {
-        if (!empty($data['code']) && strtoupper($data['code']) !== $country->code) {
+        if (! empty($data['code']) && strtoupper($data['code']) !== $country->code) {
             $this->checkDuplicateCode($data['code'], $country->id);
         }
 
         $country->update([
-            'name'     => $data['name'] ?? $country->name,
-            'code'     => isset($data['code']) ? strtoupper($data['code']) : $country->code,
+            'name' => $data['name'] ?? $country->name,
+            'code' => isset($data['code']) ? strtoupper($data['code']) : $country->code,
             'flag_url' => array_key_exists('flag_url', $data) ? $data['flag_url'] : $country->flag_url,
         ]);
 
@@ -101,7 +101,7 @@ class CountryService
     }
 
     /**
-        * ham delete se xoa mem mot quoc gia, neu thanh cong se tra ve null, neu khong tim thay quoc gia se nem ApiException
+     * ham delete se xoa mem mot quoc gia, neu thanh cong se tra ve null, neu khong tim thay quoc gia se nem ApiException
      */
     public function delete(Country $country): void
     {
@@ -109,13 +109,13 @@ class CountryService
     }
 
     /**
-        * ham restore se phuc hoi mot quoc gia da bi xoa mem, neu thanh cong se tra ve doi tuong Country sau khi da duoc phuc hoi, neu khong tim thay quoc gia da bi xoa mem se nem ApiException
+     * ham restore se phuc hoi mot quoc gia da bi xoa mem, neu thanh cong se tra ve doi tuong Country sau khi da duoc phuc hoi, neu khong tim thay quoc gia da bi xoa mem se nem ApiException
      */
     public function restore(int $id): Country
     {
         $country = Country::onlyTrashed()->find($id);
 
-        if (!$country) {
+        if (! $country) {
             throw new ApiException('Không tìm thấy quốc gia đã xóa.', Response::HTTP_NOT_FOUND, 'NOT_FOUND');
         }
 
@@ -148,4 +148,3 @@ class CountryService
         }
     }
 }
-

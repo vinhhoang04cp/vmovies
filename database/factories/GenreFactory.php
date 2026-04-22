@@ -12,11 +12,10 @@ class GenreFactory extends Factory
         $name = fake()->unique()->word();
 
         return [
-            'name'        => ucfirst($name),
-            'slug'        => Str::slug($name),
+            'name' => ucfirst($name),
+            'slug' => Str::slug($name),
             'description' => fake()->sentence(),
-            'icon_url'    => null,
+            'icon_url' => null,
         ];
     }
 }
-

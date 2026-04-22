@@ -35,7 +35,7 @@ class WatchHistory extends Model
      */
     protected $casts = [
         'current_timestamp' => 'integer',
-        'watched_at'        => 'datetime',
+        'watched_at' => 'datetime',
     ];
 
     /**
@@ -62,4 +62,3 @@ class WatchHistory extends Model
         return $this->belongsTo(Episode::class);
     }
 }
-

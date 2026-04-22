@@ -8,37 +8,55 @@ import FormModal from '@/Components/FormModal';
 import LoadingSpinner from '@/Components/LoadingSpinner';
 import Toast from '@/Components/Toast';
 
+/**
+ * Khởi tạo dữ liệu trống cho Form tập phim.
+ * Phục vụ việc reset form khi tạo mới.
+ */
 const emptyForm = {
     episode_number: '',
     title: '',
     arc_name: '',
     video_url: '',
-    video_file: null,
+    video_file: null, // Dùng cho trường hợp upload file video trực tiếp từ máy tính.
     duration: '',
 };
 
+/**
+ * EpisodeManagement - Thành phần quản lý danh sách tập phim cho một bộ phim cụ thể.
+ * 
+ * Các tính năng chính:
+ * 1. Hiển thị danh sách tập phim thuộc về một Movie ID (lấy từ URL params).
+ * 2. Hỗ trợ tạo mới tập phim (tự động gợi ý số tập kế tiếp).
+ * 3. Hỗ trợ chỉnh sửa thông tin tập phim (Số tập, Tiêu đề, Arc, Video Source).
+ * 4. Xử lý Upload video file (multipart/form-data) hoặc sử dụng Link video (URL).
+ * 5. Định dạng thời lượng tập phim (giây sang mm:ss).
+ */
 export default function EpisodeManagement() {
-    const { movieId } = useParams();
+    const { movieId } = useParams(); // Lấy ID phim từ URL thông qua React Router.
     const navigate = useNavigate();
 
-    const [movie, setMovie] = useState(null);
-    const [episodes, setEpisodes] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [meta, setMeta] = useState({});
-    const [page, setPage] = useState(1);
-    const [search, setSearch] = useState('');
-    const [sortBy, setSortBy] = useState('episode_number');
-    const [sortDir, setSortDir] = useState('asc');
+    // --- CÁC STATE QUẢN LÝ DỮ LIỆU ---
+    const [movie, setMovie] = useState(null);       // Lưu thông tin phim cha để hiển thị tiêu đề.
+    const [episodes, setEpisodes] = useState([]);   // Danh sách các tập phim đã lấy từ server.
+    const [loading, setLoading] = useState(false);  // Trạng thái tải dữ liệu danh sách.
+    const [error, setError] = useState(null);      // Thông báo lỗi hệ thống.
+    const [meta, setMeta] = useState({});           // Thông tin phân trang của Laravel.
+    const [page, setPage] = useState(1);            // Trang hiện tại.
+    const [search, setSearch] = useState('');       // Từ khóa tìm kiếm tập phim.
+    const [sortBy, setSortBy] = useState('episode_number'); // Mặc định sắp xếp theo số thứ tự tập.
+    const [sortDir, setSortDir] = useState('asc');  // Hướng sắp xếp: Tăng dần.
 
+    // --- CÁC STATE QUẢN LÝ MODAL & FORM ---
     const [showModal, setShowModal] = useState(false);
-    const [editingId, setEditingId] = useState(null);
+    const [editingId, setEditingId] = useState(null);   // ID tập phim đang sửa (null = tạo mới).
     const [formLoading, setFormLoading] = useState(false);
-    const [toast, setToast] = useState(null);
-
+    const [toast, setToast] = useState(null);           // Thông báo Toast thành công/thất bại.
     const [formData, setFormData] = useState(emptyForm);
 
-    // Load movie info
+    /**
+     * Tải thông tin cơ bản của bộ phim hiện tại.
+     * Giúp người dùng biết mình đang quản lý tập phim cho bộ phim nào.
+     */
     useEffect(() => {
         const loadMovie = async () => {
             try {
@@ -48,13 +66,16 @@ export default function EpisodeManagement() {
                     setMovie(m);
                 }
             } catch (err) {
-                console.error('Error loading movie:', err);
+                console.error('Lỗi khi tải thông tin phim:', err);
             }
         };
         loadMovie();
     }, [movieId]);
 
-    // Fetch episodes
+    /**
+     * fetchEpisodes: Hàm lấy danh sách tập phim từ API với các tham số lọc.
+     * Sử dụng useCallback để tránh việc khởi tạo lại hàm gây loop trong useEffect.
+     */
     const fetchEpisodes = useCallback(async (pageNum = 1) => {
         setLoading(true);
         setError(null);
@@ -75,7 +96,7 @@ export default function EpisodeManagement() {
                 setMeta(metaData);
                 setPage(pageNum);
             } else {
-                setError(response.error || 'Lỗi khi tải dữ liệu');
+                setError(response.error || 'Lỗi khi tải danh sách tập phim');
             }
         } catch (err) {
             setError(err.message);
@@ -84,10 +105,16 @@ export default function EpisodeManagement() {
         }
     }, [movieId, search, sortBy, sortDir]);
 
+    /**
+     * Effect: Theo dõi các thay đổi về tiêu chí lọc (Search, Sort) để tải lại dữ liệu từ trang 1.
+     */
     useEffect(() => {
         fetchEpisodes(1);
     }, [search, sortBy, sortDir, fetchEpisodes]);
 
+    /**
+     * Effect: Theo dõi việc chuyển trang để tải dữ liệu trang tương ứng.
+     */
     useEffect(() => {
         if (page > 1) {
             fetchEpisodes(page);
@@ -95,6 +122,10 @@ export default function EpisodeManagement() {
         // eslint-disable-next-line
     }, [page]);
 
+    /**
+     * handleCreate: Khởi tạo form cho việc thêm mới tập phim.
+     * Tự động tính toán số tập tiếp theo dựa trên số lượng tập hiện có để tiện cho Admin.
+     */
     const handleCreate = () => {
         setEditingId(null);
         setFormData({
@@ -104,6 +135,9 @@ export default function EpisodeManagement() {
         setShowModal(true);
     };
 
+    /**
+     * handleEdit: Nạp dữ liệu của một tập phim vào form để chỉnh sửa.
+     */
     const handleEdit = (episode) => {
         setEditingId(episode.id);
         setFormData({
@@ -112,41 +146,41 @@ export default function EpisodeManagement() {
             arc_name: episode.arc_name || '',
             video_url: episode.video_url || '',
             duration: episode.duration || '',
+            video_file: null, // Quan trọng: Luôn reset file upload, bắt buộc người dùng chọn lại nếu muốn thay thế video.
         });
         setShowModal(true);
     };
 
+    /**
+     * handleSubmit: Gửi dữ liệu tập phim tới server.
+     * Xử lý đặc biệt: Sử dụng FormData để có thể gửi tệp tin video nhị phân.
+     */
     const handleSubmit = async () => {
+        // Kiểm tra dữ liệu bắt buộc.
         if (!formData.episode_number) {
             setError('Số tập không được để trống');
             return;
         }
 
-        // Check if video URL or file exists
+        // Kiểm tra nguồn video: Phải có Link URL hoặc File upload.
         if (!formData.video_url && !formData.video_file) {
-            setError('Vui lòng nhập URL video hoặc upload file video');
+            setError('Vui lòng cung cấp URL video hoặc tải lên file video');
             return;
         }
 
         setFormLoading(true);
         try {
-            console.log('=== Episode Submit ===');
-            console.log('Episode number:', formData.episode_number);
-            console.log('Title:', formData.title);
-            console.log('Video URL:', formData.video_url);
-            console.log('Video File:', formData.video_file ? {name: formData.video_file.name, size: formData.video_file.size} : null);
-
-            // Use FormData for multipart upload
+            // Chuyển đổi dữ liệu sang đối tượng FormData cho multipart/form-data.
             const formDataToSend = new FormData();
             formDataToSend.append('episode_number', parseInt(formData.episode_number));
             formDataToSend.append('title', formData.title || '');
             formDataToSend.append('arc_name', formData.arc_name || '');
 
-            // Nếu có video_file, gửi file. Nếu không, gửi video_url
+            // Ưu tiên tệp tin video nếu được chọn.
             if (formData.video_file) {
-                console.log('Appending video file to FormData');
                 formDataToSend.append('video_file', formData.video_file);
             } else if (formData.video_url) {
+                // Nếu không có tệp tin, sử dụng đường dẫn URL.
                 formDataToSend.append('video_url', formData.video_url);
             }
 
@@ -154,51 +188,46 @@ export default function EpisodeManagement() {
                 formDataToSend.append('duration', parseInt(formData.duration));
             }
 
-            console.log('FormData entries:');
-            for (let [key, value] of formDataToSend.entries()) {
-                console.log(`  ${key}:`, value instanceof File ? {name: value.name, size: value.size} : value);
-            }
-
             let response;
             if (editingId) {
-                console.log('Calling updateWithFile for episode:', editingId);
+                // Thực hiện cập nhật tập phim hiện có.
                 response = await episodeApi.updateWithFile(editingId, formDataToSend);
             } else {
-                console.log('Calling createWithFile for movie:', movieId);
+                // Tạo mới tập phim cho bộ phim đang quản lý.
                 response = await episodeApi.createWithFile(movieId, formDataToSend);
             }
 
-            console.log('Response:', response);
-
             if (response.success) {
                 setToast({
-                    message: editingId ? 'Cập nhật tập phim thành công!' : 'Tạo tập phim thành công!',
+                    message: editingId ? 'Cập nhật tập phim thành công!' : 'Thêm tập phim thành công!',
                     type: 'success',
                 });
                 setShowModal(false);
-                await fetchEpisodes(1);
+                await fetchEpisodes(1); // Quay lại trang đầu để xem kết quả mới nhất.
             } else {
-                setError(response.error || 'Lỗi khi lưu');
+                setError(response.error || 'Lỗi hệ thống khi lưu tập phim');
             }
         } catch (err) {
-            console.error('Error:', err);
             setError(err.message);
         } finally {
             setFormLoading(false);
         }
     };
 
+    /**
+     * handleDelete: Xóa vĩnh viễn một tập phim.
+     */
     const handleDelete = async (id) => {
-        if (!window.confirm('Bạn có chắc chắn muốn xóa tập phim này?')) return;
+        if (!window.confirm('Bạn có chắc chắn muốn xóa tập phim này? Hành động này không thể hoàn tác.')) return;
 
         setLoading(true);
         try {
             const response = await episodeApi.destroy(id);
             if (response.success) {
-                setToast({ message: 'Xóa tập phim thành công!', type: 'success' });
+                setToast({ message: 'Đã xóa tập phim!', type: 'success' });
                 await fetchEpisodes(page);
             } else {
-                setError(response.error || 'Lỗi khi xóa');
+                setError(response.error || 'Không thể xóa tập phim');
             }
         } catch (err) {
             setError(err.message);
@@ -207,7 +236,9 @@ export default function EpisodeManagement() {
         }
     };
 
-    // Format duration seconds to mm:ss
+    /**
+     * formatDuration: Chuyển đổi số giây thành định dạng thời gian mm:ss dễ nhìn.
+     */
     const formatDuration = (seconds) => {
         if (!seconds) return '—';
         const m = Math.floor(seconds / 60);
@@ -215,18 +246,24 @@ export default function EpisodeManagement() {
         return `${m}:${String(s).padStart(2, '0')}`;
     };
 
+    // Định nghĩa các cột cho bảng quản lý tập phim.
     const columns = [
         { key: 'id', label: 'ID', sortable: false },
-        { key: 'episode_number', label: 'Số tập', sortable: true },
+        { 
+            key: 'episode_number', 
+            label: 'Số tập', 
+            sortable: true,
+            render: (val) => <span className="font-black text-lg">Tập {val}</span>
+        },
         {
             key: 'title',
-            label: 'Tiêu đề',
+            label: 'Tiêu đề / Phần (Arc)',
             sortable: true,
             render: (value, row) => (
                 <div>
-                    <div className="font-semibold">{value || `Tập ${row.episode_number}`}</div>
+                    <div className="font-bold text-black">{value || `Tập ${row.episode_number}`}</div>
                     {row.arc_name && (
-                        <div className="text-sm text-gray-500">Arc: {row.arc_name}</div>
+                        <div className="text-xs text-gray-500 uppercase tracking-tighter italic">Arc: {row.arc_name}</div>
                     )}
                 </div>
             ),
@@ -235,13 +272,13 @@ export default function EpisodeManagement() {
             key: 'duration',
             label: 'Thời lượng',
             sortable: true,
-            render: (value) => formatDuration(value),
+            render: (value) => <span className="font-mono bg-gray-100 px-2 py-1 border border-gray-300">{formatDuration(value)}</span>,
         },
         {
             key: 'views',
             label: 'Lượt xem',
             sortable: true,
-            render: (value) => (value || 0).toLocaleString(),
+            render: (value) => <span className="font-bold">{(value || 0).toLocaleString()}</span>,
         },
         {
             key: 'video_url',
@@ -253,13 +290,13 @@ export default function EpisodeManagement() {
                         href={value}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline text-sm truncate block max-w-[200px]"
+                        className="text-blue-600 hover:underline text-sm truncate block max-w-[150px]"
                         title={value}
                     >
                         {value}
                     </a>
                 ) : (
-                    <span className="text-gray-400">Chưa có</span>
+                    <span className="text-gray-400 italic">File Uploaded</span>
                 ),
         },
     ];
@@ -267,66 +304,62 @@ export default function EpisodeManagement() {
     return (
         <div className="p-8 bg-gray-50 min-h-screen">
             <div className="max-w-7xl mx-auto">
-                {/* Header */}
-                <div className="flex items-center justify-between mb-6">
+                {/* PHẦN ĐẦU TRANG: ĐIỀU HƯỚNG VÀ TIÊU ĐỀ */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
                     <div>
                         <button
                             onClick={() => navigate('/movies')}
-                            className="text-blue-600 hover:text-blue-800 mb-2 flex items-center gap-1 transition"
+                            className="text-black hover:bg-black hover:text-white mb-4 flex items-center gap-1 transition-all border-2 border-black px-4 py-1 font-black uppercase text-xs shadow-[2px_2px_0_0_rgba(0,0,0,1)] active:shadow-none"
                         >
-                            ← Quay lại danh sách phim
+                            ← Quay lại phim
                         </button>
-                        <h1 className="text-4xl font-extrabold text-black uppercase tracking-tight border-b-4 border-black inline-block pb-2">
+                        <h1 className="text-4xl font-black text-black uppercase tracking-tighter border-b-8 border-black pb-2">
                             Quản lý tập phim
                         </h1>
                         {movie && (
-                            <p className="text-gray-600 mt-1">
-                                Phim: <span className="font-semibold text-gray-800">{movie.title}</span>
+                            <div className="mt-4 flex items-center gap-3">
+                                <span className="font-bold text-gray-500 uppercase text-sm">Phim đang chọn:</span>
+                                <span className="px-4 py-1 bg-yellow-400 text-black font-black uppercase border-2 border-black shadow-[3px_3px_0_0_rgba(0,0,0,1)]">
+                                    {movie.title}
+                                </span>
                                 {movie.type && (
-                                    <span className="ml-2 px-2 py-0.5 text-xs rounded bg-blue-100 text-blue-700">
-                                        {movie.type === 'series' ? 'Series' : movie.type === 'movie' ? 'Phim lẻ' : 'Đặc biệt'}
+                                    <span className="px-2 py-0.5 text-[10px] font-black border-2 border-black uppercase">
+                                        {movie.type}
                                     </span>
                                 )}
-                            </p>
+                            </div>
                         )}
                     </div>
                     <button
                         onClick={handleCreate}
                         disabled={loading}
-                        className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 transition"
+                        className="px-8 py-3 bg-black text-white border-2 border-black font-black uppercase transition-all shadow-[6px_6px_0_0_rgba(0,0,0,1)] active:shadow-none active:translate-x-[2px] active:translate-y-[2px] hover:bg-gray-900 disabled:opacity-50 h-fit"
                     >
-                        + Thêm tập phim
+                        + Thêm tập mới
                     </button>
                 </div>
 
-                {toast && (
-                    <Toast
-                        message={toast.message}
-                        type={toast.type}
-                        onClose={() => setToast(null)}
-                    />
-                )}
+                {/* THÔNG BÁO HỆ THỐNG */}
+                {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+                {error && <Toast message={error} type="error" onClose={() => setError(null)} />}
 
-                {error && (
-                    <Toast message={error} type="error" onClose={() => setError(null)} />
-                )}
-
-                {/* Search */}
-                <div className="mb-6 bg-white p-4 border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] rounded-none">
+                {/* THANH TÌM KIẾM */}
+                <div className="mb-6 bg-white p-4 border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
                     <input
                         type="text"
-                        placeholder="Tìm kiếm tập phim..."
+                        placeholder="Tìm kiếm tập theo tiêu đề, tên Arc..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-400 rounded-none focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                        className="w-full px-4 py-3 border-2 border-gray-200 focus:border-black outline-none transition-colors"
                     />
                 </div>
 
-                {/* Table */}
-                <div className="bg-white border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] rounded-none">
+                {/* DANH SÁCH TẬP PHIM */}
+                <div className="bg-white border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] overflow-hidden">
                     {loading ? (
-                        <div className="p-8 flex justify-center">
+                        <div className="p-20 flex flex-col items-center gap-4">
                             <LoadingSpinner />
+                            <span className="font-black uppercase tracking-widest text-gray-400">Đang tải dữ liệu tập phim...</span>
                         </div>
                     ) : (
                         <>
@@ -343,13 +376,13 @@ export default function EpisodeManagement() {
                                     <div className="flex gap-2 justify-center">
                                         <button
                                             onClick={() => handleEdit(row)}
-                                            className="px-3 py-1 text-sm bg-black text-white rounded-none border border-black hover:bg-gray-800 hover:text-white uppercase font-bold transition"
+                                            className="px-4 py-1 text-xs bg-black text-white border border-black font-black uppercase hover:bg-gray-800 transition"
                                         >
                                             Sửa
                                         </button>
                                         <button
                                             onClick={() => handleDelete(row.id)}
-                                            className="px-3 py-1 text-sm bg-red-600 text-white rounded-none hover:bg-red-800 uppercase font-bold transition"
+                                            className="px-4 py-1 text-xs bg-white text-red-600 border border-red-600 font-black uppercase hover:bg-red-50 transition"
                                         >
                                             Xóa
                                         </button>
@@ -358,8 +391,9 @@ export default function EpisodeManagement() {
                                 loading={loading}
                             />
 
+                            {/* PHÂN TRANG */}
                             {meta.last_page > 1 && (
-                                <div className="p-4">
+                                <div className="p-4 border-t-2 border-black bg-gray-50">
                                     <Pagination
                                         currentPage={page}
                                         lastPage={meta.last_page}
@@ -373,124 +407,120 @@ export default function EpisodeManagement() {
                     )}
                 </div>
 
-                {/* Episode Form Modal */}
+                {/* MODAL FORM TẬP PHIM */}
                 <FormModal
                     isOpen={showModal}
-                    title={editingId ? 'Sửa tập phim' : 'Tạo tập phim mới'}
+                    title={editingId ? `Sửa tập ${formData.episode_number}` : 'Thêm tập mới'}
                     onClose={() => setShowModal(false)}
                     onSubmit={handleSubmit}
                     loading={formLoading}
                 >
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Số tập *
-                        </label>
-                        <input
-                            type="number"
-                            value={formData.episode_number}
-                            onChange={(e) =>
-                                setFormData({ ...formData, episode_number: e.target.value })
-                            }
-                            className="w-full px-3 py-2 border border-gray-400 rounded-none focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
-                            placeholder="1"
-                            min={1}
-                        />
-                    </div>
+                    <div className="space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {/* TRƯỜNG: SỐ TẬP */}
+                            <div>
+                                <label className="block text-sm font-black text-black uppercase mb-1">
+                                    Số tập <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    type="number"
+                                    value={formData.episode_number}
+                                    onChange={(e) => setFormData({ ...formData, episode_number: e.target.value })}
+                                    className="w-full px-4 py-3 border-2 border-black rounded-none focus:outline-none focus:bg-yellow-50 font-black text-xl"
+                                    placeholder="VD: 1"
+                                    min={1}
+                                />
+                            </div>
+                            {/* TRƯỜNG: THỜI LƯỢNG */}
+                            <div>
+                                <label className="block text-sm font-black text-black uppercase mb-1">
+                                    Thời lượng (giây)
+                                </label>
+                                <input
+                                    type="number"
+                                    value={formData.duration}
+                                    onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
+                                    className="w-full px-4 py-3 border-2 border-black rounded-none focus:outline-none focus:bg-yellow-50 font-bold"
+                                    placeholder="VD: 1440"
+                                />
+                                {formData.duration && (
+                                    <p className="text-xs text-gray-500 mt-2 font-mono italic">
+                                        Quy đổi: {formatDuration(parseInt(formData.duration))}
+                                    </p>
+                                )}
+                            </div>
+                        </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Tiêu đề tập
-                        </label>
-                        <input
-                            type="text"
-                            value={formData.title}
-                            onChange={(e) =>
-                                setFormData({ ...formData, title: e.target.value })
-                            }
-                            className="w-full px-3 py-2 border border-gray-400 rounded-none focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
-                            placeholder="Nhập tiêu đề tập phim"
-                        />
-                    </div>
+                        {/* TRƯỜNG: TIÊU ĐỀ TẬP */}
+                        <div>
+                            <label className="block text-sm font-black text-black uppercase mb-1">
+                                Tiêu đề tập phim
+                            </label>
+                            <input
+                                type="text"
+                                value={formData.title}
+                                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                className="w-full px-4 py-3 border-2 border-black rounded-none focus:outline-none focus:bg-yellow-50 font-bold"
+                                placeholder="Nhập tiêu đề tập (VD: Khởi đầu mới...)"
+                            />
+                        </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Tên Arc
-                        </label>
-                        <input
-                            type="text"
-                            value={formData.arc_name}
-                            onChange={(e) =>
-                                setFormData({ ...formData, arc_name: e.target.value })
-                            }
-                            className="w-full px-3 py-2 border border-gray-400 rounded-none focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
-                            placeholder="VD: Mùa 1, Arc Khai Mở..."
-                        />
-                    </div>
+                        {/* TRƯỜNG: TÊN ARC */}
+                        <div>
+                            <label className="block text-sm font-black text-black uppercase mb-1">
+                                Tên Arc / Phần (Saga)
+                            </label>
+                            <input
+                                type="text"
+                                value={formData.arc_name}
+                                onChange={(e) => setFormData({ ...formData, arc_name: e.target.value })}
+                                className="w-full px-4 py-3 border-2 border-black rounded-none focus:outline-none focus:bg-yellow-50"
+                                placeholder="VD: Wano Country Arc, Season 1..."
+                            />
+                        </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            URL Video
-                        </label>
-                        <input
-                            type="url"
-                            value={formData.video_url}
-                            onChange={(e) =>
-                                setFormData({ ...formData, video_url: e.target.value })
-                            }
-                            className="w-full px-3 py-2 border border-gray-400 rounded-none focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
-                            placeholder="https://..."
-                        />
-                        <p className="text-xs text-gray-500 mt-1">Hoặc upload file video bên dưới</p>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Upload Video File
-                        </label>
-                        <input
-                            type="file"
-                            accept="video/mp4,video/x-msvideo,video/quicktime,video/x-matroska,video/x-flv,video/x-ms-wmv,video/webm"
-                            onChange={(e) => {
-                                const file = e.target.files?.[0];
-                                if (file) {
-                                    setFormData({ ...formData, video_file: file });
-                                }
-                            }}
-                            className="w-full px-3 py-2 border border-gray-400 rounded-none focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
-                        />
-                        <p className="text-xs text-gray-500 mt-1">
-                            Hỗ trợ: mp4, avi, mov, mkv, flv, wmv, webm (tối đa 20GB)
-                        </p>
-                        {formData.video_file && (
-                            <p className="text-sm text-green-600 mt-2">
-                                ✓ Đã chọn: {formData.video_file.name}
-                            </p>
-                        )}
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Thời lượng (giây)
-                        </label>
-                        <input
-                            type="number"
-                            value={formData.duration}
-                            onChange={(e) =>
-                                setFormData({ ...formData, duration: e.target.value })
-                            }
-                            className="w-full px-3 py-2 border border-gray-400 rounded-none focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
-                            placeholder="VD: 1440 (= 24 phút)"
-                            min={0}
-                        />
-                        {formData.duration && (
-                            <p className="text-xs text-gray-500 mt-1">
-                                = {formatDuration(parseInt(formData.duration))}
-                            </p>
-                        )}
+                        {/* PHẦN QUẢN LÝ NGUỒN VIDEO */}
+                        <div className="border-t-4 border-black pt-6">
+                            <label className="block text-md font-black text-black uppercase mb-2">
+                                Nguồn Video (Chọn 1 trong 2)
+                            </label>
+                            
+                            {/* NHẬP LINK URL */}
+                            <div className="mb-4">
+                                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">Đường dẫn URL (HLS, MP4, Youtube...)</label>
+                                <input
+                                    type="url"
+                                    value={formData.video_url}
+                                    onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
+                                    className="w-full px-4 py-3 border-2 border-black rounded-none focus:outline-none focus:bg-yellow-50"
+                                    placeholder="Dán link video tại đây..."
+                                />
+                            </div>
+                            
+                            {/* UPLOAD FILE */}
+                            <div className="bg-gray-100 p-6 border-4 border-dashed border-gray-300 text-center relative group hover:border-black transition-colors">
+                                <label className="cursor-pointer">
+                                    <span className="text-sm font-black text-black uppercase block mb-2">Hoặc Tải lên File Video</span>
+                                    <input
+                                        type="file"
+                                        accept="video/*"
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) setFormData({ ...formData, video_file: file });
+                                        }}
+                                        className="hidden"
+                                    />
+                                    <div className="text-xs font-bold text-gray-500 bg-white border-2 border-black inline-block px-4 py-2 shadow-[3px_3px_0_0_rgba(0,0,0,1)] group-hover:bg-yellow-400 group-hover:text-black">
+                                        {formData.video_file 
+                                            ? `✓ FILE ĐÃ CHỌN: ${formData.video_file.name} (${(formData.video_file.size / (1024*1024)).toFixed(2)} MB)` 
+                                            : "CHỌN FILE TỪ THIẾT BỊ"}
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </FormModal>
             </div>
         </div>
     );
 }
-

@@ -27,12 +27,14 @@ class ActorController extends Controller
     {
         try {
             $actors = $this->actorService->list($request->query());
+
             return $this->successResponse(
                 ActorResource::collection($actors)->response()->getData(true),
                 'Danh sách diễn viên.'
             );
         } catch (\Exception $e) {
             Log::error('Admin list actors error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi lấy danh sách diễn viên.', 500);
         }
     }
@@ -45,12 +47,14 @@ class ActorController extends Controller
     {
         try {
             $actors = $this->actorService->listTrashed($request->query());
+
             return $this->successResponse(
                 ActorResource::collection($actors)->response()->getData(true),
                 'Danh sách diễn viên đã xóa.'
             );
         } catch (\Exception $e) {
             Log::error('Admin list trashed actors error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi lấy danh sách diễn viên đã xóa.', 500);
         }
     }
@@ -63,9 +67,11 @@ class ActorController extends Controller
     {
         try {
             $actor = $this->actorService->create($request->validated());
+
             return $this->createdResponse(new ActorResource($actor), 'Tạo diễn viên thành công.');
         } catch (\Exception $e) {
             Log::error('Admin store actor error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi tạo diễn viên.', 500);
         }
     }
@@ -78,11 +84,13 @@ class ActorController extends Controller
     {
         try {
             $actor = $this->actorService->findOrFail($id, withTrashed: true);
+
             return $this->successResponse(new ActorResource($actor), 'Chi tiết diễn viên.');
         } catch (ApiException $e) {
             return $this->notFoundResponse($e->getMessage());
         } catch (\Exception $e) {
             Log::error('Admin show actor error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi lấy diễn viên.', 500);
         }
     }
@@ -96,11 +104,13 @@ class ActorController extends Controller
         try {
             $actor = $this->actorService->findOrFail($id);
             $actor = $this->actorService->update($actor, $request->validated());
+
             return $this->successResponse(new ActorResource($actor), 'Cập nhật diễn viên thành công.');
         } catch (ApiException $e) {
             return $e->render($request);
         } catch (\Exception $e) {
             Log::error('Admin update actor error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi cập nhật diễn viên.', 500);
         }
     }
@@ -114,11 +124,13 @@ class ActorController extends Controller
         try {
             $actor = $this->actorService->findOrFail($id);
             $this->actorService->delete($actor);
+
             return $this->successResponse(null, 'Xóa diễn viên thành công.');
         } catch (ApiException $e) {
             return $this->notFoundResponse($e->getMessage());
         } catch (\Exception $e) {
             Log::error('Admin delete actor error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi xóa diễn viên.', 500);
         }
     }
@@ -131,13 +143,14 @@ class ActorController extends Controller
     {
         try {
             $actor = $this->actorService->restore($id);
+
             return $this->successResponse(new ActorResource($actor), 'Khôi phục diễn viên thành công.');
         } catch (ApiException $e) {
             return $this->notFoundResponse($e->getMessage());
         } catch (\Exception $e) {
             Log::error('Admin restore actor error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi khôi phục diễn viên.', 500);
         }
     }
 }
-

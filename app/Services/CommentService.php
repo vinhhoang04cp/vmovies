@@ -15,7 +15,7 @@ class CommentService
         $query = Comment::with(['user', 'movie', 'episode'])
             ->where('is_deleted', false);
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $search = $filters['search'];
             $query->where('content', 'like', "%{$search}%");
         }
@@ -24,11 +24,11 @@ class CommentService
             $query->where('is_approved', (bool) $filters['is_approved']);
         }
 
-        if (!empty($filters['movie_id'])) {
+        if (! empty($filters['movie_id'])) {
             $query->where('movie_id', $filters['movie_id']);
         }
 
-        if (!empty($filters['user_id'])) {
+        if (! empty($filters['user_id'])) {
             $query->where('user_id', $filters['user_id']);
         }
 
@@ -46,6 +46,7 @@ class CommentService
     public function listPending(array $filters = []): LengthAwarePaginator
     {
         $filters['is_approved'] = 0;
+
         return $this->list($filters);
     }
 
@@ -63,6 +64,7 @@ class CommentService
     public function approve(Comment $comment): Comment
     {
         $comment->update(['is_approved' => true]);
+
         return $comment->fresh(['user', 'movie', 'episode']);
     }
 
@@ -74,4 +76,3 @@ class CommentService
         $comment->update(['is_deleted' => true, 'is_approved' => false]);
     }
 }
-

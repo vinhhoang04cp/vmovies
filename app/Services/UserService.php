@@ -14,23 +14,23 @@ class UserService
     {
         $query = User::with('role')->withCount('comments');
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
 
-        if (!empty($filters['role'])) {
+        if (! empty($filters['role'])) {
             $query->whereHas('role', fn ($q) => $q->where('name', $filters['role']));
         }
 
-        $sortBy  = in_array($filters['sort_by'] ?? '', ['name', 'email', 'created_at', 'status'])
+        $sortBy = in_array($filters['sort_by'] ?? '', ['name', 'email', 'created_at', 'status'])
                    ? $filters['sort_by'] : 'created_at';
         $sortDir = ($filters['sort_dir'] ?? 'desc') === 'asc' ? 'asc' : 'desc';
 
@@ -55,6 +55,7 @@ class UserService
     public function update(User $user, array $data): User
     {
         $user->update($data);
+
         return $user->fresh(['role']);
     }
 
@@ -101,7 +102,7 @@ class UserService
     public function unban(User $user): User
     {
         $user->update(['status' => 'active']);
+
         return $user->fresh();
     }
 }
-

@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Exceptions\ApiException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
-use App\Http\Resources\AuthUserResource;
 use App\Services\Auth\AuthService;
 use App\Traits\HasJsonResponse;
 use Illuminate\Http\JsonResponse;
@@ -22,8 +22,6 @@ class AuthController extends Controller
 
     /**
      * Login user and return authentication token.
-     *
-     * @return JsonResponse
      */
     public function login(LoginRequest $request): JsonResponse
     {
@@ -46,7 +44,7 @@ class AuthController extends Controller
                 'exception' => $e->getMessage(),
             ]);
 
-            if ($e instanceof \App\Exceptions\ApiException) {
+            if ($e instanceof ApiException) {
                 return $e->render($request);
             }
 
@@ -59,8 +57,6 @@ class AuthController extends Controller
 
     /**
      * Register a new user.
-     *
-     * @return JsonResponse
      */
     public function register(RegisterRequest $request): JsonResponse
     {
@@ -80,7 +76,7 @@ class AuthController extends Controller
                 'exception' => $e->getMessage(),
             ]);
 
-            if ($e instanceof \App\Exceptions\ApiException) {
+            if ($e instanceof ApiException) {
                 return $e->render($request);
             }
 
@@ -93,8 +89,6 @@ class AuthController extends Controller
 
     /**
      * Get current authenticated user.
-     *
-     * @return JsonResponse
      */
     public function me(Request $request): JsonResponse
     {
@@ -125,8 +119,6 @@ class AuthController extends Controller
 
     /**
      * Logout user (revoke token).
-     *
-     * @return JsonResponse
      */
     public function logout(Request $request): JsonResponse
     {
@@ -157,8 +149,6 @@ class AuthController extends Controller
 
     /**
      * Refresh authentication token.
-     *
-     * @return JsonResponse
      */
     public function refresh(Request $request): JsonResponse
     {
@@ -187,4 +177,3 @@ class AuthController extends Controller
         }
     }
 }
-

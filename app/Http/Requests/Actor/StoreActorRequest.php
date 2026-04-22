@@ -14,8 +14,8 @@ class StoreActorRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name'      => ['required', 'string', 'max:150'],
-            'bio'       => ['nullable', 'string', 'max:2000'],
+            'name' => ['required', 'string', 'max:150'],
+            'bio' => ['nullable', 'string', 'max:2000'],
             'image_url' => ['nullable', 'string', 'max:2048'],
         ];
     }
@@ -24,8 +24,7 @@ class StoreActorRequest extends FormRequest
     {
         return [
             'name.required' => 'Tên diễn viên là bắt buộc.',
-            'name.max'      => 'Tên diễn viên không vượt quá 150 ký tự.',
+            'name.max' => 'Tên diễn viên không vượt quá 150 ký tự.',
         ];
     }
 }
-

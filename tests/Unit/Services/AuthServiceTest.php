@@ -145,4 +145,3 @@ class AuthServiceTest extends TestCase
         $this->assertArrayHasKey('permissions', $result['role']);
     }
 }
-

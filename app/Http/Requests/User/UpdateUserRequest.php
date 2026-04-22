@@ -17,21 +17,20 @@ class UpdateUserRequest extends FormRequest
         $userId = $this->route('user');
 
         return [
-            'name'       => ['sometimes', 'required', 'string', 'max:255'],
-            'email'      => ['sometimes', 'required', 'email', Rule::unique('users', 'email')->ignore($userId)],
+            'name' => ['sometimes', 'required', 'string', 'max:255'],
+            'email' => ['sometimes', 'required', 'email', Rule::unique('users', 'email')->ignore($userId)],
             'avatar_url' => ['nullable', 'string', 'max:2048'],
-            'status'     => ['sometimes', 'required', Rule::in(['active', 'inactive', 'banned'])],
+            'status' => ['sometimes', 'required', Rule::in(['active', 'inactive', 'banned'])],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'name.required'  => 'Tên người dùng là bắt buộc.',
+            'name.required' => 'Tên người dùng là bắt buộc.',
             'email.required' => 'Email là bắt buộc.',
-            'email.unique'   => 'Email này đã được sử dụng.',
-            'status.in'      => 'Status phải là: active, inactive hoặc banned.',
+            'email.unique' => 'Email này đã được sử dụng.',
+            'status.in' => 'Status phải là: active, inactive hoặc banned.',
         ];
     }
 }
-

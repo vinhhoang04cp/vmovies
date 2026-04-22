@@ -41,8 +41,8 @@ class Episode extends Model
      */
     protected $casts = [
         'episode_number' => 'integer',
-        'duration'       => 'integer',
-        'views'          => 'integer',
+        'duration' => 'integer',
+        'views' => 'integer',
     ];
 
     /**
@@ -80,4 +80,3 @@ class Episode extends Model
         return $this->hasMany(WatchHistory::class);
     }
 }
-

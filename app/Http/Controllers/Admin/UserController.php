@@ -7,6 +7,7 @@ use App\Http\Requests\User\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Services\UserService;
 use App\Traits\HasJsonResponse;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -39,8 +40,9 @@ class UserController extends Controller
     {
         try {
             $found = $this->userService->findOrFail($user);
+
             return $this->successResponse(new UserResource($found), 'Lấy chi tiết người dùng thành công.');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+        } catch (ModelNotFoundException) {
             return $this->notFoundResponse('Người dùng không tồn tại.');
         }
     }
@@ -51,10 +53,11 @@ class UserController extends Controller
     public function update(UpdateUserRequest $request, int $user): JsonResponse
     {
         try {
-            $found   = $this->userService->findOrFail($user);
+            $found = $this->userService->findOrFail($user);
             $updated = $this->userService->update($found, $request->validated());
+
             return $this->successResponse(new UserResource($updated), 'Cập nhật người dùng thành công.');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+        } catch (ModelNotFoundException) {
             return $this->notFoundResponse('Người dùng không tồn tại.');
         }
     }
@@ -67,8 +70,9 @@ class UserController extends Controller
         try {
             $found = $this->userService->findOrFail($user);
             $this->userService->delete($found, $request->user());
+
             return $this->successResponse(null, 'Xóa người dùng thành công.');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+        } catch (ModelNotFoundException) {
             return $this->notFoundResponse('Người dùng không tồn tại.');
         } catch (\DomainException $e) {
             return $this->errorResponse($e->getMessage(), 403, null, 'FORBIDDEN');
@@ -81,15 +85,16 @@ class UserController extends Controller
     public function ban(Request $request, int $user): JsonResponse
     {
         try {
-            $found  = $this->userService->findOrFail($user);
+            $found = $this->userService->findOrFail($user);
 
             if ($found->isBanned()) {
                 return $this->errorResponse('Người dùng đã bị ban rồi.', 409, null, 'ALREADY_BANNED');
             }
 
             $banned = $this->userService->ban($found, $request->user());
+
             return $this->successResponse(new UserResource($banned), 'Ban người dùng thành công.');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+        } catch (ModelNotFoundException) {
             return $this->notFoundResponse('Người dùng không tồn tại.');
         } catch (\DomainException $e) {
             return $this->errorResponse($e->getMessage(), 403, null, 'FORBIDDEN');
@@ -104,15 +109,15 @@ class UserController extends Controller
         try {
             $found = $this->userService->findOrFail($user);
 
-            if (!$found->isBanned()) {
+            if (! $found->isBanned()) {
                 return $this->errorResponse('Người dùng chưa bị ban.', 409, null, 'NOT_BANNED');
             }
 
             $unbanned = $this->userService->unban($found);
+
             return $this->successResponse(new UserResource($unbanned), 'Unban người dùng thành công.');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+        } catch (ModelNotFoundException) {
             return $this->notFoundResponse('Người dùng không tồn tại.');
         }
     }
 }
-

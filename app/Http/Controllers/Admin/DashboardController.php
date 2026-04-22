@@ -23,9 +23,11 @@ class DashboardController extends Controller
     {
         try {
             $data = $this->dashboardService->overview();
+
             return $this->successResponse($data, 'Dữ liệu dashboard tổng quan.');
         } catch (\Exception $e) {
             Log::error('Dashboard overview error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi lấy dữ liệu dashboard.', 500);
         }
     }
@@ -39,9 +41,11 @@ class DashboardController extends Controller
     {
         try {
             $data = $this->dashboardService->movieStats();
+
             return $this->successResponse($data, 'Thống kê phim.');
         } catch (\Exception $e) {
             Log::error('Movie stats error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi lấy thống kê phim.', 500);
         }
     }
@@ -55,9 +59,11 @@ class DashboardController extends Controller
     {
         try {
             $data = $this->dashboardService->userStats();
+
             return $this->successResponse($data, 'Thống kê người dùng.');
         } catch (\Exception $e) {
             Log::error('User stats error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi lấy thống kê người dùng.', 500);
         }
     }
@@ -71,11 +77,12 @@ class DashboardController extends Controller
     {
         try {
             $data = $this->dashboardService->commentStats();
+
             return $this->successResponse($data, 'Thống kê bình luận.');
         } catch (\Exception $e) {
             Log::error('Comment stats error', ['exception' => $e->getMessage()]);
+
             return $this->errorResponse('Lỗi khi lấy thống kê bình luận.', 500);
         }
     }
 }
-

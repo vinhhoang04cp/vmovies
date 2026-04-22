@@ -16,11 +16,11 @@ class DirectorService
     {
         $query = Director::withCount('movies');
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $query->where('name', 'like', "%{$filters['search']}%");
         }
 
-        $sortBy  = in_array($filters['sort_by'] ?? '', ['name', 'created_at', 'movies_count'])
+        $sortBy = in_array($filters['sort_by'] ?? '', ['name', 'created_at', 'movies_count'])
             ? $filters['sort_by']
             : 'name';
         $sortDir = ($filters['sort_dir'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
@@ -57,7 +57,7 @@ class DirectorService
 
         $director = $query->find($id);
 
-        if (!$director) {
+        if (! $director) {
             throw new ApiException('Không tìm thấy đạo diễn.', Response::HTTP_NOT_FOUND, 'NOT_FOUND');
         }
 
@@ -70,8 +70,8 @@ class DirectorService
     public function create(array $data): Director
     {
         return Director::create([
-            'name'      => $data['name'],
-            'bio'       => $data['bio'] ?? null,
+            'name' => $data['name'],
+            'bio' => $data['bio'] ?? null,
             'image_url' => $data['image_url'] ?? null,
         ]);
     }
@@ -82,8 +82,8 @@ class DirectorService
     public function update(Director $director, array $data): Director
     {
         $director->update([
-            'name'      => $data['name'] ?? $director->name,
-            'bio'       => array_key_exists('bio', $data) ? $data['bio'] : $director->bio,
+            'name' => $data['name'] ?? $director->name,
+            'bio' => array_key_exists('bio', $data) ? $data['bio'] : $director->bio,
             'image_url' => array_key_exists('image_url', $data) ? $data['image_url'] : $director->image_url,
         ]);
 
@@ -105,7 +105,7 @@ class DirectorService
     {
         $director = Director::onlyTrashed()->find($id);
 
-        if (!$director) {
+        if (! $director) {
             throw new ApiException('Không tìm thấy đạo diễn đã xóa.', Response::HTTP_NOT_FOUND, 'NOT_FOUND');
         }
 
@@ -117,4 +117,3 @@ class DirectorService
         return $director;
     }
 }
-

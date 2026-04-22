@@ -1,6 +1,7 @@
 <?php
 
 // linh
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -32,4 +33,3 @@ class Director extends Model
         return $this->belongsToMany(Movie::class, 'movie_director');
     }
 }
-

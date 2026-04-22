@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\CommentResource;
 use App\Services\CommentService;
 use App\Traits\HasJsonResponse;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -54,8 +55,9 @@ class CommentController extends Controller
     {
         try {
             $found = $this->commentService->findOrFail($comment);
+
             return $this->successResponse(new CommentResource($found), 'Lấy chi tiết bình luận thành công.');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+        } catch (ModelNotFoundException) {
             return $this->notFoundResponse('Bình luận không tồn tại.');
         }
     }
@@ -77,8 +79,9 @@ class CommentController extends Controller
             }
 
             $approved = $this->commentService->approve($found);
+
             return $this->successResponse(new CommentResource($approved), 'Duyệt bình luận thành công.');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+        } catch (ModelNotFoundException) {
             return $this->notFoundResponse('Bình luận không tồn tại.');
         }
     }
@@ -96,10 +99,10 @@ class CommentController extends Controller
             }
 
             $this->commentService->delete($found);
+
             return $this->successResponse(null, 'Xóa bình luận thành công.');
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException) {
+        } catch (ModelNotFoundException) {
             return $this->notFoundResponse('Bình luận không tồn tại.');
         }
     }
 }
-

@@ -21,9 +21,9 @@ class UserSeeder extends Seeder
         $admin = User::firstOrCreate(
             ['email' => 'admin@vmovies.com'],
             [
-                'name'     => 'Admin',
+                'name' => 'Admin',
                 'password' => Hash::make('password'),
-                'status'   => 'active',
+                'status' => 'active',
             ]
         );
         if ($adminRole) {
@@ -35,9 +35,9 @@ class UserSeeder extends Seeder
         $editor = User::firstOrCreate(
             ['email' => 'editor@vmovies.com'],
             [
-                'name'     => 'Editor',
+                'name' => 'Editor',
                 'password' => Hash::make('password'),
-                'status'   => 'active',
+                'status' => 'active',
             ]
         );
         if ($editorRole) {
@@ -49,9 +49,9 @@ class UserSeeder extends Seeder
         $moderator = User::firstOrCreate(
             ['email' => 'moderator@vmovies.com'],
             [
-                'name'     => 'Moderator',
+                'name' => 'Moderator',
                 'password' => Hash::make('password'),
-                'status'   => 'active',
+                'status' => 'active',
             ]
         );
         if ($moderatorRole) {
@@ -63,9 +63,9 @@ class UserSeeder extends Seeder
         $user = User::firstOrCreate(
             ['email' => 'user@vmovies.com'],
             [
-                'name'     => 'User',
+                'name' => 'User',
                 'password' => Hash::make('password'),
-                'status'   => 'active',
+                'status' => 'active',
             ]
         );
         if ($userRole) {
@@ -94,4 +94,3 @@ class UserSeeder extends Seeder
         }
     }
 }
-

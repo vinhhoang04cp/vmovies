@@ -3,26 +3,26 @@
 namespace Database\Seeders;
 
 use App\Models\Actor;
+use App\Models\Comment;
 use App\Models\Country;
 use App\Models\Director;
+use App\Models\Episode;
 use App\Models\Genre;
 use App\Models\Movie;
-use App\Models\Episode;
 use App\Models\Rating;
-use App\Models\Comment;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
+use Illuminate\Support\Arr;
 
 class MovieSeeder extends Seeder
 {
     public function run(): void
     {
-        $genres    = Genre::all();
+        $genres = Genre::all();
         $countries = Country::all();
         $directors = Director::factory(20)->create();
-        $actors    = Actor::factory(50)->create();
-        $users     = User::where('is_admin', false)->get();
+        $actors = Actor::factory(50)->create();
+        $users = User::where('is_admin', false)->get();
 
         $posters = [
             'https://image.tmdb.org/t/p/w500/1E5baAaEse26fej7uHcjOgEE2t2.jpg',
@@ -55,8 +55,8 @@ class MovieSeeder extends Seeder
         // -----------------------------------------------
         Movie::factory(20)->movie()->create()->each(function (Movie $movie) use ($genres, $countries, $directors, $actors, $users, $posters, $banners) {
             $movie->update([
-                'poster_url' => \Illuminate\Support\Arr::random($posters),
-                'banner_url' => \Illuminate\Support\Arr::random($banners),
+                'poster_url' => Arr::random($posters),
+                'banner_url' => Arr::random($banners),
             ]);
 
             // Gắn thể loại, quốc gia, đạo diễn, diễn viên
@@ -71,13 +71,13 @@ class MovieSeeder extends Seeder
 
             // Thêm 1 tập duy nhất cho phim lẻ
             Episode::create([
-                'movie_id'       => $movie->id,
+                'movie_id' => $movie->id,
                 'episode_number' => 1,
-                'arc_name'       => null,
-                'title'          => $movie->title,
-                'video_url'      => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-                'duration'       => rand(4800, 9000), // 80-150 phút
-                'views'          => rand(100, 100000),
+                'arc_name' => null,
+                'title' => $movie->title,
+                'video_url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                'duration' => rand(4800, 9000), // 80-150 phút
+                'views' => rand(100, 100000),
             ]);
 
             // Sinh ratings & comments
@@ -89,8 +89,8 @@ class MovieSeeder extends Seeder
         // -----------------------------------------------
         Movie::factory(10)->series()->create()->each(function (Movie $movie) use ($genres, $countries, $directors, $actors, $users, $posters, $banners) {
             $movie->update([
-                'poster_url' => \Illuminate\Support\Arr::random($posters),
-                'banner_url' => \Illuminate\Support\Arr::random($banners),
+                'poster_url' => Arr::random($posters),
+                'banner_url' => Arr::random($banners),
             ]);
 
             $movie->genres()->attach($genres->random(rand(1, 3))->pluck('id'));
@@ -106,13 +106,13 @@ class MovieSeeder extends Seeder
             $totalEps = rand(12, 24);
             for ($i = 1; $i <= $totalEps; $i++) {
                 Episode::create([
-                    'movie_id'       => $movie->id,
+                    'movie_id' => $movie->id,
                     'episode_number' => $i,
-                    'arc_name'       => null,
-                    'title'          => "Tập $i",
-                    'video_url'      => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-                    'duration'       => rand(1200, 2700),
-                    'views'          => rand(100, 500000),
+                    'arc_name' => null,
+                    'title' => "Tập $i",
+                    'video_url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                    'duration' => rand(1200, 2700),
+                    'views' => rand(100, 500000),
                 ]);
             }
 
@@ -123,17 +123,17 @@ class MovieSeeder extends Seeder
         // 3. Anime dài tập (One Piece style) - 1 series đặc biệt
         // -----------------------------------------------
         $anime = Movie::create([
-            'title'          => 'Vua Hải Tặc',
+            'title' => 'Vua Hải Tặc',
             'original_title' => 'One Piece',
-            'slug'           => 'vua-hai-tac-one-piece',
-            'poster_url'     => 'https://image.tmdb.org/t/p/w500/fcZNmtDkARkQx2t9fF83w229H5u.jpg',
-            'banner_url'     => 'https://image.tmdb.org/t/p/w1280/R0sQoEEER1z9pW1gq8FepWcMIf.jpg',
-            'trailer_url'    => 'https://www.youtube.com/watch?v=MCf3RXeRe74',
-            'summary'        => 'Câu chuyện về Monkey D. Luffy trên hành trình tìm kho báu One Piece để trở thành Vua Hải Tặc.',
-            'release_year'   => 1999,
-            'status'         => 'ongoing',
-            'type'           => 'series',
-            'view_count'     => 5000000,
+            'slug' => 'vua-hai-tac-one-piece',
+            'poster_url' => 'https://image.tmdb.org/t/p/w500/fcZNmtDkARkQx2t9fF83w229H5u.jpg',
+            'banner_url' => 'https://image.tmdb.org/t/p/w1280/R0sQoEEER1z9pW1gq8FepWcMIf.jpg',
+            'trailer_url' => 'https://www.youtube.com/watch?v=MCf3RXeRe74',
+            'summary' => 'Câu chuyện về Monkey D. Luffy trên hành trình tìm kho báu One Piece để trở thành Vua Hải Tặc.',
+            'release_year' => 1999,
+            'status' => 'ongoing',
+            'type' => 'series',
+            'view_count' => 5000000,
             'average_rating' => 4.8,
         ]);
 
@@ -145,7 +145,7 @@ class MovieSeeder extends Seeder
             ['name' => 'Arc Alabasta',    'eps' => 71],
             ['name' => 'Arc Skypiea',     'eps' => 43],
             ['name' => 'Arc Water 7',     'eps' => 119],
-            ['name' => 'Arc Thriller Bark','eps' => 45],
+            ['name' => 'Arc Thriller Bark', 'eps' => 45],
             ['name' => 'Arc Marineford',  'eps' => 33],
             ['name' => 'Arc Haki',        'eps' => 91],
             ['name' => 'Arc Dressrosa',   'eps' => 118],
@@ -157,13 +157,13 @@ class MovieSeeder extends Seeder
         foreach ($arcs as $arc) {
             for ($i = 1; $i <= $arc['eps']; $i++) {
                 Episode::create([
-                    'movie_id'       => $anime->id,
+                    'movie_id' => $anime->id,
                     'episode_number' => $epNumber++,
-                    'arc_name'       => $arc['name'],
-                    'title'          => "Tập $epNumber - " . $arc['name'],
-                    'video_url'      => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
-                    'duration'       => rand(1200, 1560), // ~20-26 phút
-                    'views'          => rand(10000, 2000000),
+                    'arc_name' => $arc['name'],
+                    'title' => "Tập $epNumber - ".$arc['name'],
+                    'video_url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+                    'duration' => rand(1200, 1560), // ~20-26 phút
+                    'views' => rand(10000, 2000000),
                 ]);
             }
         }
@@ -176,7 +176,9 @@ class MovieSeeder extends Seeder
      */
     private function seedInteractions(Movie $movie, $users): void
     {
-        if ($users->isEmpty()) return;
+        if ($users->isEmpty()) {
+            return;
+        }
 
         $ratingUsers = $users->random(min(rand(5, 15), $users->count()));
         foreach ($ratingUsers as $user) {
@@ -191,14 +193,13 @@ class MovieSeeder extends Seeder
         $commentUsers = $users->random(min(rand(3, 10), $users->count()));
         foreach ($commentUsers as $user) {
             Comment::create([
-                'user_id'     => $user->id,
-                'movie_id'    => $movie->id,
-                'episode_id'  => null,
-                'content'     => fake()->paragraph(),
+                'user_id' => $user->id,
+                'movie_id' => $movie->id,
+                'episode_id' => null,
+                'content' => fake()->paragraph(),
                 'is_approved' => true,
-                'is_deleted'  => false,
+                'is_deleted' => false,
             ]);
         }
     }
 }
-

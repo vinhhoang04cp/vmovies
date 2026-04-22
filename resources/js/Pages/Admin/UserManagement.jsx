@@ -6,16 +6,27 @@ import Pagination from '@/Components/Pagination';
 import LoadingSpinner from '@/Components/LoadingSpinner';
 import Toast from '@/Components/Toast';
 
+/**
+ * UserManagement - Thành phần quản trị hệ thống người dùng.
+ * 
+ * Các chức năng chính:
+ * 1. Liệt kê danh sách người dùng đã đăng ký trên hệ thống.
+ * 2. Phân biệt vai trò người dùng (Admin/User).
+ * 3. Kiểm soát trạng thái hoạt động: Cho phép cấm (Ban) hoặc bỏ cấm (Unban) tài khoản.
+ * 4. Tìm kiếm người dùng theo tên hoặc email.
+ * 5. Theo dõi ngày tham gia của thành viên.
+ */
 export default function UserManagement() {
+    // Sử dụng hook useResourceManagement để quản lý việc truy vấn danh sách người dùng.
     const {
-        items: users,
-        loading,
-        error,
-        meta,
-        page,
-        search,
-        sortBy,
-        sortDir,
+        items: users,     // Danh sách người dùng.
+        loading,        // Trạng thái đang đồng bộ dữ liệu.
+        error,          // Lỗi từ backend (nếu có).
+        meta,           // Thông tin phân trang.
+        page,           // Trang hiện tại.
+        search,         // Từ khóa tìm kiếm (name/email).
+        sortBy,         // Cột sắp xếp.
+        sortDir,        // Hướng sắp xếp (asc/desc).
         setSearch,
         setPage,
         setSortBy,
@@ -24,13 +35,19 @@ export default function UserManagement() {
         setError,
     } = useResourceManagement(userApi);
 
-    const [toast, setToast] = useState(null);
+    const [toast, setToast] = useState(null); // Quản lý thông báo nổi (Toast).
 
+    /**
+     * Effect: Tự động tải lại danh sách khi tiêu chí tìm kiếm hoặc sắp xếp thay đổi.
+     */
     useEffect(() => {
         fetchItems(1);
         // eslint-disable-next-line
     }, [search, sortBy, sortDir]);
 
+    /**
+     * Effect: Xử lý chuyển trang qua phân trang.
+     */
     useEffect(() => {
         if (page > 1) {
             fetchItems(page);
@@ -38,49 +55,70 @@ export default function UserManagement() {
         // eslint-disable-next-line
     }, [page]);
 
+    /**
+     * handleBan: Thực hiện lệnh cấm tài khoản người dùng sau khi xác nhận.
+     * @param {number} id - ID người dùng.
+     */
     const handleBan = async (id) => {
-        if (!window.confirm('Bạn có chắc chắn muốn cấm người dùng này?')) return;
+        if (!window.confirm('Bạn có chắc chắn muốn cấm người dùng này không? Người dùng sẽ không thể đăng nhập vào hệ thống.')) return;
 
         try {
             const response = await userApi.ban(id);
             if (response.success) {
-                setToast({ message: 'Cấm người dùng thành công!', type: 'success' });
-                await fetchItems(page);
+                setToast({ message: 'Đã cấm tài khoản thành công!', type: 'success' });
+                await fetchItems(page); // Tải lại trang hiện tại để cập nhật UI.
             } else {
-                setError(response.error || 'Lỗi khi cấm người dùng');
+                setError(response.error || 'Lỗi hệ thống khi thực hiện lệnh cấm');
             }
         } catch (err) {
             setError(err.message);
         }
     };
 
+    /**
+     * handleUnban: Khôi phục quyền truy cập cho tài khoản bị cấm.
+     * @param {number} id - ID người dùng.
+     */
     const handleUnban = async (id) => {
         try {
             const response = await userApi.unban(id);
             if (response.success) {
-                setToast({ message: 'Bỏ cấm người dùng thành công!', type: 'success' });
+                setToast({ message: 'Đã bỏ cấm và khôi phục tài khoản thành công!', type: 'success' });
                 await fetchItems(page);
             } else {
-                setError(response.error || 'Lỗi khi bỏ cấm');
+                setError(response.error || 'Lỗi hệ thống khi thực hiện lệnh bỏ cấm');
             }
         } catch (err) {
             setError(err.message);
         }
     };
 
+    /**
+     * Định nghĩa các cột hiển thị cho bảng người dùng.
+     */
     const columns = [
         { key: 'id', label: 'ID', sortable: false },
-        { key: 'name', label: 'Tên', sortable: true },
-        { key: 'email', label: 'Email', sortable: true },
+        { 
+            key: 'name', 
+            label: 'Họ và tên', 
+            sortable: true,
+            render: (val) => <span className="font-black text-black uppercase tracking-tight">{val}</span>
+        },
+        { 
+            key: 'email', 
+            label: 'Địa chỉ Email', 
+            sortable: true,
+            render: (val) => <span className="text-gray-600 font-medium">{val}</span>
+        },
         {
             key: 'role',
             label: 'Vai trò',
             sortable: true,
             render: (value) => (
-                <span className={`px-2 py-1 rounded text-white text-sm ${
-                    value === 'admin' ? 'bg-red-600' : 'bg-blue-600'
+                <span className={`px-4 py-1 font-black uppercase text-[10px] border-2 border-black shadow-[3px_3px_0_0_rgba(0,0,0,1)] ${
+                    value === 'admin' ? 'bg-red-500 text-white' : 'bg-blue-400 text-black'
                 }`}>
-                    {value === 'admin' ? 'Admin' : 'Người dùng'}
+                    {value === 'admin' ? 'Quản trị viên' : 'Thành viên'}
                 </span>
             ),
         },
@@ -89,49 +127,52 @@ export default function UserManagement() {
             label: 'Trạng thái',
             sortable: true,
             render: (value) => (
-                <span className={`px-2 py-1 rounded text-white text-sm ${
-                    value ? 'bg-red-500' : 'bg-green-500'
+                <span className={`px-3 py-1 font-bold text-xs uppercase ${
+                    value ? 'text-red-600 bg-red-50 border-2 border-red-600' : 'text-green-600 bg-green-50 border-2 border-green-600'
                 }`}>
-                    {value ? 'Đã cấm' : 'Hoạt động'}
+                    {value ? 'Đã bị cấm' : 'Đang hoạt động'}
                 </span>
             ),
         },
-        { key: 'created_at', label: 'Ngày tạo', sortable: true },
+        { 
+            key: 'created_at', 
+            label: 'Ngày gia nhập', 
+            sortable: true,
+            render: (val) => val ? new Date(val).toLocaleDateString('vi-VN') : '-'
+        },
     ];
 
     return (
         <div className="p-8 bg-gray-50 min-h-screen">
             <div className="max-w-7xl mx-auto">
-                <div className="flex items-center justify-between mb-6">
-                    <h1 className="text-4xl font-extrabold text-black uppercase tracking-tight border-b-4 border-black inline-block pb-2">Quản lý người dùng</h1>
+                {/* PHẦN TIÊU ĐỀ TRANG */}
+                <div className="flex items-center justify-between mb-8">
+                    <h1 className="text-4xl font-black text-black uppercase tracking-tighter border-b-8 border-black pb-2">
+                        Quản lý người dùng
+                    </h1>
                 </div>
 
-                {toast && (
-                    <Toast
-                        message={toast.message}
-                        type={toast.type}
-                        onClose={() => setToast(null)}
-                    />
-                )}
+                {/* THÔNG BÁO TOAST */}
+                {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+                {error && <Toast message={error} type="error" onClose={() => setError(null)} />}
 
-                {error && (
-                    <Toast message={error} type="error" onClose={() => setError(null)} />
-                )}
-
-                <div className="mb-6 bg-white p-4 border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] rounded-none">
+                {/* THANH TÌM KIẾM NGƯỜI DÙNG */}
+                <div className="mb-6 bg-white p-4 border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)]">
                     <input
                         type="text"
-                        placeholder="Tìm kiếm người dùng..."
+                        placeholder="Tìm kiếm theo tên người dùng hoặc địa chỉ email..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-400 rounded-none focus:outline-none focus:ring-2 focus:ring-black focus:border-black"
+                        className="w-full px-4 py-3 border-2 border-gray-200 focus:border-black outline-none transition-colors"
                     />
                 </div>
 
-                <div className="bg-white border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] rounded-none">
+                {/* BẢNG DỮ LIỆU NGƯỜI DÙNG */}
+                <div className="bg-white border-2 border-black shadow-[4px_4px_0_0_rgba(0,0,0,1)] overflow-hidden">
                     {loading ? (
-                        <div className="p-8 flex justify-center">
+                        <div className="p-20 flex flex-col items-center gap-4">
                             <LoadingSpinner />
+                            <span className="font-black uppercase tracking-widest text-gray-400">Đang quét danh sách người dùng...</span>
                         </div>
                     ) : (
                         <>
@@ -149,14 +190,15 @@ export default function UserManagement() {
                                         {row.is_banned ? (
                                             <button
                                                 onClick={() => handleUnban(row.id)}
-                                                className="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700 transition"
+                                                className="px-4 py-1 text-xs bg-green-600 text-white border-2 border-black font-black uppercase shadow-[3px_3px_0_0_rgba(0,0,0,1)] active:shadow-none transition-all"
                                             >
                                                 Bỏ cấm
                                             </button>
                                         ) : (
                                             <button
+                                                disabled={row.role === 'admin'} // Ngăn chặn việc Admin tự cấm chính mình hoặc Admin khác.
                                                 onClick={() => handleBan(row.id)}
-                                                className="px-3 py-1 text-sm bg-red-600 text-white rounded-none hover:bg-red-800 uppercase font-bold transition"
+                                                className="px-4 py-1 text-xs bg-black text-white border-2 border-black font-black uppercase shadow-[3px_3px_0_0_rgba(0,0,0,1)] active:shadow-none transition-all disabled:opacity-20 disabled:cursor-not-allowed"
                                             >
                                                 Cấm
                                             </button>
@@ -166,8 +208,9 @@ export default function UserManagement() {
                                 loading={loading}
                             />
 
+                            {/* ĐIỀU HƯỚNG PHÂN TRANG */}
                             {meta.last_page > 1 && (
-                                <div className="p-4">
+                                <div className="p-4 border-t-2 border-black bg-gray-50">
                                     <Pagination
                                         currentPage={page}
                                         lastPage={meta.last_page}
@@ -184,4 +227,3 @@ export default function UserManagement() {
         </div>
     );
 }
-

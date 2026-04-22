@@ -30,11 +30,10 @@ class CountrySeeder extends Seeder
 
         foreach ($countries as $country) {
             Country::firstOrCreate(['code' => $country['code']], [
-                'name'     => $country['name'],
-                'code'     => $country['code'],
+                'name' => $country['name'],
+                'code' => $country['code'],
                 'flag_url' => null,
             ]);
         }
     }
 }
-
