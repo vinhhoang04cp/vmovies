@@ -194,6 +194,119 @@ classDiagram
     Episode "1" --> "*" WatchHistory
 ```
 
+### 3. Chi tiết các bảng CSDL (Database Schema)
+
+Dưới đây là chi tiết các trường (columns) quan trọng trong các bảng dữ liệu chính của hệ thống:
+
+#### Bảng `users` (Người dùng)
+| Column | Type | Description |
+|---|---|---|
+| `id` | BigInt | Primary Key |
+| `name` | String | Tên hiển thị |
+| `email` | String | Email đăng nhập (Unique) |
+| `password` | String | Mật khẩu (đã hash) |
+| `avatar_url` | String | Link ảnh đại diện (Nullable) |
+| `is_admin` | Boolean | Cờ đánh dấu tài khoản Admin (`true`/`false`) |
+| `status` | Enum | Trạng thái tài khoản: `active`, `banned` |
+
+#### Bảng `movies` (Phim)
+| Column | Type | Description |
+|---|---|---|
+| `id` | BigInt | Primary Key |
+| `title` | String | Tên phim |
+| `original_title`| String | Tên gốc của phim |
+| `slug` | String | Đường dẫn tĩnh (Unique) |
+| `poster_url` | String | Link ảnh dọc (Poster) |
+| `banner_url` | String | Link ảnh ngang (Banner) |
+| `trailer_url` | String | Link video trailer |
+| `summary` | Text | Tóm tắt nội dung phim |
+| `release_year` | Year | Năm phát hành |
+| `status` | Enum | Tình trạng: `ongoing` (Đang chiếu), `completed` (Hoàn thành) |
+| `type` | Enum | Loại phim: `movie` (Phim lẻ), `series` (Phim bộ) |
+| `view_count` | BigInt | Tổng lượt xem |
+| `average_rating`| Decimal(3,2)| Điểm đánh giá trung bình |
+
+#### Bảng `episodes` (Tập phim)
+| Column | Type | Description |
+|---|---|---|
+| `id` | BigInt | Primary Key |
+| `movie_id` | BigInt | Foreign Key -> `movies` |
+| `episode_number`| Integer | Số thứ tự tập |
+| `arc_name` | String | Tên phần (nếu có, VD: Mùa 1, Arc Wano) |
+| `title` | String | Tiêu đề riêng của tập (nếu có) |
+| `video_url` | String | Link nguồn video để stream |
+| `duration` | Integer | Thời lượng tập (tính bằng giây) |
+| `views` | BigInt | Lượt xem của tập |
+
+#### Bảng `comments` (Bình luận)
+| Column | Type | Description |
+|---|---|---|
+| `id` | BigInt | Primary Key |
+| `user_id` | BigInt | Foreign Key -> `users` |
+| `movie_id` | BigInt | Foreign Key -> `movies` |
+| `episode_id` | BigInt | Foreign Key -> `episodes` (Nullable) |
+| `content` | Text | Nội dung bình luận |
+| `is_approved` | Boolean | Trạng thái duyệt (Dùng cho kiểm duyệt) |
+
+#### Bảng `watch_history` (Lịch sử xem)
+| Column | Type | Description |
+|---|---|---|
+| `id` | BigInt | Primary Key |
+| `user_id` | BigInt | Foreign Key -> `users` |
+| `movie_id` | BigInt | Foreign Key -> `movies` |
+| `episode_id` | BigInt | Foreign Key -> `episodes` |
+| `watched_seconds`| Integer | Thời gian đã xem tới (giây) để Resume |
+
+#### Các bảng Danh mục (Categories & People)
+**1. Bảng `genres` (Thể loại) & `countries` (Quốc gia)**
+| Column | Type | Description |
+|---|---|---|
+| `id` | BigInt | Primary Key |
+| `name` | String | Tên danh mục (Ví dụ: Hành động, Hàn Quốc) |
+| `slug` | String | URL tĩnh (Ví dụ: hanh-dong) - Unique |
+| `description` | Text | Mô tả chi tiết (Chỉ có ở bảng `genres`) |
+| `icon_url` | String | Hình ảnh icon/đại diện |
+
+**2. Bảng `directors` (Đạo diễn) & `actors` (Diễn viên)**
+| Column | Type | Description |
+|---|---|---|
+| `id` | BigInt | Primary Key |
+| `name` | String | Tên đạo diễn / Diễn viên |
+| `bio` | Text | Tiểu sử (Nullable) |
+| `image_url` | String | Ảnh chân dung (Nullable) |
+
+#### Các bảng Pivot (Trung gian nhiều-nhiều)
+Các bảng này dùng để thiết lập quan hệ Many-to-Many giữa Phim và các Thực thể liên quan:
+- **`movie_genre`**: Chứa `movie_id` và `genre_id`.
+- **`movie_country`**: Chứa `movie_id` và `country_id`.
+- **`movie_director`**: Chứa `movie_id` và `director_id`.
+- **`movie_actor`**: Chứa `movie_id`, `actor_id`, và bổ sung thêm trường **`role_name`** (để lưu tên nhân vật hoặc vai diễn của diễn viên trong bộ phim đó).
+
+*Lưu ý: Tất cả các bảng Pivot trên đều được thiết lập khóa **Unique** kết hợp (ví dụ: `movie_id` + `actor_id`) để đảm bảo không bị trùng lặp bộ đôi dữ liệu.*
+
+#### Các bảng Tương tác & Phân quyền khác
+**1. Bảng `ratings` (Đánh giá phim)**
+| Column | Type | Description |
+|---|---|---|
+| `user_id` | BigInt | Khóa ngoại -> `users` |
+| `movie_id` | BigInt | Khóa ngoại -> `movies` |
+| `score` | TinyInt | Điểm số đánh giá (Từ 1-5 sao) |
+| `review_text` | Text | Lời bình/Nhận xét chi tiết (Nullable) |
+| `helpful_count`| Integer | Lượt bình chọn là đánh giá hữu ích |
+
+**2. Bảng `bookmarks` (Tủ phim cá nhân)**
+| Column | Type | Description |
+|---|---|---|
+| `user_id` | BigInt | Khóa ngoại -> `users` |
+| `movie_id` | BigInt | Khóa ngoại -> `movies` |
+| `bookmarked_at`| Timestamp| Thời gian bấm lưu vào tủ phim |
+
+**3. Bảng Phân quyền Admin**
+Gồm 3 bảng liên kết theo mô hình RBAC (Role-Based Access Control):
+- **`roles`**: Gồm `id`, `name`, `display_name`, `description`.
+- **`permissions`**: Gồm `id`, `name`, `display_name`, `description`.
+- **`role_permissions`**: Gồm `role_id`, `permission_id` (Bảng trung gian thiết lập quyền hành cho vai trò).
+
 ---
 
 ## 📂 Cấu trúc thư mục (Project Structure)
