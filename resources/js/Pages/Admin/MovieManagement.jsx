@@ -58,8 +58,8 @@ export default function MovieManagement() {
         original_title: '',
         summary: '',
         release_year: new Date().getFullYear(),
-        type: 'movie', // movie, series, special
-        status: 'draft', // draft, published, archived
+        type: 'movie', // movie, series
+        status: 'ongoing', // ongoing, completed
         poster: '',
         banner: '',
         trailer_url: '',
@@ -136,7 +136,7 @@ export default function MovieManagement() {
             summary: '',
             release_year: new Date().getFullYear(),
             type: 'movie',
-            status: 'draft',
+            status: 'ongoing',
             poster: '',
             banner: '',
             trailer_url: '',
@@ -161,7 +161,7 @@ export default function MovieManagement() {
             summary: movie.summary || '',
             release_year: movie.release_year || new Date().getFullYear(),
             type: movie.type || 'movie',
-            status: movie.status || 'draft',
+            status: movie.status || 'ongoing',
             poster: movie.poster || '',
             banner: movie.banner || '',
             trailer_url: movie.trailer_url || '',
@@ -292,9 +292,9 @@ export default function MovieManagement() {
             sortable: true,
             render: (val) => (
                 <span className={`px-2 py-0.5 rounded text-xs font-bold ${
-                    val === 'published' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                    val === 'completed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
                 }`}>
-                    {val === 'published' ? 'CÔNG KHAI' : 'BẢN NHÁP'}
+                    {val === 'completed' ? 'HOÀN THÀNH' : 'ĐANG RA'}
                 </span>
             )
         },
@@ -305,6 +305,33 @@ export default function MovieManagement() {
             sortable: true,
             render: (value) => (value || 0).toLocaleString(),
         },
+        {
+            key: 'actions',
+            label: 'Thao tác',
+            render: (_, row) => (
+                <div className="flex justify-center gap-2">
+                    <button
+                        onClick={() => navigate(`/movies/${row.id}/episodes`)}
+                        className="px-3 py-1 text-sm bg-blue-600 text-white rounded-none border border-black hover:bg-blue-700 uppercase font-bold transition"
+                        title="Tập phim"
+                    >
+                        Tập phim
+                    </button>
+                    <button
+                        onClick={() => handleEdit(row)}
+                        className="px-3 py-1 text-sm bg-black text-white rounded-none border border-black hover:bg-gray-800 uppercase font-bold transition"
+                    >
+                        Sửa
+                    </button>
+                    <button
+                        onClick={() => handleDelete(row.id)}
+                        className="px-3 py-1 text-sm bg-red-600 text-white rounded-none border border-black hover:bg-red-800 uppercase font-bold transition"
+                    >
+                        Xóa
+                    </button>
+                </div>
+            )
+        }
     ];
 
     return (
@@ -356,29 +383,6 @@ export default function MovieManagement() {
                                 }}
                                 sortBy={sortBy}
                                 sortDir={sortDir}
-                                rowAction={(row) => (
-                                    <div className="flex gap-2 justify-center">
-                                        {/* Nút điều hướng đến quản lý tập phim */}
-                                        <button
-                                            onClick={() => navigate(`/movies/${row.id}/episodes`)}
-                                            className="px-3 py-1 text-sm bg-blue-600 text-white font-bold rounded-none border border-black hover:bg-blue-700 transition"
-                                        >
-                                            Tập phim
-                                        </button>
-                                        <button
-                                            onClick={() => handleEdit(row)}
-                                            className="px-3 py-1 text-sm bg-black text-white rounded-none border border-black hover:bg-gray-800 uppercase font-bold transition"
-                                        >
-                                            Sửa
-                                        </button>
-                                        <button
-                                            onClick={() => handleDelete(row.id)}
-                                            className="px-3 py-1 text-sm bg-red-600 text-white rounded-none border border-black hover:bg-red-800 uppercase font-bold transition"
-                                        >
-                                            Xóa
-                                        </button>
-                                    </div>
-                                )}
                                 loading={loading}
                             />
 
@@ -446,7 +450,6 @@ export default function MovieManagement() {
                                     >
                                         <option value="movie">Phim lẻ</option>
                                         <option value="series">Series</option>
-                                        <option value="special">Đặc biệt</option>
                                     </select>
                                 </div>
                                 <div>
@@ -456,9 +459,8 @@ export default function MovieManagement() {
                                         onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                                         className="w-full px-3 py-2 border-2 border-black rounded-none focus:outline-none"
                                     >
-                                        <option value="draft">Nháp</option>
-                                        <option value="published">Công khai</option>
-                                        <option value="archived">Lưu trữ</option>
+                                        <option value="ongoing">Đang ra</option>
+                                        <option value="completed">Hoàn thành</option>
                                     </select>
                                 </div>
                                 <div>

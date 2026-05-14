@@ -27,7 +27,7 @@ export function ProtectedRoute({ children, adminOnly = false }) {
     }
 
     // Nếu trang yêu cầu quyền Admin mà người dùng hiện tại không phải Admin -> Chuyển về trang chủ
-    if (adminOnly && user?.role !== 'admin') {
+    if (adminOnly && !user?.is_admin) {
         return <Navigate to="/" replace />;
     }
 
@@ -55,7 +55,7 @@ export function PublicRoute({ children }) {
 
     // Nếu đã đăng nhập → Admin vào Dashboard, Viewer quay về trang chủ
     if (isAuthenticated) {
-        const redirectPath = user?.role === 'admin' ? '/dashboard' : '/';
+        const redirectPath = user?.is_admin ? '/dashboard' : '/';
         return <Navigate to={redirectPath} replace />;
     }
 

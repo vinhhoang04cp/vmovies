@@ -69,7 +69,7 @@ export default function LoginAPI() {
 
         if (result.success) {
             // Chuyển hướng dựa trên vai trò: Admin → Dashboard, Viewer → Trang chủ.
-            const redirectPath = result.user?.role === 'admin' ? '/dashboard' : '/';
+            const redirectPath = result.user?.is_admin ? '/dashboard' : '/';
             navigate(redirectPath);
         } else {
             // Hiển thị lỗi trả về từ Server.

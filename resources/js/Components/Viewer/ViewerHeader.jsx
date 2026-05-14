@@ -194,7 +194,7 @@ export default function ViewerHeader() {
                                     <Link to="/bookmarks" className="viewer-header__dropdown-item" onClick={() => setUserDropdownOpen(false)}>
                                         📑 Phim yêu thích
                                     </Link>
-                                    {user?.role === 'admin' && (
+                                    {user?.is_admin && (
                                         <Link to="/dashboard" className="viewer-header__dropdown-item" onClick={() => setUserDropdownOpen(false)}>
                                             ⚙️ Dashboard quản trị
                                         </Link>
@@ -251,7 +251,7 @@ export default function ViewerHeader() {
                     {isAuthenticated ? (
                         <>
                             <Link to="/bookmarks" className="viewer-header__mobile-link" onClick={() => setMobileMenuOpen(false)}>📑 Phim yêu thích</Link>
-                            {user?.role === 'admin' && (
+                            {user?.is_admin && (
                                 <Link to="/dashboard" className="viewer-header__mobile-link" onClick={() => setMobileMenuOpen(false)}>⚙️ Dashboard</Link>
                             )}
                             <button onClick={handleLogout} className="viewer-header__mobile-link viewer-header__mobile-link--danger">🚪 Đăng xuất</button>

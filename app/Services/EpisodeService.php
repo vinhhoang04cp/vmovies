@@ -55,7 +55,7 @@ class EpisodeService
         // Debug logging
         \Log::info('Episode create request', [
             'has_video_file' => ! empty($data['video_file']),
-            'video_file_type' => $data['video_file'] ? get_class($data['video_file']) : null,
+            'video_file_type' => ! empty($data['video_file']) ? get_class($data['video_file']) : null,
             'video_url' => $videoUrl,
         ]);
 
