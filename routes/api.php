@@ -13,6 +13,7 @@ use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\CountryController;
 use App\Http\Controllers\GenreController;
 use App\Http\Controllers\MovieController;
+use App\Http\Controllers\ViewerController;
 use Illuminate\Support\Facades\Route;
 
 // ═══════════════════════════════════════════════════════
@@ -39,10 +40,34 @@ Route::prefix('movies')->group(function () {
     Route::get('/{movie}', [MovieController::class, 'show']);
     Route::get('/{movie}/episodes', [MovieController::class, 'episodes']);
     Route::get('/{movie}/episodes/{episode}', [MovieController::class, 'showEpisode']);
+    // Public: Bình luận cho phim (không cần đăng nhập để xem)
+    Route::get('/{movie}/comments', [ViewerController::class, 'getMovieComments']);
+    // Public: Đánh giá cho phim
+    Route::get('/{movie}/ratings', [ViewerController::class, 'getMovieRatings']);
 });
 
 Route::get('/genres', [GenreController::class, 'index']);
 Route::get('/countries', [CountryController::class, 'index']);
+
+// ═══════════════════════════════════════════════════════
+//  VIEWER ROUTES (authenticated users - any role)
+// ═══════════════════════════════════════════════════════
+
+Route::middleware('auth:sanctum')->group(function () {
+    // Bookmark
+    Route::get('/bookmarks', [ViewerController::class, 'getBookmarks']);
+    Route::post('/bookmarks', [ViewerController::class, 'addBookmark']);
+    Route::delete('/bookmarks/{movieId}', [ViewerController::class, 'removeBookmark']);
+    Route::get('/bookmarks/check/{movieId}', [ViewerController::class, 'checkBookmark']);
+
+    // Comment (gửi/xóa yêu cầu đăng nhập)
+    Route::post('/movies/{movie}/comments', [ViewerController::class, 'postComment']);
+    Route::delete('/comments/{comment}', [ViewerController::class, 'deleteComment']);
+
+    // Rating (gửi/xem rating cá nhân yêu cầu đăng nhập)
+    Route::post('/movies/{movie}/ratings', [ViewerController::class, 'rateMovie']);
+    Route::get('/movies/{movie}/ratings/mine', [ViewerController::class, 'getMyRating']);
+});
 
 // ═══════════════════════════════════════════════════════
 //  ADMIN ROUTES (requires auth + admin role)

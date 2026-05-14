@@ -68,8 +68,9 @@ export default function LoginAPI() {
         const result = await login(formData.email, formData.password);
 
         if (result.success) {
-            // Chuyển hướng đến bảng điều khiển nếu đăng nhập thành công.
-            navigate('/dashboard');
+            // Chuyển hướng dựa trên vai trò: Admin → Dashboard, Viewer → Trang chủ.
+            const redirectPath = result.user?.role === 'admin' ? '/dashboard' : '/';
+            navigate(redirectPath);
         } else {
             // Hiển thị lỗi trả về từ Server.
             setFormErrors({ submit: result.error });
@@ -82,7 +83,7 @@ export default function LoginAPI() {
                 {/* Header trang đăng nhập */}
                 <div className="border-b-2 border-black bg-black px-8 py-10">
                     <h1 className="text-4xl font-black tracking-tighter text-white uppercase italic">VMovies</h1>
-                    <p className="mt-2 text-gray-400 text-[10px] font-black tracking-[0.3em] uppercase">Hệ thống quản trị nội dung</p>
+                    <p className="mt-2 text-gray-400 text-[10px] font-black tracking-[0.3em] uppercase">Đăng nhập tài khoản</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6 p-8">
@@ -95,7 +96,7 @@ export default function LoginAPI() {
 
                     {/* Trường Email */}
                     <div>
-                        <InputLabel htmlFor="email" value="Email Quản trị" className="uppercase text-[10px] font-black tracking-widest text-gray-500" />
+                        <InputLabel htmlFor="email" value="Email" className="uppercase text-[10px] font-black tracking-widest text-gray-500" />
                         <TextInput
                             id="email"
                             type="email"
@@ -139,7 +140,7 @@ export default function LoginAPI() {
 
                     {/* Link Đăng ký */}
                     <div className="text-center text-[10px] font-bold text-gray-500 pt-6 border-t border-gray-100 uppercase tracking-widest">
-                        Chưa có tài khoản quản trị?{' '}
+                        Chưa có tài khoản?{' '}
                         <Link
                             to="/register"
                             className="text-black underline decoration-2 underline-offset-4 hover:text-gray-600 transition-colors"

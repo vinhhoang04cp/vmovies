@@ -26,9 +26,9 @@ export function ProtectedRoute({ children, adminOnly = false }) {
         return <Navigate to="/login" replace />;
     }
 
-    // Nếu trang yêu cầu quyền Admin mà người dùng hiện tại không phải Admin -> Chuyển về Dashboard
+    // Nếu trang yêu cầu quyền Admin mà người dùng hiện tại không phải Admin -> Chuyển về trang chủ
     if (adminOnly && user?.role !== 'admin') {
-        return <Navigate to="/dashboard" replace />;
+        return <Navigate to="/" replace />;
     }
 
     // Đủ điều kiện -> Hiển thị nội dung bên trong (children)
@@ -40,7 +40,7 @@ export function ProtectedRoute({ children, adminOnly = false }) {
  * Ví dụ: Đã login rồi thì không cho quay lại trang Login/Register nữa.
  */
 export function PublicRoute({ children }) {
-    const { isAuthenticated, loading } = useAuth();
+    const { isAuthenticated, loading, user } = useAuth();
 
     if (loading) {
         return (
@@ -53,9 +53,10 @@ export function PublicRoute({ children }) {
         );
     }
 
-    // Nếu đã đăng nhập -> Không cho vào trang login/register, đẩy thẳng vào dashboard
+    // Nếu đã đăng nhập → Admin vào Dashboard, Viewer quay về trang chủ
     if (isAuthenticated) {
-        return <Navigate to="/dashboard" replace />;
+        const redirectPath = user?.role === 'admin' ? '/dashboard' : '/';
+        return <Navigate to={redirectPath} replace />;
     }
 
     return children;

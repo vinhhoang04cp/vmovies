@@ -156,6 +156,14 @@ export default function ViewerHeader() {
 
                     <Link to="/search?type=single" className="viewer-header__nav-link">Phim Lẻ</Link>
                     <Link to="/search?type=series" className="viewer-header__nav-link">Phim Bộ</Link>
+                    {isAuthenticated && (
+                        <Link to="/bookmarks" className="viewer-header__nav-link viewer-header__nav-link--bookmark">
+                            <svg viewBox="0 0 20 20" fill="currentColor" style={{width:'16px',height:'16px',marginRight:'4px'}}>
+                                <path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z" />
+                            </svg>
+                            Yêu thích
+                        </Link>
+                    )}
                 </nav>
 
                 {/* Auth Button */}
@@ -173,13 +181,27 @@ export default function ViewerHeader() {
                             </button>
                             {userDropdownOpen && (
                                 <div className="viewer-header__dropdown viewer-header__dropdown--right">
+                                    <div className="viewer-header__dropdown-user-info">
+                                        <div className="viewer-header__dropdown-avatar">
+                                            {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+                                        </div>
+                                        <div>
+                                            <div style={{fontWeight:900,color:'#fff',fontSize:'14px'}}>{user?.name}</div>
+                                            <div style={{fontSize:'10px',color:'#9ca3af',textTransform:'uppercase',letterSpacing:'0.1em'}}>{user?.email}</div>
+                                        </div>
+                                    </div>
+                                    <div style={{borderTop:'1px solid #374151',margin:'4px 0'}}></div>
+                                    <Link to="/bookmarks" className="viewer-header__dropdown-item" onClick={() => setUserDropdownOpen(false)}>
+                                        📑 Phim yêu thích
+                                    </Link>
                                     {user?.role === 'admin' && (
                                         <Link to="/dashboard" className="viewer-header__dropdown-item" onClick={() => setUserDropdownOpen(false)}>
-                                            Dashboard
+                                            ⚙️ Dashboard quản trị
                                         </Link>
                                     )}
+                                    <div style={{borderTop:'1px solid #374151',margin:'4px 0'}}></div>
                                     <button onClick={handleLogout} className="viewer-header__dropdown-item viewer-header__dropdown-item--danger">
-                                        Đăng xuất
+                                        🚪 Đăng xuất
                                     </button>
                                 </div>
                             )}
@@ -228,10 +250,11 @@ export default function ViewerHeader() {
                     <Link to="/search?type=series" className="viewer-header__mobile-link" onClick={() => setMobileMenuOpen(false)}>Phim Bộ</Link>
                     {isAuthenticated ? (
                         <>
+                            <Link to="/bookmarks" className="viewer-header__mobile-link" onClick={() => setMobileMenuOpen(false)}>📑 Phim yêu thích</Link>
                             {user?.role === 'admin' && (
-                                <Link to="/dashboard" className="viewer-header__mobile-link" onClick={() => setMobileMenuOpen(false)}>Dashboard</Link>
+                                <Link to="/dashboard" className="viewer-header__mobile-link" onClick={() => setMobileMenuOpen(false)}>⚙️ Dashboard</Link>
                             )}
-                            <button onClick={handleLogout} className="viewer-header__mobile-link viewer-header__mobile-link--danger">Đăng xuất</button>
+                            <button onClick={handleLogout} className="viewer-header__mobile-link viewer-header__mobile-link--danger">🚪 Đăng xuất</button>
                         </>
                     ) : (
                         <Link to="/login" className="viewer-header__mobile-link" onClick={() => setMobileMenuOpen(false)}>Đăng nhập</Link>

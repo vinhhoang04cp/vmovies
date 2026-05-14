@@ -89,7 +89,8 @@ export default function RegisterAPI() {
         );
 
         if (result.success) {
-            navigate('/dashboard');
+            // Người dùng mới đăng ký mặc định là viewer → về trang chủ
+            navigate('/');
         } else {
             setFormErrors({ submit: result.error });
         }
@@ -101,7 +102,7 @@ export default function RegisterAPI() {
                 {/* Header trang đăng ký */}
                 <div className="border-b-2 border-black bg-black px-8 py-10">
                     <h1 className="text-4xl font-black tracking-tighter text-white uppercase italic">VMovies</h1>
-                    <p className="mt-2 text-gray-400 text-[10px] font-black tracking-[0.3em] uppercase">Khởi tạo tài khoản quản trị</p>
+                    <p className="mt-2 text-gray-400 text-[10px] font-black tracking-[0.3em] uppercase">Tạo tài khoản mới</p>
                 </div>
 
                 <form onSubmit={handleSubmit} className="space-y-5 p-8">

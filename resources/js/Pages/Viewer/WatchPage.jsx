@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { publicApi } from '@/Services/publicApi';
 import ViewerLayout from '@/Layouts/ViewerLayout';
+import CommentSection from '@/Components/Viewer/CommentSection';
 
 /**
  * extractItem - Helper trích xuất một đối tượng duy nhất từ phản hồi API.
@@ -240,6 +241,9 @@ export default function WatchPage() {
                                 {movie.summary || "Đang cập nhật nội dung cho bộ phim này..."}
                             </p>
                         </div>
+
+                        {/* BÌNH LUẬN CHO TẬP PHIM */}
+                        <CommentSection movieId={parseInt(movieId)} episodeId={parseInt(episodeId)} />
                     </div>
 
                     {/* Cột phải: Danh sách tập phim */}

@@ -40,6 +40,7 @@ import HomePage from '@/Pages/Viewer/HomePage';
 import MovieDetailPage from '@/Pages/Viewer/MovieDetailPage';
 import WatchPage from '@/Pages/Viewer/WatchPage';
 import SearchPage from '@/Pages/Viewer/SearchPage';
+import BookmarkPage from '@/Pages/Viewer/BookmarkPage';
 
 // Layout bọc khung giao diện trang Admin (chứa Header, Sidebar...)
 import AdminLayout from '@/Layouts/AdminLayout';
@@ -60,6 +61,7 @@ function App() {
                     <Route path="/movie/:id" element={<MovieDetailPage />} />
                     <Route path="/watch/:movieId/:episodeId" element={<WatchPage />} />
                     <Route path="/search" element={<SearchPage />} />
+                    <Route path="/bookmarks" element={<BookmarkPage />} />
 
                     {/* ═══ Auth Routes (Tuyến đường xác thực) ═══ */}
                     {/* PublicRoute bọc lại để đảm bảo: Nếu đã đăng nhập, sẽ bị đá ra khỏi trang này (thường chuyển về /dashboard) */}
@@ -80,23 +82,23 @@ function App() {
                         }
                     />
 
-                    {/* ═══ Protected routes (Tuyến đường bảo vệ - Cần đăng nhập) ═══ */}
-                    {/* ProtectedRoute đảm bảo: Chưa đăng nhập sẽ bị đá văng về trang /login */}
+                    {/* ═══ Protected routes (Tuyến đường bảo vệ - Cần đăng nhập + quyền Admin) ═══ */}
+                    {/* ProtectedRoute với adminOnly: Chưa đăng nhập → /login, không phải admin → về trang chủ */}
                     <Route
                         path="/dashboard"
                         element={
-                            <ProtectedRoute>
+                            <ProtectedRoute adminOnly>
                                 <DashboardAPI />
                             </ProtectedRoute>
                         }
                     />
 
                     {/* ═══ Admin routes (Trang CMS cho Quản trị viên) ═══ */}
-                    {/* Vừa yêu cầu ProtectedRoute (phải đăng nhập), vừa được bọc bởi AdminLayout (để có thanh menu) */}
+                    {/* Vừa yêu cầu ProtectedRoute adminOnly, vừa được bọc bởi AdminLayout (để có thanh menu) */}
                     <Route
                         path="/movies"
                         element={
-                            <ProtectedRoute>
+                            <ProtectedRoute adminOnly>
                                 <AdminLayout>
                                     <MovieManagement />
                                 </AdminLayout>
@@ -106,7 +108,7 @@ function App() {
                     <Route
                         path="/movies/:movieId/episodes"
                         element={
-                            <ProtectedRoute>
+                            <ProtectedRoute adminOnly>
                                 <AdminLayout>
                                     <EpisodeManagement />
                                 </AdminLayout>
@@ -116,7 +118,7 @@ function App() {
                     <Route
                         path="/genres"
                         element={
-                            <ProtectedRoute>
+                            <ProtectedRoute adminOnly>
                                 <AdminLayout>
                                     <GenreManagement />
                                 </AdminLayout>
@@ -126,7 +128,7 @@ function App() {
                     <Route
                         path="/countries"
                         element={
-                            <ProtectedRoute>
+                            <ProtectedRoute adminOnly>
                                 <AdminLayout>
                                     <CountryManagement />
                                 </AdminLayout>
@@ -136,7 +138,7 @@ function App() {
                     <Route
                         path="/directors"
                         element={
-                            <ProtectedRoute>
+                            <ProtectedRoute adminOnly>
                                 <AdminLayout>
                                     <DirectorManagement />
                                 </AdminLayout>
@@ -146,7 +148,7 @@ function App() {
                     <Route
                         path="/actors"
                         element={
-                            <ProtectedRoute>
+                            <ProtectedRoute adminOnly>
                                 <AdminLayout>
                                     <ActorManagement />
                                 </AdminLayout>
@@ -156,7 +158,7 @@ function App() {
                     <Route
                         path="/users"
                         element={
-                            <ProtectedRoute>
+                            <ProtectedRoute adminOnly>
                                 <AdminLayout>
                                     <UserManagement />
                                 </AdminLayout>
@@ -166,7 +168,7 @@ function App() {
                     <Route
                         path="/comments"
                         element={
-                            <ProtectedRoute>
+                            <ProtectedRoute adminOnly>
                                 <AdminLayout>
                                     <CommentManagement />
                                 </AdminLayout>

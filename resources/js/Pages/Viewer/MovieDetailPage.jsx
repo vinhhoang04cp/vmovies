@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { publicApi } from '@/Services/publicApi';
 import ViewerLayout from '@/Layouts/ViewerLayout';
+import BookmarkButton from '@/Components/Viewer/BookmarkButton';
+import RatingSection from '@/Components/Viewer/RatingSection';
+import CommentSection from '@/Components/Viewer/CommentSection';
 
 /**
  * extractItem - Chuẩn hóa dữ liệu trả về cho một đối tượng duy nhất.
@@ -35,6 +38,9 @@ function extractList(res) {
  * 3. Danh sách các tập phim (Episodes) hiện có.
  * 4. Tích hợp Trailer (YouTube/Video URL).
  * 5. Nút "Xem Phim" tự động chuyển tới tập đầu tiên.
+ * 6. Bookmark phim vào danh sách yêu thích.
+ * 7. Đánh giá phim (Rating 1-10 sao).
+ * 8. Bình luận về phim (Comment).
  */
 export default function MovieDetailPage() {
     const { id } = useParams(); // Lấy Movie ID từ URL.
@@ -184,7 +190,7 @@ export default function MovieDetailPage() {
                             </div>
 
                             {/* Nút tác vụ chính */}
-                            <div className="flex gap-4 mt-6">
+                            <div className="flex flex-wrap gap-4 mt-6">
                                 {firstEpisode ? (
                                     <Link
                                         to={`/watch/${movie.id}/${firstEpisode.id}`}
@@ -200,6 +206,9 @@ export default function MovieDetailPage() {
                                         Phim sắp chiếu
                                     </button>
                                 )}
+
+                                {/* NÚT BOOKMARK */}
+                                <BookmarkButton movieId={movie.id} />
                             </div>
                         </div>
                     </div>
@@ -247,6 +256,12 @@ export default function MovieDetailPage() {
                                 </div>
                             </section>
                         )}
+
+                        {/* ĐÁNH GIÁ PHIM */}
+                        <RatingSection movieId={movie.id} currentRating={movie.average_rating} />
+
+                        {/* BÌNH LUẬN */}
+                        <CommentSection movieId={movie.id} />
                     </div>
 
                     {/* CỘT PHỤ (SIDEBAR): ĐẠO DIỄN, DIỄN VIÊN */}

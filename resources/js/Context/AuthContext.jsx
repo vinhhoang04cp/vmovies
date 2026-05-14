@@ -80,7 +80,7 @@ export function AuthProvider({ children }) {
             setToken(authToken);
             setUser(data.data.user);
 
-            return { success: true };
+            return { success: true, user: data.data.user };
         } catch (err) {
             const errorMsg = err.message || 'Đã có lỗi xảy ra trong quá trình đăng nhập';
             setError(errorMsg);
