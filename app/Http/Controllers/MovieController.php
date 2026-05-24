@@ -121,7 +121,7 @@ class MovieController extends Controller
     {
         try {
             // Xác thực bộ phim tồn tại
-            $this->movieService->findOrFail($movieId);
+            $movie = $this->movieService->findOrFail($movieId);
             // Lấy thông tin tập phim
             $episode = $this->episodeService->findOrFail($episodeId);
 
@@ -129,6 +129,19 @@ class MovieController extends Controller
             // Đảm bảo tập phim ($episodeId) thực sự thuộc về bộ phim ($movieId).
             if ($episode->movie_id !== $movieId) {
                 return $this->notFoundResponse('Tập phim không thuộc bộ phim này.');
+            }
+
+            // Phòng chống spam lượt xem bằng cách kiểm tra IP qua Cache 10 phút
+            $ip = request()->ip();
+            $cacheKey = "view_lock:{$episodeId}:" . md5($ip);
+
+            if (!\Illuminate\Support\Facades\Cache::has($cacheKey)) {
+                // Đặt thời gian khóa trong 10 phút (600 giây)
+                \Illuminate\Support\Facades\Cache::put($cacheKey, true, 600);
+
+                // Tăng view cho tập phim và phim
+                $episode->increment('views');
+                $movie->increment('view_count');
             }
 
             return $this->successResponse(new EpisodeResource($episode), 'Chi tiết tập phim.');

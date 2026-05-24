@@ -15,13 +15,6 @@ window.axios.defaults.headers.common['Accept'] = 'application/json';
 // Lấy từ biến môi trường VITE_API_URL, nếu không có thì mặc định gọi vào http://localhost:8000/api
 window.axios.defaults.baseURL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
-// Lấy chuỗi token xác thực từ LocalStorage (do quá trình đăng nhập lưu vào)
-const token = localStorage.getItem('auth_token');
-
-// Nếu người dùng đã đăng nhập (đã có token)
-if (token) {
-    // Tự động gắn header 'Authorization' kiểu Bearer vào tất cả các request tiếp theo.
-    // Điều này giúp mọi API endpoint yêu cầu quyền (middleware auth:sanctum) có thể xác thực người dùng thành công.
-    window.axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-}
+// Thiết lập defaults.withCredentials = true để tự động gửi cookie trong các request axios
+window.axios.defaults.withCredentials = true;
 

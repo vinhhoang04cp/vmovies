@@ -41,7 +41,7 @@ return [
     */
 
     'tokens' => [
-        'expiration' => null, // null means no expiration
+        'expiration' => 10080, // 7 days in minutes
         'abilities' => ['*'], // Default abilities for all tokens
     ],
 

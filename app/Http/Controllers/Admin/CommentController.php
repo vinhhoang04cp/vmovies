@@ -94,6 +94,10 @@ class CommentController extends Controller
         try {
             $found = $this->commentService->findOrFail($comment);
 
+            if (!\Illuminate\Support\Facades\Gate::allows('delete', $found)) {
+                return $this->errorResponse('Bạn không có quyền xóa bình luận này.', 403, null, 'FORBIDDEN');
+            }
+
             if ($found->is_deleted) {
                 return $this->errorResponse('Bình luận đã bị xóa rồi.', 409, null, 'ALREADY_DELETED');
             }

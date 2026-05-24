@@ -98,4 +98,47 @@ class FileUploadService
 
         return false;
     }
+
+    /**
+     * Upload video file from temporary path to public storage and return public URL.
+     */
+    public function uploadVideoFromPath(string $tempPath, string $episode_id, string $originalExtension): string
+    {
+        try {
+            Log::info('Starting video upload from path', [
+                'tempPath' => $tempPath,
+                'episode_id' => $episode_id,
+            ]);
+
+            // Generate unique filename: episodes/{episode_id}/{uuid}.{ext}
+            $filename = Str::uuid().'.'.$originalExtension;
+            $path = "episodes/{$episode_id}";
+
+            // Read temp file and write to public storage
+            $storagePath = "{$path}/{$filename}";
+            $stored = Storage::disk('public')->put($storagePath, Storage::disk('local')->get($tempPath));
+
+            if ($stored === false) {
+                throw new \RuntimeException(
+                    'Không thể lưu file video vào storage. Kiểm tra quyền ghi thư mục storage/app/public.'
+                );
+            }
+
+            Log::info('File stored from path successfully', ['storagePath' => $storagePath]);
+
+            // Clean up temporary local file
+            Storage::disk('local')->delete($tempPath);
+
+            // Return public URL
+            $publicUrl = asset('storage/'.$storagePath);
+            Log::info('Video upload from path complete', ['url' => $publicUrl]);
+
+            return $publicUrl;
+        } catch (\Exception $e) {
+            Log::error('Video upload from path error', [
+                'error' => $e->getMessage(),
+            ]);
+            throw $e;
+        }
+    }
 }

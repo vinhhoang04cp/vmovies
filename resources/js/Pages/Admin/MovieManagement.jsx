@@ -60,8 +60,8 @@ export default function MovieManagement() {
         release_year: new Date().getFullYear(),
         type: 'movie', // movie, series
         status: 'ongoing', // ongoing, completed
-        poster: '',
-        banner: '',
+        poster_url: '',
+        banner_url: '',
         trailer_url: '',
         genres: [], // Danh sách ID thể loại
         countries: [], // Danh sách ID quốc gia
@@ -137,8 +137,8 @@ export default function MovieManagement() {
             release_year: new Date().getFullYear(),
             type: 'movie',
             status: 'ongoing',
-            poster: '',
-            banner: '',
+            poster_url: '',
+            banner_url: '',
             trailer_url: '',
             genres: [],
             countries: [],
@@ -162,8 +162,8 @@ export default function MovieManagement() {
             release_year: movie.release_year || new Date().getFullYear(),
             type: movie.type || 'movie',
             status: movie.status || 'ongoing',
-            poster: movie.poster || '',
-            banner: movie.banner || '',
+            poster_url: movie.poster_url || '',
+            banner_url: movie.banner_url || '',
             trailer_url: movie.trailer_url || '',
             genres: movie.genres?.map((g) => g.id) || [],
             countries: movie.countries?.map((c) => c.id) || [],
@@ -194,9 +194,13 @@ export default function MovieManagement() {
                 release_year: formData.release_year,
                 type: formData.type,
                 status: formData.status,
-                poster: formData.poster,
-                banner: formData.banner,
+                poster_url: formData.poster_url,
+                banner_url: formData.banner_url,
                 trailer_url: formData.trailer_url,
+                genres: formData.genres,
+                countries: formData.countries,
+                directors: formData.directors,
+                actors: formData.actors.map(id => ({ id })),
             };
 
             let response;
@@ -207,39 +211,6 @@ export default function MovieManagement() {
             }
 
             if (response.success) {
-                const movieId = editingId || response.data.id;
-
-                // Xử lý gắn các mối quan hệ (Cần tối ưu hơn bằng cách sync một lần ở backend nếu có thể)
-                // Ở đây code đang thực hiện gọi API tuần tự cho từng liên kết
-
-                // Gắn Thể loại
-                if (formData.genres.length > 0) {
-                    for (const genreId of formData.genres) {
-                        await movieApi.attachGenre(movieId, genreId);
-                    }
-                }
-
-                // Gắn Quốc gia
-                if (formData.countries.length > 0) {
-                    for (const countryId of formData.countries) {
-                        await movieApi.attachCountry(movieId, countryId);
-                    }
-                }
-
-                // Gắn Đạo diễn
-                if (formData.directors.length > 0) {
-                    for (const directorId of formData.directors) {
-                        await movieApi.attachDirector(movieId, directorId);
-                    }
-                }
-
-                // Gắn Diễn viên
-                if (formData.actors.length > 0) {
-                    for (const actorId of formData.actors) {
-                        await movieApi.attachActor(movieId, actorId);
-                    }
-                }
-
                 setToast({
                     message: editingId ? 'Cập nhật phim thành công!' : 'Tạo phim mới thành công!',
                     type: 'success',
@@ -586,8 +557,8 @@ export default function MovieManagement() {
                                     <label className="block text-sm font-bold text-black mb-1">URL Poster (Ảnh dọc)</label>
                                     <input
                                         type="url"
-                                        value={formData.poster}
-                                        onChange={(e) => setFormData({ ...formData, poster: e.target.value })}
+                                        value={formData.poster_url}
+                                        onChange={(e) => setFormData({ ...formData, poster_url: e.target.value })}
                                         className="w-full px-3 py-2 border-2 border-black rounded-none focus:outline-none"
                                         placeholder="https://imgur.com/..."
                                     />
@@ -597,8 +568,8 @@ export default function MovieManagement() {
                                     <label className="block text-sm font-bold text-black mb-1">URL Banner (Ảnh ngang)</label>
                                     <input
                                         type="url"
-                                        value={formData.banner}
-                                        onChange={(e) => setFormData({ ...formData, banner: e.target.value })}
+                                        value={formData.banner_url}
+                                        onChange={(e) => setFormData({ ...formData, banner_url: e.target.value })}
                                         className="w-full px-3 py-2 border-2 border-black rounded-none focus:outline-none"
                                         placeholder="https://imgur.com/..."
                                     />

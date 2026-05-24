@@ -13,7 +13,7 @@ class RatingFactory extends Factory
         return [
             'user_id' => User::factory(),
             'movie_id' => Movie::factory(),
-            'score' => fake()->numberBetween(1, 5),
+            'score' => fake()->numberBetween(1, 10),
             'review_text' => fake()->optional(0.4)->paragraph(),
             'helpful_count' => fake()->numberBetween(0, 100),
         ];

@@ -31,13 +31,25 @@ class AuthController extends Controller
                 $request->validated()['password']
             );
 
+            $cookie = cookie(
+                'auth_token',
+                $data['token'],
+                10080, // 7 days in minutes
+                null,
+                null,
+                false, // secure
+                true, // httpOnly
+                false, // raw
+                'Lax' // sameSite
+            );
+
             return $this->successResponse(
                 [
                     'user' => $data['user'],
                     'token' => $data['token'],
                 ],
                 'Login successful'
-            );
+            )->withCookie($cookie);
         } catch (\Exception $e) {
             Log::error('Login error', [
                 'email' => $request->validated()['email'] ?? null,
@@ -63,13 +75,25 @@ class AuthController extends Controller
         try {
             $data = $this->authService->register($request->validated());
 
+            $cookie = cookie(
+                'auth_token',
+                $data['token'],
+                10080, // 7 days in minutes
+                null,
+                null,
+                false, // secure
+                true, // httpOnly
+                false, // raw
+                'Lax' // sameSite
+            );
+
             return $this->createdResponse(
                 [
                     'user' => $data['user'],
                     'token' => $data['token'],
                 ],
                 'Registration successful'
-            );
+            )->withCookie($cookie);
         } catch (\Exception $e) {
             Log::error('Registration error', [
                 'email' => $request->validated()['email'] ?? null,
@@ -131,10 +155,12 @@ class AuthController extends Controller
 
             $this->authService->logout($user);
 
+            $cookie = cookie()->forget('auth_token');
+
             return $this->successResponse(
                 null,
                 'Logout successful'
-            );
+            )->withCookie($cookie);
         } catch (\Exception $e) {
             Log::error('Logout error', [
                 'exception' => $e->getMessage(),
@@ -153,18 +179,47 @@ class AuthController extends Controller
     public function refresh(Request $request): JsonResponse
     {
         try {
-            $user = $request->user();
-
-            if (! $user) {
-                return $this->unauthorizedResponse('User not authenticated');
+            $tokenStr = $request->bearerToken();
+            if (!$tokenStr && $request->hasCookie('auth_token')) {
+                $tokenStr = $request->cookie('auth_token');
             }
 
-            $data = $this->authService->refreshToken($user);
+            if (!$tokenStr) {
+                return $this->unauthorizedResponse('Token not provided');
+            }
+
+            $model = \Laravel\Sanctum\PersonalAccessToken::findToken($tokenStr);
+            if (!$model) {
+                return $this->unauthorizedResponse('Invalid token');
+            }
+
+            $user = $model->tokenable;
+            if (!$user) {
+                return $this->unauthorizedResponse('User not found');
+            }
+
+            $model->delete();
+
+            $newToken = $user->createToken('api-token', ['*'])->plainTextToken;
+
+            $cookie = cookie(
+                'auth_token',
+                $newToken,
+                10080, // 7 days
+                null,
+                null,
+                false,
+                true,
+                false,
+                'Lax'
+            );
 
             return $this->successResponse(
-                $data,
+                [
+                    'token' => $newToken,
+                ],
                 'Token refreshed successfully'
-            );
+            )->withCookie($cookie);
         } catch (\Exception $e) {
             Log::error('Refresh token error', [
                 'exception' => $e->getMessage(),

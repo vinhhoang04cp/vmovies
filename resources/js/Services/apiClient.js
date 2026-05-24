@@ -13,7 +13,6 @@ export const apiClient = {
      */
     async request(endpoint, options = {}) {
         const url = `${API_URL}${endpoint}`;
-        const token = localStorage.getItem('auth_token');
 
         // Thiết lập các header mặc định
         const headers = {
@@ -22,16 +21,24 @@ export const apiClient = {
             ...options.headers,
         };
 
-        // Nếu có token trong localStorage, tự động đính kèm vào header Authorization
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-        }
-
         try {
             const response = await fetch(url, {
                 ...options,
                 headers,
+                credentials: 'include',
             });
+
+            // Nếu gặp lỗi 401 và chưa thử lại, tiến hành silent refresh
+            if (response.status === 401 && !options._retry && endpoint !== '/auth/login' && endpoint !== '/auth/refresh') {
+                options._retry = true;
+                const refreshSuccess = await this.refreshToken();
+                if (refreshSuccess) {
+                    return this.request(endpoint, options);
+                } else {
+                    this.handleSessionExpired();
+                    throw new Error('Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.');
+                }
+            }
 
             const data = await response.json();
 
@@ -53,16 +60,11 @@ export const apiClient = {
      */
     async requestMultipart(endpoint, formData, options = {}) {
         const url = `${API_URL}${endpoint}`;
-        const token = localStorage.getItem('auth_token');
 
         const headers = {
             'Accept': 'application/json',
             ...options.headers,
         };
-
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-        }
 
         try {
             const response = await fetch(url, {
@@ -70,7 +72,20 @@ export const apiClient = {
                 method: options.method || 'POST',
                 headers,
                 body: formData,
+                credentials: 'include',
             });
+
+            // Nếu gặp lỗi 401 và chưa thử lại, tiến hành silent refresh
+            if (response.status === 401 && !options._retry && endpoint !== '/auth/refresh') {
+                options._retry = true;
+                const refreshSuccess = await this.refreshToken();
+                if (refreshSuccess) {
+                    return this.requestMultipart(endpoint, formData, options);
+                } else {
+                    this.handleSessionExpired();
+                    throw new Error('Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.');
+                }
+            }
 
             const data = await response.json();
 
@@ -82,6 +97,32 @@ export const apiClient = {
         } catch (error) {
             return { success: false, error: error.message };
         }
+    },
+
+    /**
+     * Hàm gọi API /auth/refresh để lấy token mới lưu trong HttpOnly cookie
+     */
+    async refreshToken() {
+        try {
+            const response = await fetch(`${API_URL}/auth/refresh`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                credentials: 'include',
+            });
+            return response.ok;
+        } catch (error) {
+            return false;
+        }
+    },
+
+    /**
+     * Phát sự kiện báo phiên làm việc đã hết hạn
+     */
+    handleSessionExpired() {
+        window.dispatchEvent(new CustomEvent('auth:expired'));
     },
 
     // Các hàm wrapper tiện ích cho các phương thức HTTP thông dụng

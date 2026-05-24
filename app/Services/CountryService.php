@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Exceptions\ApiException;
 use App\Models\Country;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 use Symfony\Component\HttpFoundation\Response;
 
 class CountryService
@@ -14,25 +15,30 @@ class CountryService
      */
     public function list(array $filters = []): LengthAwarePaginator
     {
-        $query = Country::withCount('movies');
+        $version = Cache::rememberForever('countries:version', fn() => time());
+        $cacheKey = "countries:list:{$version}:" . md5(serialize($filters));
 
-        if (! empty($filters['search'])) {
-            $query->where(function ($q) use ($filters) {
-                $q->where('name', 'like', "%{$filters['search']}%")
-                    ->orWhere('code', 'like', "%{$filters['search']}%");
-            });
-        }
+        return Cache::remember($cacheKey, now()->addHour(), function () use ($filters) {
+            $query = Country::withCount('movies');
 
-        $sortBy = in_array($filters['sort_by'] ?? '', ['name', 'code', 'created_at', 'movies_count'])
-            ? $filters['sort_by']
-            : 'name';
-        $sortDir = ($filters['sort_dir'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
+            if (! empty($filters['search'])) {
+                $query->where(function ($q) use ($filters) {
+                    $q->where('name', 'like', "%{$filters['search']}%")
+                        ->orWhere('code', 'like', "%{$filters['search']}%");
+                });
+            }
 
-        $query->orderBy($sortBy, $sortDir);
+            $sortBy = in_array($filters['sort_by'] ?? '', ['name', 'code', 'created_at', 'movies_count'])
+                ? $filters['sort_by']
+                : 'name';
+            $sortDir = ($filters['sort_dir'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
 
-        $perPage = min((int) ($filters['per_page'] ?? 15), 100);
+            $query->orderBy($sortBy, $sortDir);
 
-        return $query->paginate($perPage);
+            $perPage = min((int) ($filters['per_page'] ?? 15), 100);
+
+            return $query->paginate($perPage);
+        });
     }
 
     /**
@@ -75,11 +81,17 @@ class CountryService
     {
         $this->checkDuplicateCode($data['code']);
 
-        return Country::create([
+        $country = Country::create([
             'name' => $data['name'],
             'code' => strtoupper($data['code']),
             'flag_url' => $data['flag_url'] ?? null,
         ]);
+
+        Cache::forever('countries:version', time());
+        Cache::forget('dashboard:overview');
+        Cache::forget('dashboard:movie_stats');
+
+        return $country;
     }
 
     /**
@@ -97,6 +109,10 @@ class CountryService
             'flag_url' => array_key_exists('flag_url', $data) ? $data['flag_url'] : $country->flag_url,
         ]);
 
+        Cache::forever('countries:version', time());
+        Cache::forget('dashboard:overview');
+        Cache::forget('dashboard:movie_stats');
+
         return $country->fresh();
     }
 
@@ -106,6 +122,9 @@ class CountryService
     public function delete(Country $country): void
     {
         $country->delete();
+        Cache::forever('countries:version', time());
+        Cache::forget('dashboard:overview');
+        Cache::forget('dashboard:movie_stats');
     }
 
     /**
@@ -120,6 +139,10 @@ class CountryService
         }
 
         $country->restore();
+
+        Cache::forever('countries:version', time());
+        Cache::forget('dashboard:overview');
+        Cache::forget('dashboard:movie_stats');
 
         /** @var Country $country */
         $country = $country->fresh();

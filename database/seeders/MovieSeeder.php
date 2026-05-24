@@ -22,7 +22,8 @@ class MovieSeeder extends Seeder
         $countries = Country::all();
         $directors = Director::factory(20)->create();
         $actors = Actor::factory(50)->create();
-        $users = User::where('is_admin', false)->get();
+        $adminRole = \App\Models\Role::where('name', 'admin')->first();
+        $users = User::where('role_id', '!=', $adminRole?->id)->get();
 
         $posters = [
             'https://image.tmdb.org/t/p/w500/1E5baAaEse26fej7uHcjOgEE2t2.jpg',

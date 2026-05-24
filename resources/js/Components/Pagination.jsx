@@ -10,7 +10,7 @@ export default function Pagination({
     perPage = 15,
     total = 0,
 }) {
-    const startItem = (currentPage - 1) * perPage + 1;
+    const startItem = total === 0 ? 0 : (currentPage - 1) * perPage + 1;
     const endItem = Math.min(currentPage * perPage, total);
 
     return (
@@ -28,19 +28,32 @@ export default function Pagination({
                 </button>
 
                 <div className="flex items-center gap-1">
-                    {Array.from({ length: lastPage }, (_, i) => i + 1).map((page) => (
-                        <button
-                            key={page}
-                            onClick={() => onPageChange(page)}
-                            className={`px-3 py-2 rounded border transition ${
-                                currentPage === page
-                                    ? 'bg-blue-600 text-white border-blue-600'
-                                    : 'border-gray-300 hover:bg-gray-100'
-                            }`}
-                        >
-                            {page}
-                        </button>
-                    ))}
+                    {Array.from({ length: Math.min(lastPage, 5) }, (_, i) => {
+                        let pageNum;
+                        if (lastPage <= 5) {
+                            pageNum = i + 1;
+                        } else if (currentPage <= 3) {
+                            pageNum = i + 1;
+                        } else if (currentPage >= lastPage - 2) {
+                            pageNum = lastPage - 4 + i;
+                        } else {
+                            pageNum = currentPage - 2 + i;
+                        }
+
+                        return (
+                            <button
+                                key={pageNum}
+                                onClick={() => onPageChange(pageNum)}
+                                className={`px-3 py-2 rounded border transition ${
+                                    currentPage === pageNum
+                                        ? 'bg-blue-600 text-white border-blue-600'
+                                        : 'border-gray-300 hover:bg-gray-100'
+                                }`}
+                            >
+                                {pageNum}
+                            </button>
+                        );
+                    })}
                 </div>
 
                 <button

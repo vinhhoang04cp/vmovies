@@ -51,6 +51,9 @@ class Role extends Model
      */
     public function hasPermission(string $permissionName): bool
     {
+        if ($this->relationLoaded('permissions')) {
+            return $this->permissions->contains('name', $permissionName);
+        }
         return $this->permissions()->where('name', $permissionName)->exists();
     }
 
@@ -59,6 +62,9 @@ class Role extends Model
      */
     public function hasAnyPermission(array $permissionNames): bool
     {
+        if ($this->relationLoaded('permissions')) {
+            return $this->permissions->pluck('name')->intersect($permissionNames)->isNotEmpty();
+        }
         return $this->permissions()->whereIn('name', $permissionNames)->exists();
     }
 
@@ -67,6 +73,9 @@ class Role extends Model
      */
     public function hasAllPermissions(array $permissionNames): bool
     {
+        if ($this->relationLoaded('permissions')) {
+            return count($permissionNames) === $this->permissions->pluck('name')->intersect($permissionNames)->count();
+        }
         return count($permissionNames) === $this->permissions()
             ->whereIn('name', $permissionNames)
             ->count();

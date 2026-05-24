@@ -16,11 +16,16 @@ class CheckRole
      */
     public function handle(Request $request, Closure $next, string $role): Response
     {
-        if (! $request->user()) {
+        $user = $request->user();
+        if (! $user) {
             throw new AuthorizationException(
                 'User is not authenticated',
                 'NOT_AUTHENTICATED'
             );
+        }
+
+        if (!$user->relationLoaded('role')) {
+            $user->load('role.permissions');
         }
 
         $allowedRoles = explode('|', $role);

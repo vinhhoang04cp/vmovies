@@ -15,7 +15,7 @@ class UserResource extends JsonResource
             'email' => $this->email,
             'avatar_url' => $this->avatar_url,
             'status' => $this->status,
-            'is_admin' => $this->is_admin,
+            'is_admin' => $this->isAdmin(),
             'role' => $this->whenLoaded('role', fn () => $this->role?->name),
             'email_verified_at' => $this->email_verified_at,
             'comments_count' => $this->whenCounted('comments'),

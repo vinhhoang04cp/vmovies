@@ -14,36 +14,39 @@ export function AuthProvider({ children }) {
 
     // Effect: Tự động chạy khi ứng dụng khởi chạy (hoặc mount lần đầu)
     useEffect(() => {
-        // Kiểm tra xem có token được lưu trong localStorage từ lần đăng nhập trước không
-        const savedToken = localStorage.getItem('auth_token');
-        if (savedToken) {
-            setToken(savedToken);
-            // Nếu có token, gọi API /auth/me để lấy lại thông tin người dùng mới nhất
-            fetchUser(savedToken);
-        } else {
-            setLoading(false);
-        }
+        // Tự động gọi API /auth/me để kiểm tra phiên làm việc qua httpOnly cookie
+        fetchUser();
+
+        const handleAuthExpired = () => {
+            setToken(null);
+            setUser(null);
+            setError('Phiên làm việc đã hết hạn. Vui lòng đăng nhập lại.');
+        };
+
+        window.addEventListener('auth:expired', handleAuthExpired);
+        return () => {
+            window.removeEventListener('auth:expired', handleAuthExpired);
+        };
     }, []);
 
-    // Hàm lấy thông tin người dùng từ server dựa trên token
-    const fetchUser = async (authToken) => {
+    // Hàm lấy thông tin người dùng từ server dựa trên session cookie
+    const fetchUser = async () => {
         try {
             const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/auth/me`, {
                 method: 'GET',
                 headers: {
-                    'Authorization': `Bearer ${authToken}`,
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
                 },
+                credentials: 'include',
             });
 
             if (response.ok) {
                 const data = await response.json();
                 setUser(data.data.user); // Lưu thông tin người dùng vào state
+                setToken(true); // Đánh dấu đã đăng nhập
                 setError(null);
-            } else if (response.status === 401) {
-                // Token đã hết hạn hoặc không hợp lệ trên server -> Xóa sạch session local
-                localStorage.removeItem('auth_token');
+            } else {
                 setToken(null);
                 setUser(null);
             }
@@ -65,6 +68,7 @@ export function AuthProvider({ children }) {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify({ email, password }),
             });
 
@@ -74,10 +78,7 @@ export function AuthProvider({ children }) {
                 throw new Error(data.message || 'Đăng nhập thất bại');
             }
 
-            const authToken = data.data.token;
-            // Lưu token vào localStorage để duy trì phiên làm việc khi reload trang
-            localStorage.setItem('auth_token', authToken);
-            setToken(authToken);
+            setToken(true);
             setUser(data.data.user);
 
             return { success: true, user: data.data.user };
@@ -101,6 +102,7 @@ export function AuthProvider({ children }) {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
                 },
+                credentials: 'include',
                 body: JSON.stringify({
                     name,
                     email,
@@ -115,9 +117,7 @@ export function AuthProvider({ children }) {
                 throw new Error(data.message || 'Đăng ký thất bại');
             }
 
-            const authToken = data.data.token;
-            localStorage.setItem('auth_token', authToken);
-            setToken(authToken);
+            setToken(true);
             setUser(data.data.user);
 
             return { success: true };
@@ -134,20 +134,19 @@ export function AuthProvider({ children }) {
     const logout = async () => {
         setLoading(true);
         try {
-            // Thông báo cho server xóa token (nếu backend có hỗ trợ blacklist)
+            // Thông báo cho server xóa token và cookie
             await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:8000/api'}/auth/logout`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
                 },
+                credentials: 'include',
             });
         } catch (err) {
             console.error('Logout error:', err);
         } finally {
             // Bất kể server trả về gì, frontend luôn xóa sạch dữ liệu cục bộ
-            localStorage.removeItem('auth_token');
             setToken(null);
             setUser(null);
             setLoading(false);

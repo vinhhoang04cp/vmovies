@@ -30,7 +30,6 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'avatar_url' => null,
-            'is_admin' => false,
             'status' => 'active',
             'remember_token' => Str::random(10),
         ];
@@ -49,7 +48,7 @@ class UserFactory extends Factory
     public function admin(): static
     {
         return $this->state(fn (array $attributes) => [
-            'is_admin' => true,
+            'role_id' => \App\Models\Role::where('name', 'admin')->value('id'),
         ]);
     }
 

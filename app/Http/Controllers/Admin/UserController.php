@@ -69,6 +69,11 @@ class UserController extends Controller
     {
         try {
             $found = $this->userService->findOrFail($user);
+
+            if (!\Illuminate\Support\Facades\Gate::allows('delete', $found)) {
+                return $this->errorResponse('Bạn không có quyền thực hiện thao tác này.', 403, null, 'FORBIDDEN');
+            }
+
             $this->userService->delete($found, $request->user());
 
             return $this->successResponse(null, 'Xóa người dùng thành công.');
@@ -86,6 +91,10 @@ class UserController extends Controller
     {
         try {
             $found = $this->userService->findOrFail($user);
+
+            if (!\Illuminate\Support\Facades\Gate::allows('ban', $found)) {
+                return $this->errorResponse('Bạn không có quyền thực hiện thao tác này.', 403, null, 'FORBIDDEN');
+            }
 
             if ($found->isBanned()) {
                 return $this->errorResponse('Người dùng đã bị ban rồi.', 409, null, 'ALREADY_BANNED');

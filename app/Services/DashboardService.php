@@ -13,6 +13,7 @@ use App\Models\Movie;
 use App\Models\Rating;
 use App\Models\User;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class DashboardService
@@ -23,20 +24,22 @@ class DashboardService
 
     public function overview(): array
     {
-        $now = Carbon::now();
-        $weekAgo = $now->copy()->subWeek();
-        $monthAgo = $now->copy()->subMonth();
+        return Cache::remember('dashboard:overview', now()->addMinutes(10), function () {
+            $now = Carbon::now();
+            $weekAgo = $now->copy()->subWeek();
+            $monthAgo = $now->copy()->subMonth();
 
-        return [
-            'totals' => $this->totals(),
-            'new_this_week' => $this->newThisWeek($weekAgo),
-            'new_this_month' => $this->newThisMonth($monthAgo),
-            'pending_actions' => $this->pendingActions(),
-            'top_movies' => $this->topMoviesByViews(5),
-            'recent_movies' => $this->recentMovies(5),
-            'recent_comments' => $this->recentComments(5),
-            'recent_users' => $this->recentUsers(5),
-        ];
+            return [
+                'totals' => $this->totals(),
+                'new_this_week' => $this->newThisWeek($weekAgo),
+                'new_this_month' => $this->newThisMonth($monthAgo),
+                'pending_actions' => $this->pendingActions(),
+                'top_movies' => $this->topMoviesByViews(5),
+                'recent_movies' => $this->recentMovies(5),
+                'recent_comments' => $this->recentComments(5),
+                'recent_users' => $this->recentUsers(5),
+            ];
+        });
     }
 
     private function totals(): array
@@ -143,18 +146,20 @@ class DashboardService
 
     public function movieStats(): array
     {
-        return [
-            'overview' => $this->movieOverview(),
-            'by_type' => $this->moviesByType(),
-            'by_status' => $this->moviesByStatus(),
-            'by_genre' => $this->moviesByGenre(),
-            'by_country' => $this->moviesByCountry(),
-            'by_release_year' => $this->moviesByYear(),
-            'top_viewed' => $this->topMoviesByViews(10),
-            'top_rated' => $this->topMoviesByRating(10),
-            'most_commented' => $this->mostCommentedMovies(10),
-            'most_bookmarked' => $this->mostBookmarkedMovies(10),
-        ];
+        return Cache::remember('dashboard:movie_stats', now()->addMinutes(10), function () {
+            return [
+                'overview' => $this->movieOverview(),
+                'by_type' => $this->moviesByType(),
+                'by_status' => $this->moviesByStatus(),
+                'by_genre' => $this->moviesByGenre(),
+                'by_country' => $this->moviesByCountry(),
+                'by_release_year' => $this->moviesByYear(),
+                'top_viewed' => $this->topMoviesByViews(10),
+                'top_rated' => $this->topMoviesByRating(10),
+                'most_commented' => $this->mostCommentedMovies(10),
+                'most_bookmarked' => $this->mostBookmarkedMovies(10),
+            ];
+        });
     }
 
     private function movieOverview(): array
@@ -248,15 +253,17 @@ class DashboardService
 
     public function userStats(): array
     {
-        return [
-            'overview' => $this->userOverview(),
-            'by_status' => $this->usersByStatus(),
-            'by_role' => $this->usersByRole(),
-            'growth_by_month' => $this->userGrowthByMonth(),
-            'top_commenters' => $this->topCommenters(10),
-            'top_bookmarkers' => $this->topBookmarkers(10),
-            'top_raters' => $this->topRaters(10),
-        ];
+        return Cache::remember('dashboard:user_stats', now()->addMinutes(10), function () {
+            return [
+                'overview' => $this->userOverview(),
+                'by_status' => $this->usersByStatus(),
+                'by_role' => $this->usersByRole(),
+                'growth_by_month' => $this->userGrowthByMonth(),
+                'top_commenters' => $this->topCommenters(10),
+                'top_bookmarkers' => $this->topBookmarkers(10),
+                'top_raters' => $this->topRaters(10),
+            ];
+        });
     }
 
     private function userOverview(): array
@@ -346,14 +353,16 @@ class DashboardService
 
     public function commentStats(): array
     {
-        return [
-            'overview' => $this->commentOverview(),
-            'by_status' => $this->commentsByStatus(),
-            'growth_by_month' => $this->commentGrowthByMonth(),
-            'top_movies' => $this->mostCommentedMovies(10),
-            'top_commenters' => $this->topCommenters(10),
-            'recent_pending' => $this->recentPendingComments(10),
-        ];
+        return Cache::remember('dashboard:comment_stats', now()->addMinutes(10), function () {
+            return [
+                'overview' => $this->commentOverview(),
+                'by_status' => $this->commentsByStatus(),
+                'growth_by_month' => $this->commentGrowthByMonth(),
+                'top_movies' => $this->mostCommentedMovies(10),
+                'top_commenters' => $this->topCommenters(10),
+                'recent_pending' => $this->recentPendingComments(10),
+            ];
+        });
     }
 
     private function commentOverview(): array

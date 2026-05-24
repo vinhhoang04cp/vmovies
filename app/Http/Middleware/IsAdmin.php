@@ -16,11 +16,16 @@ class IsAdmin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (! $request->user()) {
+        $user = $request->user();
+        if (! $user) {
             throw new AuthorizationException(
                 'User is not authenticated',
                 'NOT_AUTHENTICATED'
             );
+        }
+
+        if (!$user->relationLoaded('role')) {
+            $user->load('role.permissions');
         }
 
         if (! $request->user()->isAdmin()) {

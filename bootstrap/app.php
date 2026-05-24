@@ -25,7 +25,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Force JSON responses for all /api/* routes
         $middleware->api(prepend: [
+            \App\Http\Middleware\SecurityHeaders::class,
             ForceJsonResponse::class,
+            \App\Http\Middleware\ReadTokenFromCookie::class,
         ]);
 
         // Register custom middleware aliases

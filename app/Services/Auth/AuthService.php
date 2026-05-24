@@ -2,11 +2,14 @@
 
 namespace App\Services\Auth;
 
+use App\Exceptions\ApiException;
 use App\Exceptions\AuthenticationException;
 use App\Exceptions\ValidationException;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\Str;
 
 class AuthService
 {
@@ -15,31 +18,47 @@ class AuthService
      *
      * @throws AuthenticationException
      * @throws ValidationException
+     * @throws ApiException
      */
     public function login(string $email, string $password): array
     {
+        $throttleKey = Str::transliterate(Str::lower($email).'|'.request()->ip());
+
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            throw new ApiException(
+                "Quá nhiều lần thử đăng nhập. Vui lòng thử lại sau {$seconds} giây.",
+                429,
+                'TOO_MANY_ATTEMPTS'
+            );
+        }
+
         $user = User::where('email', $email)->first();
 
         if (! $user) {
+            RateLimiter::hit($throttleKey, 60);
             throw new AuthenticationException(
-                'Email not found',
-                'EMAIL_NOT_FOUND'
+                'Email hoặc mật khẩu không đúng',
+                'INVALID_CREDENTIALS'
             );
         }
 
         if ($user->isBanned()) {
             throw new AuthenticationException(
-                'Your account has been banned',
+                'Tài khoản của bạn đã bị khóa',
                 'ACCOUNT_BANNED'
             );
         }
 
         if (! Hash::check($password, $user->password)) {
+            RateLimiter::hit($throttleKey, 60);
             throw new AuthenticationException(
-                'Invalid password',
-                'INVALID_PASSWORD'
+                'Email hoặc mật khẩu không đúng',
+                'INVALID_CREDENTIALS'
             );
         }
+
+        RateLimiter::clear($throttleKey);
 
         return $this->generateTokenResponse($user);
     }
@@ -82,6 +101,7 @@ class AuthService
      */
     public function generateTokenResponse(User $user): array
     {
+        $user->loadMissing('role');
         $token = $user->createToken('api-token', ['*'])->plainTextToken;
 
         return [
@@ -108,6 +128,8 @@ class AuthService
      */
     public function getCurrentUser(User $user): array
     {
+        $user->loadMissing('role.permissions');
+
         return [
             'id' => $user->id,
             'name' => $user->name,
@@ -118,7 +140,7 @@ class AuthService
                 'id' => $user->role->id,
                 'name' => $user->role->name,
                 'display_name' => $user->role->display_name,
-                'permissions' => $user->role->permissions()->pluck('name')->toArray(),
+                'permissions' => $user->role->permissions->pluck('name')->toArray(),
             ] : null,
             'is_admin' => $user->isAdmin(),
             'created_at' => $user->created_at,

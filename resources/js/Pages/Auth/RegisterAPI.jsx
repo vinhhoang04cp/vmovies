@@ -65,8 +65,8 @@ export default function RegisterAPI() {
 
         if (!formData.password) {
             errors.password = 'Vui lòng nhập mật khẩu';
-        } else if (formData.password.length < 6) {
-            errors.password = 'Mật khẩu phải có ít nhất 6 ký tự';
+        } else if (formData.password.length < 8) {
+            errors.password = 'Mật khẩu phải có ít nhất 8 ký tự';
         }
 
         if (!formData.password_confirmation) {

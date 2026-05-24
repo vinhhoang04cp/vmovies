@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Exceptions\ApiException;
 use App\Models\Genre;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -15,22 +16,27 @@ class GenreService
      */
     public function list(array $filters = []): LengthAwarePaginator
     {
-        $query = Genre::withCount('movies');
+        $version = Cache::rememberForever('genres:version', fn() => time());
+        $cacheKey = "genres:list:{$version}:" . md5(serialize($filters));
 
-        if (! empty($filters['search'])) {
-            $query->where('name', 'like', "%{$filters['search']}%");
-        }
+        return Cache::remember($cacheKey, now()->addHour(), function () use ($filters) {
+            $query = Genre::withCount('movies');
 
-        $sortBy = in_array($filters['sort_by'] ?? '', ['name', 'created_at', 'movies_count'])
-            ? $filters['sort_by']
-            : 'name';
-        $sortDir = ($filters['sort_dir'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
+            if (! empty($filters['search'])) {
+                $query->where('name', 'like', "%{$filters['search']}%");
+            }
 
-        $query->orderBy($sortBy, $sortDir);
+            $sortBy = in_array($filters['sort_by'] ?? '', ['name', 'created_at', 'movies_count'])
+                ? $filters['sort_by']
+                : 'name';
+            $sortDir = ($filters['sort_dir'] ?? 'asc') === 'desc' ? 'desc' : 'asc';
 
-        $perPage = min((int) ($filters['per_page'] ?? 15), 100);
+            $query->orderBy($sortBy, $sortDir);
 
-        return $query->paginate($perPage);
+            $perPage = min((int) ($filters['per_page'] ?? 15), 100);
+
+            return $query->paginate($perPage);
+        });
     }
 
     /**
@@ -75,12 +81,18 @@ class GenreService
 
         $this->checkDuplicateSlug($slug);
 
-        return Genre::create([
+        $genre = Genre::create([
             'name' => $data['name'],
             'slug' => $slug,
             'description' => $data['description'] ?? null,
             'icon_url' => $data['icon_url'] ?? null,
         ]);
+
+        Cache::forever('genres:version', time());
+        Cache::forget('dashboard:overview');
+        Cache::forget('dashboard:movie_stats');
+
+        return $genre;
     }
 
     /**
@@ -99,6 +111,10 @@ class GenreService
             'icon_url' => array_key_exists('icon_url', $data) ? $data['icon_url'] : $genre->icon_url,
         ]);
 
+        Cache::forever('genres:version', time());
+        Cache::forget('dashboard:overview');
+        Cache::forget('dashboard:movie_stats');
+
         return $genre->fresh();
     }
 
@@ -108,6 +124,9 @@ class GenreService
     public function delete(Genre $genre): void
     {
         $genre->delete();
+        Cache::forever('genres:version', time());
+        Cache::forget('dashboard:overview');
+        Cache::forget('dashboard:movie_stats');
     }
 
     /**
@@ -122,6 +141,10 @@ class GenreService
         }
 
         $genre->restore();
+
+        Cache::forever('genres:version', time());
+        Cache::forget('dashboard:overview');
+        Cache::forget('dashboard:movie_stats');
 
         /** @var Genre $genre */
         $genre = $genre->fresh();

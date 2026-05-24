@@ -49,17 +49,9 @@ class EpisodeService
     {
         $this->checkDuplicateEpisodeNumber($movie->id, $data['episode_number']);
 
-        // Handle video file upload if provided
         $videoUrl = $data['video_url'] ?? null;
 
-        // Debug logging
-        \Log::info('Episode create request', [
-            'has_video_file' => ! empty($data['video_file']),
-            'video_file_type' => ! empty($data['video_file']) ? get_class($data['video_file']) : null,
-            'video_url' => $videoUrl,
-        ]);
-
-        // Tạo episode tạm thời để có ID cho upload
+        // Tạo episode tạm thời
         $episode = Episode::create([
             'movie_id' => $movie->id,
             'episode_number' => $data['episode_number'],
@@ -70,22 +62,16 @@ class EpisodeService
             'views' => 0,
         ]);
 
-        // Upload video file if provided
+        // Xử lý upload video file qua hàng đợi
         if (! empty($data['video_file'])) {
-            \Log::info('Uploading video file', ['episode_id' => $episode->id]);
-            try {
-                $videoUrl = $this->fileUploadService->uploadVideo($data['video_file'], (string) $episode->id);
-                \Log::info('Video uploaded successfully', ['url' => $videoUrl]);
-                $episode->update(['video_url' => $videoUrl]);
-            } catch (\Exception $e) {
-                \Log::error('Video upload failed', ['error' => $e->getMessage()]);
-                throw $e;
-            }
+            // Lưu tạm vào disk local
+            $tempPath = $data['video_file']->store('temp', 'local');
+            $originalExtension = $data['video_file']->getClientOriginalExtension();
+
+            // Dispatch Job
+            \App\Jobs\ProcessEpisodeVideo::dispatch($episode, $tempPath, $originalExtension);
         } elseif (! empty($videoUrl) && $videoUrl !== 'pending') {
-            \Log::info('Using provided video URL', ['url' => $videoUrl]);
             $episode->update(['video_url' => $videoUrl]);
-        } else {
-            \Log::warning('No video URL or file provided');
         }
 
         return $episode->fresh();
@@ -148,26 +134,26 @@ class EpisodeService
             $this->checkDuplicateEpisodeNumber($episode->movie_id, $data['episode_number'], $episode->id);
         }
 
-        // Handle video file upload if provided
         $newDuration = array_key_exists('duration', $data) ? $data['duration'] : $episode->duration;
         $updateData = [
             'episode_number' => $data['episode_number'] ?? $episode->episode_number,
             'arc_name' => array_key_exists('arc_name', $data) ? $data['arc_name'] : $episode->arc_name,
             'title' => array_key_exists('title', $data) ? $data['title'] : $episode->title,
-            'video_url' => $episode->video_url, // Start with existing, will update if file uploaded
+            'video_url' => $episode->video_url,
             'duration' => ($newDuration !== null) ? (int) $newDuration : $episode->duration ?? 0,
         ];
 
-        // Upload new video file if provided (PRIORITY over video_url)
         if (! empty($data['video_file'])) {
-            // Delete old video if exists and is local
-            if ($episode->video_url && strpos($episode->video_url, '/storage/') !== false) {
-                $this->fileUploadService->deleteVideo($episode->video_url);
-            }
+            // Đặt trạng thái processing
+            $updateData['video_url'] = 'processing';
 
-            $updateData['video_url'] = $this->fileUploadService->uploadVideo($data['video_file'], (string) $episode->id);
+            // Lưu tạm vào disk local
+            $tempPath = $data['video_file']->store('temp', 'local');
+            $originalExtension = $data['video_file']->getClientOriginalExtension();
+
+            // Dispatch Job
+            \App\Jobs\ProcessEpisodeVideo::dispatch($episode, $tempPath, $originalExtension);
         } elseif (! empty($data['video_url'])) {
-            // Only use URL if no file is provided
             $updateData['video_url'] = $data['video_url'];
         }
 
@@ -215,6 +201,8 @@ class EpisodeService
         if (! $episode) {
             throw new ApiException('Không tìm thấy tập phim đã xóa.', Response::HTTP_NOT_FOUND, 'NOT_FOUND');
         }
+
+        $this->checkDuplicateEpisodeNumber($episode->movie_id, $episode->episode_number);
 
         $episode->restore();
 

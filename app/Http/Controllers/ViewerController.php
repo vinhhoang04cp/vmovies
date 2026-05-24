@@ -153,12 +153,14 @@ class ViewerController extends Controller
     public function deleteComment(Request $request, int $commentId): JsonResponse
     {
         try {
-            $comment = Comment::where('id', $commentId)
-                ->where('user_id', $request->user()->id)
-                ->first();
+            $comment = Comment::find($commentId);
 
-            if (!$comment) {
-                return $this->notFoundResponse('Không tìm thấy bình luận hoặc bạn không có quyền xóa.');
+            if (!$comment || $comment->is_deleted) {
+                return $this->notFoundResponse('Không tìm thấy bình luận.');
+            }
+
+            if (!\Illuminate\Support\Facades\Gate::allows('delete', $comment)) {
+                return $this->errorResponse('Bạn không có quyền xóa bình luận này.', 403, null, 'FORBIDDEN');
             }
 
             $comment->update(['is_deleted' => true]);
