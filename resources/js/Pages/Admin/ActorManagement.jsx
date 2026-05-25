@@ -66,16 +66,6 @@ export default function ActorManagement() {
         // eslint-disable-next-line
     }, [search, sortBy, sortDir]);
 
-    /**
-     * Effect: Theo dõi sự thay đổi của trang (page).
-     * Khi người dùng nhấn vào các nút phân trang, fetchItems sẽ được gọi với số trang tương ứng.
-     */
-    useEffect(() => {
-        if (page > 1) {
-            fetchItems(page);
-        }
-        // eslint-disable-next-line
-    }, [page]);
 
     /**
      * handleCreate: Chuẩn bị state để mở modal thêm mới.
@@ -270,7 +260,7 @@ export default function ActorManagement() {
                                         lastPage={meta.last_page}
                                         total={meta.total}
                                         perPage={meta.per_page}
-                                        onPageChange={setPage}
+                                        onPageChange={fetchItems}
                                     />
                                 </div>
                             )}

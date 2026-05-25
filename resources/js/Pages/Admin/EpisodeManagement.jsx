@@ -112,15 +112,6 @@ export default function EpisodeManagement() {
         fetchEpisodes(1);
     }, [search, sortBy, sortDir, fetchEpisodes]);
 
-    /**
-     * Effect: Theo dõi việc chuyển trang để tải dữ liệu trang tương ứng.
-     */
-    useEffect(() => {
-        if (page > 1) {
-            fetchEpisodes(page);
-        }
-        // eslint-disable-next-line
-    }, [page]);
 
     /**
      * handleCreate: Khởi tạo form cho việc thêm mới tập phim.
@@ -399,7 +390,7 @@ export default function EpisodeManagement() {
                                         lastPage={meta.last_page}
                                         total={meta.total}
                                         perPage={meta.per_page}
-                                        onPageChange={setPage}
+                                        onPageChange={fetchEpisodes}
                                     />
                                 </div>
                             )}

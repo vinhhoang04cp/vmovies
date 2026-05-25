@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { commentApi } from '@/Services/commentApi';
 import { useResourceManagement } from '@/Hooks/useResourceManagement';
 import Table from '@/Components/Table';
@@ -17,48 +17,32 @@ import Toast from '@/Components/Toast';
  * 5. Tìm kiếm bình luận theo nội dung hoặc tên người dùng.
  */
 export default function CommentManagement() {
-    // Sử dụng custom hook để quản lý các thao tác CRUD và trạng thái danh sách.
-    const {
-        items: comments, // Danh sách các bình luận lấy từ API.
-        loading,       // Trạng thái đang tải dữ liệu.
-        error,         // Thông báo lỗi nếu có.
-        meta,          // Thông tin phân trang (tổng số, trang cuối, v.v.).
-        page,          // Số trang hiện tại.
-        search,        // Từ khóa tìm kiếm.
-        sortBy,        // Trường dữ liệu dùng để sắp xếp.
-        sortDir,       // Hướng sắp xếp (tăng/giảm).
-        setSearch,     // Hàm cập nhật từ khóa tìm kiếm.
-        setPage,       // Hàm thay đổi trang.
-        setSortBy,     // Hàm thay đổi trường sắp xếp.
-        setSortDir,    // Hàm thay đổi hướng sắp xếp.
-        fetchItems,    // Hàm gọi API lấy dữ liệu.
-        deleteItem,    // Hàm thực hiện xóa một bản ghi.
-        setError,      // Hàm thiết lập thông báo lỗi thủ công.
-    } = useResourceManagement(commentApi);
-
     // --- CÁC STATE NỘI BỘ ---
-    const [toast, setToast] = useState(null); // Quản lý thông báo toast thành công/thất bại.
-    const [showPending, setShowPending] = useState(false); // State để lọc chỉ hiển thị bình luận chưa duyệt.
+    const [toast, setToast] = useState(null);
+    const [showPending, setShowPending] = useState(false);
 
-    /**
-     * Effect: Tự động gọi API tải dữ liệu khi có sự thay đổi về tìm kiếm, 
-     * sắp xếp hoặc trạng thái lọc "Chờ duyệt".
-     */
+    // Tạo api wrapper truyền is_approved=0 khi đang lọc "Chờ duyệt"
+    // useMemo đảm bảo object chỉ tạo lại khi showPending thay đổi,
+    // khiến hook nhận apiService mới → fetchItems mới → useEffect tự kích hoạt
+    const filteredCommentApi = useMemo(() => ({
+        ...commentApi,
+        list: (params = {}) => showPending
+            ? commentApi.pending(params)
+            : commentApi.list(params),
+    }), [showPending]);
+
+    const {
+        items: comments, loading, error, meta, page,
+        search, sortBy, sortDir,
+        setSearch, setSortBy, setSortDir,
+        fetchItems, deleteItem, setError,
+    } = useResourceManagement(filteredCommentApi);
+
     useEffect(() => {
-        // Mỗi khi thay đổi tiêu chí lọc, chúng ta luôn quay về trang 1.
         fetchItems(1);
         // eslint-disable-next-line
     }, [search, sortBy, sortDir, showPending]);
 
-    /**
-     * Effect: Xử lý tải dữ liệu khi người dùng chuyển trang.
-     */
-    useEffect(() => {
-        if (page > 1) {
-            fetchItems(page);
-        }
-        // eslint-disable-next-line
-    }, [page]);
 
     /**
      * handleApprove: Chuyển trạng thái bình luận từ 'pending' sang 'approved'.
@@ -77,6 +61,20 @@ export default function CommentManagement() {
             }
         } catch (err) {
             setError(err.message || 'Lỗi hệ thống khi phê duyệt');
+        }
+    };
+
+    const handleUnapprove = async (id) => {
+        try {
+            const response = await commentApi.unapprove(id);
+            if (response.success) {
+                setToast({ message: 'Đã huỷ duyệt bình luận!', type: 'success' });
+                await fetchItems(page);
+            } else {
+                setError(response.error || 'Lỗi khi huỷ duyệt');
+            }
+        } catch (err) {
+            setError(err.message || 'Lỗi hệ thống khi huỷ duyệt');
         }
     };
 
@@ -202,13 +200,20 @@ export default function CommentManagement() {
                                 sortDir={sortDir}
                                 rowAction={(row) => (
                                     <div className="flex gap-2 justify-center">
-                                        {/* Nút Duyệt chỉ xuất hiện khi bình luận chưa được duyệt */}
                                         {row.status === 'pending' && (
                                             <button
                                                 onClick={() => handleApprove(row.id)}
                                                 className="px-4 py-1 text-xs bg-green-500 text-black border border-black font-black uppercase hover:bg-green-400 transition"
                                             >
                                                 Duyệt
+                                            </button>
+                                        )}
+                                        {row.status === 'approved' && (
+                                            <button
+                                                onClick={() => handleUnapprove(row.id)}
+                                                className="px-4 py-1 text-xs bg-yellow-400 text-black border border-black font-black uppercase hover:bg-yellow-300 transition"
+                                            >
+                                                Huỷ duyệt
                                             </button>
                                         )}
                                         <button
@@ -230,7 +235,7 @@ export default function CommentManagement() {
                                         lastPage={meta.last_page}
                                         total={meta.total}
                                         perPage={meta.per_page}
-                                        onPageChange={setPage}
+                                        onPageChange={fetchItems}
                                     />
                                 </div>
                             )}

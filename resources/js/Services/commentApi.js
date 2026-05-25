@@ -26,6 +26,11 @@ export const commentApi = {
         return apiClient.patch(`/admin/comments/${id}/approve`, {});
     },
 
+    // Huỷ duyệt — đưa bình luận về trạng thái chờ duyệt
+    unapprove(id) {
+        return apiClient.patch(`/admin/comments/${id}/unapprove`, {});
+    },
+
     // Xóa bỏ bình luận (nếu vi phạm quy định)
     destroy(id) {
         return apiClient.delete(`/admin/comments/${id}`);

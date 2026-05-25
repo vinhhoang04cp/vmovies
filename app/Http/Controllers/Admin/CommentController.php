@@ -87,6 +87,30 @@ class CommentController extends Controller
     }
 
     /**
+     * PATCH /api/admin/comments/{comment}/unapprove
+     */
+    public function unapprove(int $comment): JsonResponse
+    {
+        try {
+            $found = $this->commentService->findOrFail($comment);
+
+            if ($found->is_deleted) {
+                return $this->errorResponse('Không thể huỷ duyệt bình luận đã bị xóa.', 409, null, 'COMMENT_DELETED');
+            }
+
+            if (! $found->is_approved) {
+                return $this->errorResponse('Bình luận chưa được duyệt.', 409, null, 'NOT_APPROVED');
+            }
+
+            $unapproved = $this->commentService->unapprove($found);
+
+            return $this->successResponse(new CommentResource($unapproved), 'Đã huỷ duyệt bình luận.');
+        } catch (ModelNotFoundException) {
+            return $this->notFoundResponse('Bình luận không tồn tại.');
+        }
+    }
+
+    /**
      * DELETE /api/admin/comments/{comment}
      */
     public function destroy(int $comment): JsonResponse

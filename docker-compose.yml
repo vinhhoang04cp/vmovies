@@ -1,0 +1,71 @@
+services:
+
+  # ─── PHP 8.2 + Apache ────────────────────────────────────────────────────
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: vmovies_app
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      # Hot-reload: toàn bộ source code được đồng bộ trực tiếp vào container
+      - .:/var/www/html
+    environment:
+      APP_ENV: local
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - vmovies_network
+
+  # ─── MySQL 8.0 ───────────────────────────────────────────────────────────
+  db:
+    image: mysql:8.0
+    container_name: vmovies_db
+    restart: unless-stopped
+    ports:
+      - "3306:3306"        # expose ra host để dùng GUI client (TablePlus, DBeaver...)
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: vmovies
+      MYSQL_USER: vmovies
+      MYSQL_PASSWORD: secret
+    volumes:
+      # Named volume → dữ liệu DB không bị mất khi xóa/restart container
+      - vmovies_mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-psecret"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    networks:
+      - vmovies_network
+
+  # ─── phpMyAdmin ──────────────────────────────────────────────────────────
+  phpmyadmin:
+    image: phpmyadmin:5.2
+    container_name: vmovies_phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: secret
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - vmovies_network
+
+# ─── Networks ────────────────────────────────────────────────────────────────
+networks:
+  vmovies_network:
+    driver: bridge
+
+# ─── Volumes ─────────────────────────────────────────────────────────────────
+volumes:
+  vmovies_mysql_data:
+    driver: local

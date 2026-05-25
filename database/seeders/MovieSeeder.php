@@ -12,7 +12,6 @@ use App\Models\Movie;
 use App\Models\Rating;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Arr;
 
 class MovieSeeder extends Seeder
 {
@@ -25,39 +24,16 @@ class MovieSeeder extends Seeder
         $adminRole = \App\Models\Role::where('name', 'admin')->first();
         $users = User::where('role_id', '!=', $adminRole?->id)->get();
 
-        $posters = [
-            'https://image.tmdb.org/t/p/w500/1E5baAaEse26fej7uHcjOgEE2t2.jpg',
-            'https://image.tmdb.org/t/p/w500/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg',
-            'https://image.tmdb.org/t/p/w500/qNBAXBIQlnOThrVvA6mAaqmYpGN.jpg',
-            'https://image.tmdb.org/t/p/w500/fiVW06jE7z9YnO4trhaMEdclRVc.jpg',
-            'https://image.tmdb.org/t/p/w500/t6HIqrHecpSy7ycNYSJoMDiMci.jpg',
-            'https://image.tmdb.org/t/p/w500/vJU3rXSP9hwUuLeq8IpfsJShLOk.jpg',
-            'https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj704m8.jpg',
-            'https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg',
-            'https://image.tmdb.org/t/p/w500/A4j8S6moJS2zNtRR8oWF08gRnL5.jpg',
-            'https://image.tmdb.org/t/p/w500/nJUHX3XL1jMkk8honUZnUmudFb9.jpg',
-        ];
-
-        $banners = [
-            'https://image.tmdb.org/t/p/w1280/lWqjXgut48IK5f5IRbvwW9sSrlc.jpg',
-            'https://image.tmdb.org/t/p/w1280/9n2tZ2RGTb6tD2vI4qKryrM3I0J.jpg',
-            'https://image.tmdb.org/t/p/w1280/8rpDcsfLJypbO6vteZz0G5P91fI.jpg',
-            'https://image.tmdb.org/t/p/w1280/4M2ngA9s2T52D3Wn0XkO04JjK8r.jpg',
-            'https://image.tmdb.org/t/p/w1280/aAgGrfBmA1NxKcl7Zg2k57BwMyY.jpg',
-            'https://image.tmdb.org/t/p/w1280/tmU7GeKVybMWFButWEGl2M4GeiP.jpg',
-            'https://image.tmdb.org/t/p/w1280/wPU78OPN4BYEgWYdXy7wInvWeK3.jpg',
-            'https://image.tmdb.org/t/p/w1280/5YZbUmjbMa3ClvSW1Wj3D6XGolb.jpg',
-            'https://image.tmdb.org/t/p/w1280/3TyiNQCGNTnK0m9K0F7xIe1C6bZ.jpg',
-            'https://image.tmdb.org/t/p/w1280/zN7hhEfHqG75wEwR2P9W4qD1a7f.jpg',
-        ];
+        $poster = 'https://cellphones.com.vn/sforum/wp-content/uploads/2022/06/1-5.jpg';
+        $banner = 'https://cellphones.com.vn/sforum/wp-content/uploads/2022/06/1-5.jpg';
 
         // -----------------------------------------------
         // 1. Phim lẻ (movie) - 20 bộ
         // -----------------------------------------------
-        Movie::factory(20)->movie()->create()->each(function (Movie $movie) use ($genres, $countries, $directors, $actors, $users, $posters, $banners) {
+        Movie::factory(20)->movie()->create()->each(function (Movie $movie) use ($genres, $countries, $directors, $actors, $users, $poster, $banner) {
             $movie->update([
-                'poster_url' => Arr::random($posters),
-                'banner_url' => Arr::random($banners),
+                'poster_url' => $poster,
+                'banner_url' => $banner,
             ]);
 
             // Gắn thể loại, quốc gia, đạo diễn, diễn viên
@@ -88,10 +64,10 @@ class MovieSeeder extends Seeder
         // -----------------------------------------------
         // 2. Phim bộ thông thường - 10 series
         // -----------------------------------------------
-        Movie::factory(10)->series()->create()->each(function (Movie $movie) use ($genres, $countries, $directors, $actors, $users, $posters, $banners) {
+        Movie::factory(10)->series()->create()->each(function (Movie $movie) use ($genres, $countries, $directors, $actors, $users, $poster, $banner) {
             $movie->update([
-                'poster_url' => Arr::random($posters),
-                'banner_url' => Arr::random($banners),
+                'poster_url' => $poster,
+                'banner_url' => $banner,
             ]);
 
             $movie->genres()->attach($genres->random(rand(1, 3))->pluck('id'));
@@ -127,8 +103,8 @@ class MovieSeeder extends Seeder
             'title' => 'Vua Hải Tặc',
             'original_title' => 'One Piece',
             'slug' => 'vua-hai-tac-one-piece',
-            'poster_url' => 'https://image.tmdb.org/t/p/w500/fcZNmtDkARkQx2t9fF83w229H5u.jpg',
-            'banner_url' => 'https://image.tmdb.org/t/p/w1280/R0sQoEEER1z9pW1gq8FepWcMIf.jpg',
+            'poster_url' => 'https://cellphones.com.vn/sforum/wp-content/uploads/2022/06/1-5.jpg',
+            'banner_url' => 'https://cellphones.com.vn/sforum/wp-content/uploads/2022/06/1-5.jpg',
             'trailer_url' => 'https://www.youtube.com/watch?v=MCf3RXeRe74',
             'summary' => 'Câu chuyện về Monkey D. Luffy trên hành trình tìm kho báu One Piece để trở thành Vua Hải Tặc.',
             'release_year' => 1999,

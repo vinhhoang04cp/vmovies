@@ -45,15 +45,6 @@ export default function UserManagement() {
         // eslint-disable-next-line
     }, [search, sortBy, sortDir]);
 
-    /**
-     * Effect: Xử lý chuyển trang qua phân trang.
-     */
-    useEffect(() => {
-        if (page > 1) {
-            fetchItems(page);
-        }
-        // eslint-disable-next-line
-    }, [page]);
 
     /**
      * handleBan: Thực hiện lệnh cấm tài khoản người dùng sau khi xác nhận.
@@ -216,7 +207,7 @@ export default function UserManagement() {
                                         lastPage={meta.last_page}
                                         total={meta.total}
                                         perPage={meta.per_page}
-                                        onPageChange={setPage}
+                                        onPageChange={fetchItems}
                                     />
                                 </div>
                             )}

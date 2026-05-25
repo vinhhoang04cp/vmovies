@@ -52,15 +52,6 @@ export default function GenreManagement() {
         // eslint-disable-next-line
     }, [search, sortBy, sortDir]);
 
-    /**
-     * Effect: Tải lại dữ liệu khi người dùng chuyển trang.
-     */
-    useEffect(() => {
-        if (page > 1) {
-            fetchItems(page);
-        }
-        // eslint-disable-next-line
-    }, [page]);
 
     /**
      * handleCreate: Chuẩn bị form cho việc thêm mới thể loại.
@@ -235,7 +226,7 @@ export default function GenreManagement() {
                                         lastPage={meta.last_page}
                                         total={meta.total}
                                         perPage={meta.per_page}
-                                        onPageChange={setPage}
+                                        onPageChange={fetchItems}
                                     />
                                 </div>
                             )}

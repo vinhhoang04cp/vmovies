@@ -75,13 +75,6 @@ export default function MovieManagement() {
         // eslint-disable-next-line
     }, [search, sortBy, sortDir]);
 
-    // Xử lý chuyển trang
-    useEffect(() => {
-        if (page > 1) {
-            fetchItems(page);
-        }
-        // eslint-disable-next-line
-    }, [page]);
 
     /**
      * Helper: Trích xuất mảng dữ liệu từ phản hồi của API
@@ -365,7 +358,7 @@ export default function MovieManagement() {
                                         lastPage={meta.last_page}
                                         total={meta.total}
                                         perPage={meta.per_page}
-                                        onPageChange={setPage}
+                                        onPageChange={fetchItems}
                                     />
                                 </div>
                             )}

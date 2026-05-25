@@ -69,6 +69,16 @@ class CommentService
     }
 
     /**
+     * Unapprove a comment (set is_approved back to false).
+     */
+    public function unapprove(Comment $comment): Comment
+    {
+        $comment->update(['is_approved' => false]);
+
+        return $comment->fresh(['user', 'movie', 'episode']);
+    }
+
+    /**
      * Soft-delete a comment (flag is_deleted = true).
      */
     public function delete(Comment $comment): void

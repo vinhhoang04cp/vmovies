@@ -168,7 +168,8 @@ Route::middleware(['auth:sanctum', 'permission:dashboard.access'])->prefix('admi
         Route::get('/', [AdminCommentController::class, 'index'])->middleware('permission:comment.read');
         Route::get('/pending', [AdminCommentController::class, 'pending'])->middleware('permission:comment.read');
         Route::get('/{comment}', [AdminCommentController::class, 'show'])->middleware('permission:comment.read');
-        Route::patch('/{comment}/approve', [AdminCommentController::class, 'approve'])->middleware('permission:comment.approve');
+        Route::patch('/{comment}/approve',   [AdminCommentController::class, 'approve'])->middleware('permission:comment.approve');
+        Route::patch('/{comment}/unapprove', [AdminCommentController::class, 'unapprove'])->middleware('permission:comment.approve');
         Route::delete('/{comment}', [AdminCommentController::class, 'destroy'])->middleware('permission:comment.delete');
     });
 

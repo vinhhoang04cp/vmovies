@@ -58,15 +58,6 @@ export default function DirectorManagement() {
         // eslint-disable-next-line
     }, [search, sortBy, sortDir]);
 
-    /**
-     * Effect: Xử lý việc tải dữ liệu khi người dùng chuyển trang thông qua Pagination.
-     */
-    useEffect(() => {
-        if (page > 1) {
-            fetchItems(page);
-        }
-        // eslint-disable-next-line
-    }, [page]);
 
     /**
      * handleCreate: Khởi tạo state cho việc tạo mới một đạo diễn.
@@ -259,7 +250,7 @@ export default function DirectorManagement() {
                                         lastPage={meta.last_page}
                                         total={meta.total}
                                         perPage={meta.per_page}
-                                        onPageChange={setPage}
+                                        onPageChange={fetchItems}
                                     />
                                 </div>
                             )}

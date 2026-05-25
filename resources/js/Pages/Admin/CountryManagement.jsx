@@ -53,15 +53,6 @@ export default function CountryManagement() {
         // eslint-disable-next-line
     }, [search, sortBy, sortDir]);
 
-    /**
-     * Effect: Tải dữ liệu trang mới khi số trang thay đổi.
-     */
-    useEffect(() => {
-        if (page > 1) {
-            fetchItems(page);
-        }
-        // eslint-disable-next-line
-    }, [page]);
 
     /**
      * handleCreate: Chuẩn bị form trắng để thêm mới quốc gia.
@@ -246,7 +237,7 @@ export default function CountryManagement() {
                                         lastPage={meta.last_page}
                                         total={meta.total}
                                         perPage={meta.per_page}
-                                        onPageChange={setPage}
+                                        onPageChange={fetchItems}
                                     />
                                 </div>
                             )}
